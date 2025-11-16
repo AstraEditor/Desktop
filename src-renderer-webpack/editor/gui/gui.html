@@ -50,7 +50,7 @@
     <script>
       (function() {
         var theme = '';
-        var accent = '#ff4c4c';
+        var accent = '#4c97ff';
 
         try {
           var themeSetting = localStorage.getItem('tw:theme');
@@ -68,7 +68,7 @@
               accent = '#855cd6';
             } else if (parsed.accent === 'blue') {
               accent = '#4c97ff';
-            }
+            } 
             if (parsed.gui === 'dark' || parsed.gui === 'light') {
               theme = parsed.gui;
             }
