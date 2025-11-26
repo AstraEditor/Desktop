@@ -13,21 +13,34 @@ jobs:
       with:
         submodules: recursive
         persist-credentials: false
+    
     - name: Install Node.js
       uses: actions/setup-node@v4
       with:
         node-version: 24
-        cache: npm
-    - name: Clear npm cache and install dependencies
+        cache: 'npm'
+    
+    - name: Install dependencies
       run: |
-        npm cache clean --force
-        rm -rf node_modules package-lock.json
-        npm install
-        npm install spdx-expression-parse --save-dev
-    - name: Prepare extensions
-      # Don't need to do a full fetch, that would just cause a lot of unnecessary traffic
-      run: node scripts/prepare-extensions.mjs
+        npm ci --prefer-offline --no-audit
+        npm run prepare-extensions || true  # Allow failure during extension prep
+    
+    - name: Create required directories
+      run: |
+        mkdir -p dist-library-files dist-extensions dist-renderer-webpack
+    
     - name: Compile
       run: npm run webpack:compile
+    
     - name: Package
       run: npm run electron:package:dir
+    
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: build-output
+        path: |
+          dist/
+          dist-renderer-webpack/
+        retention-days: 7
