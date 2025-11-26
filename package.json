@@ -47,7 +47,7 @@
     "postcss-import": "^14.0.0",
     "postcss-loader": "^4.2.0",
     "postcss-simple-vars": "^6.0.3",
-    "scratch-gui": "file:./scratch-gui",
+    "scratch-gui": "file:../scratch-gui",
     "spdx-expression-parse": "^3.0.1",
     "spdx-correct": "^3.2.0",
     "style-loader": "^0.23.0",
