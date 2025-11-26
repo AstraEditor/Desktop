@@ -47,9 +47,9 @@ const FILE_SCHEMES = {
     embeddable: true, // migration helper
   },
   'tw-library': {
-    root: path.resolve(__dirname, '../dist-library-files'),
+    root: path.resolve(__dirname, '../dist-extensions'),
     supportFetch: true,
-    brotli: true,
+    brotli: false,
     csp: "default-src 'none';"
   },
   'tw-extensions': {
@@ -216,7 +216,9 @@ const createModernProtocolHandler = (metadata) => {
         parsedURL = new URL(metadata.directoryIndex, parsedURL);
       }
 
-      let resolved = path.join(root, parsedURL.pathname);
+      // Decode URL-encoded pathname to handle SVG data URIs and other encoded paths
+      const decodedPathname = decodeURIComponent(parsedURL.pathname);
+      let resolved = path.join(root, decodedPathname);
       if (!resolved.startsWith(root)) {
         return createErrorResponse(new Error('Path traversal blocked'));
       }
@@ -238,14 +240,33 @@ const createModernProtocolHandler = (metadata) => {
       };
 
       if (metadata.brotli) {
-        // Reading it all into memory is not ideal, but we've had so many problems with streaming
-        // files from the asar that I can settle with this.
-        const brotliResponse = await net.fetch(nodeURL.pathToFileURL(`${resolved}.br`));
-        const brotliData = await brotliResponse.arrayBuffer();
-        const decompressed = await brotliDecompress(brotliData);
-        return new Response(decompressed, {
-          headers
-        });
+        try {
+          // Reading it all into memory is not ideal, but we've had so many problems with streaming
+          // files from the asar that I can settle with this.
+          const brotliResponse = await net.fetch(nodeURL.pathToFileURL(`${resolved}.br`));
+          const brotliData = await brotliResponse.arrayBuffer();
+          const decompressed = await brotliDecompress(brotliData);
+          return new Response(decompressed, {
+            headers
+          });
+        } catch (brotliError) {
+          // If brotli file doesn't exist, try to fetch from network
+          if (request.url.startsWith('tw-extensions://')) {
+            const networkUrl = request.url.replace('tw-extensions://', 'https://extensions.turbowarp.org/');
+            try {
+              const networkResponse = await net.fetch(networkUrl);
+              if (networkResponse.ok) {
+                const networkData = await networkResponse.arrayBuffer();
+                return new Response(networkData, {
+                  headers
+                });
+              }
+            } catch (networkError) {
+              // Network fallback failed, continue to error
+            }
+          }
+          throw brotliError;
+        }
       }
 
       const response = await net.fetch(nodeURL.pathToFileURL(resolved));
@@ -288,7 +309,9 @@ const createLegacyBrotliProtocolHandler = (metadata) => {
         parsedURL = new URL(metadata.directoryIndex, parsedURL);
       }
 
-      let resolved = path.join(root, parsedURL.pathname);
+      // Decode URL-encoded pathname to handle SVG data URIs and other encoded paths
+      const decodedPathname = decodeURIComponent(parsedURL.pathname);
+      let resolved = path.join(root, decodedPathname);
       if (!resolved.startsWith(root)) {
         returnErrorPage(new Error('Path traversal blocked'));
         return;
@@ -354,7 +377,9 @@ const createLegacyFileProtocolHandler = (metadata) => {
         parsedURL = new URL(metadata.directoryIndex, parsedURL);
       }
 
-      let resolved = path.join(root, parsedURL.pathname);
+      // Decode URL-encoded pathname to handle SVG data URIs and other encoded paths
+      const decodedPathname = decodeURIComponent(parsedURL.pathname);
+      let resolved = path.join(root, decodedPathname);
       if (!resolved.startsWith(root)) {
         returnErrorResponse(new Error('Path traversal blocked'), 'path-traversal');
         return;

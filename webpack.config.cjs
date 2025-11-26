@@ -1,5 +1,5 @@
 const path = require('path');
-const {DefinePlugin} = require('webpack');
+const { DefinePlugin } = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const base = {
@@ -15,20 +15,32 @@ const base = {
                     presets: ['@babel/preset-env', '@babel/preset-react']
                 }
             },
+
+            // SVG loader - Use file-loader for all SVGs to ensure proper URL generation
             {
-                test: /\.(svg|png|wav|gif|jpg|mp3|woff2|hex)$/,
+                test: /\.svg$/,
                 loader: 'file-loader',
                 options: {
                     outputPath: 'static/assets/',
                     esModule: false
                 }
             },
+
+            // 原来的资源 loader
+            {
+                test: /\.(png|jpg|gif|mp3|wav|woff2|hex)$/,
+                loader: 'file-loader',
+                options: {
+                    outputPath: 'static/assets/',
+                    esModule: false
+                }
+            },
+
+            // CSS（保持你的即可）
             {
                 test: /\.css$/,
                 use: [
-                    {
-                        loader: 'style-loader'
-                    },
+                    { loader: 'style-loader' },
                     {
                         loader: 'css-loader',
                         options: {
@@ -54,6 +66,7 @@ const base = {
             }
         ]
     }
+
 }
 
 module.exports = [
@@ -91,10 +104,17 @@ module.exports = [
             })
         ],
         resolve: {
+            modules: [
+                'node_modules',
+                path.resolve(__dirname, 'node_modules')
+            ],
             alias: {
-                'scratch-gui$': path.resolve(__dirname, 'node_modules/scratch-gui/src/index.js'),
-                'scratch-render-fonts$': path.resolve(__dirname, 'node_modules/scratch-gui/src/lib/tw-scratch-render-fonts'),
-            }
+                'scratch-gui/src': path.resolve(__dirname, 'node_modules/scratch-gui/src'),
+                'scratch-gui': path.resolve(__dirname, 'node_modules/scratch-gui/src'),
+                'react': path.resolve(__dirname, 'node_modules/react'),
+                'react-dom': path.resolve(__dirname, 'node_modules/react-dom')
+            },
+            extensions: ['.js', '.jsx']
         }
     },
 

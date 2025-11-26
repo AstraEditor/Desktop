@@ -683,6 +683,24 @@ const manifest = {
       "notchSize": 0
     }
   }, {
+    "name": "圆角矩形",
+    "id": "圆角矩形积木",
+    "description": "圆角矩形积木",
+    "values": {
+      "paddingSize": 100,
+      "cornerSize": 300,
+      "notchSize": 0
+    }
+  }, {
+    "name": "02Engine",
+    "id": "02Engine样式积木",
+    "description": "02Engine样式积木",
+    "values": {
+      "paddingSize": 70,
+      "cornerSize": 300,
+      "notchSize": 0
+    }
+  }, {
     "name": "3.0 Blocks",
     "id": "default3",
     "description": "The regular appearance of Scratch 3.0 blocks",

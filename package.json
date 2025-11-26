@@ -1,10 +1,10 @@
 {
-  "name": "turbowarp-desktop",
+  "name": "astraeditor-desktop",
   "description": "Scratch mod with a compiler, dark mode, a bunch of addons, and more.",
-  "version": "1.15.0",
+  "version": "1.0.0",
   "license": "GPL-3.0",
   "author": {
-    "email": "contact@turbowarp.org",
+    "email": "contact@astra-editor.org",
     "name": "Thomas Weber"
   },
   "type": "commonjs",
@@ -14,17 +14,24 @@
     "webpack:watch": "webpack --watch",
     "webpack:prod": "cross-env NODE_ENV=production webpack",
     "electron:start": "electron src-main/entrypoint.js",
-    "electron:package:dir": "electron-builder --dir"
+    "electron:package:dir": "electron-builder --dir",
+    "electron:package": "electron-builder",
+    "electron:package:win": "electron-builder --win",
+    "electron:package:mac": "electron-builder --mac",
+    "electron:package:linux": "electron-builder --linux"
   },
   "dependencies": {
+    "react": "^16.14.0",
+    "react-dom": "^16.14.0",
+    "react-redux": "5.0.7",
     "semver": "^7.7.3"
   },
   "devDependencies": {
+    "@astra-editor/extensions": "github:AstraEditor/extensions#master",
     "@babel/core": "^7.28.4",
     "@babel/preset-env": "^7.12.16",
     "@babel/preset-react": "^7.13.13",
     "@electron/fuses": "^2.0.0",
-    "@turbowarp/extensions": "github:TurboWarp/extensions#master",
     "adm-zip": "^0.5.16",
     "autoprefixer": "^9.8.8",
     "babel-loader": "^8.4.1",
@@ -33,13 +40,16 @@
     "css-loader": "^1.0.1",
     "electron": "^39.0.0",
     "electron-builder": "^26.1.0",
+    "exports-loader": "^1.1.1",
     "file-loader": "^6.2.0",
+    "imports-loader": "^1.2.0",
     "postcss": "^8.4.13",
     "postcss-import": "^14.0.0",
     "postcss-loader": "^4.2.0",
     "postcss-simple-vars": "^6.0.3",
-    "scratch-gui": "github:TurboWarp/scratch-gui#develop",
+    "scratch-gui": "file:../scratch-gui",
     "style-loader": "^0.23.0",
+    "svg-inline-loader": "^0.8.2",
     "url-loader": "^4.1.1",
     "webpack": "4.47.0",
     "webpack-cli": "^4.10.0"
@@ -49,19 +59,19 @@
       "terser-webpack-plugin": "^4.2.3"
     }
   },
-  "homepage": "https://desktop.turbowarp.org/",
+  "homepage": "nothing",
   "repository": {
     "type": "git",
-    "url": "https://github.com/TurboWarp/desktop.git"
+    "url": "https://github.com/AstraEditor/desktop.git"
   },
   "bugs": {
-    "url": "https://github.com/TurboWarp/desktop/issues",
-    "email": "contact@turbowarp.org"
+    "url": "https://github.com/AstraEditor/desktop/issues",
+    "email": "contact@astra-editor.org"
   },
   "main": "./src-main/entrypoint.js",
   "build": {
-    "appId": "org.turbowarp.desktop",
-    "productName": "TurboWarp",
+    "appId": "org.astra-editor.desktop",
+    "productName": "astra-editor",
     "files": [
       "node_modules/**/*",
       "src-main/**/*",
@@ -74,13 +84,19 @@
     "extraResources": [
       {
         "from": "art/icon.png",
-        "to": "icon.png"
+        "to": "tools"
       },
       {
         "from": "art/icon.svg",
-        "to": "icon.svg"
+        "to": "tools"
       }
     ],
+    "nsis": {
+      "artifactName": "${productName}-Setup-${version}-${arch}.${ext}",
+      "oneClick": false,
+      "deleteAppDataOnUninstall": false,
+      "allowToChangeInstallationDirectory": true
+    },
     "win": {
       "artifactName": "${productName} Portable ${version} ${arch}.${ext}",
       "icon": "build/icon.ico",
@@ -97,9 +113,9 @@
     },
     "appx": {
       "artifactName": "${productName}-MS-Store-${version}-${arch}.${ext}",
-      "applicationId": "TurboWarp",
-      "displayName": "TurboWarp",
-      "identityName": "45747ThomasWeber.TurboWarpDesktop",
+      "applicationId": "astra-editor",
+      "displayName": "astra-editor",
+      "identityName": "45747ThomasWeber.astra-editorDesktop",
       "publisher": "CN=18FA7D4F-01BF-49F2-BF56-782DCEA49C69",
       "publisherDisplayName": "Thomas Weber",
       "backgroundColor": "#4c97ff",
@@ -151,15 +167,15 @@
       "provisioningProfile": "build/development.provisionprofile"
     },
     "linux": {
-      "executableName": "turbowarp-desktop",
+      "executableName": "astra-editor-desktop",
       "artifactName": "${productName}-${os}-${arch}-${version}.${ext}",
       "icon": "./build/",
       "synopsis": "Mod of Scratch with a compiler and more features.",
-      "description": "TurboWarp is a Scratch mod with a compiler to run projects faster, dark mode for your eyes, a bunch of addons to improve the editor, and more.",
+      "description": "astra-editor is a Scratch mod with a compiler to run projects faster, dark mode for your eyes, a bunch of addons to improve the editor, and more.",
       "category": "Development",
       "desktop": {
         "entry": {
-          "StartupWMClass": "turbowarp-desktop",
+          "StartupWMClass": "astra-editor-desktop",
           "Keywords": "scratch;"
         }
       },

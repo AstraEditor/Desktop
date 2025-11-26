@@ -3,16 +3,16 @@ const path = require('path');
 const nodeURL = require('url');
 const zlib = require('zlib');
 const nodeCrypto = require('crypto');
-const {app, dialog} = require('electron');
+const { app, dialog } = require('electron');
 const ProjectRunningWindow = require('./project-running-window');
 const AddonsWindow = require('./addons');
 const DesktopSettingsWindow = require('./desktop-settings');
 const PrivacyWindow = require('./privacy');
 const AboutWindow = require('./about');
 const PackagerWindow = require('./packager');
-const {createAtomicWriteStream} = require('../atomic-write-stream');
-const {translate, updateLocale, getStrings} = require('../l10n');
-const {APP_NAME} = require('../brand');
+const { createAtomicWriteStream } = require('../atomic-write-stream');
+const { translate, updateLocale, getStrings } = require('../l10n');
+const { APP_NAME } = require('../brand');
 const prompts = require('../prompts');
 const settings = require('../settings');
 const privilegedFetch = require('../fetch');
@@ -26,7 +26,7 @@ const TYPE_SCRATCH = 'scratch';
 const TYPE_SAMPLE = 'sample';
 
 class OpenedFile {
-  constructor (type, path) {
+  constructor(type, path) {
     /** @type {TYPE_FILE|TYPE_URL|TYPE_SCRATCH|TYPE_SAMPLE} */
     this.type = type;
 
@@ -37,7 +37,7 @@ class OpenedFile {
     this.path = path;
   }
 
-  async read () {
+  async read() {
     if (this.type === TYPE_FILE) {
       return {
         name: path.basename(this.path),
@@ -118,7 +118,7 @@ const parseOpenedFile = (file, workingDirectory) => {
 
       // Need to manually redirect extension samples to the copies we already have offline as the
       // fetching code will not go through web request handlers or custom protocols.
-      const sampleMatch = file.match(/^https?:\/\/extensions\.turbowarp\.org\/samples\/(.+\.sb3)$/);
+      const sampleMatch = file.match(/^https?:\/\/extensions\.astraeditor\.org\/samples\/(.+\.sb3)$/);
       if (sampleMatch) {
         return new OpenedFile(TYPE_SAMPLE, decodeURIComponent(sampleMatch[1]));
       }
@@ -171,14 +171,14 @@ const getUnsafePaths = () => {
       app: APP_NAME,
     },
 
-    // TurboWarp Desktop defaults
+    // astraeditor Desktop defaults
     {
-      path: path.join(appData, 'turbowarp-desktop'),
-      app: 'TurboWarp Desktop'
+      path: path.join(appData, 'astraeditor-desktop'),
+      app: 'astraeditor Desktop'
     },
     {
-      path: path.join(localPrograms, 'TurboWarp'),
-      app: 'TurboWarp Desktop'
+      path: path.join(localPrograms, 'astraeditor'),
+      app: 'astraeditor Desktop'
     },
 
     // Scratch Desktop defaults
@@ -216,7 +216,7 @@ class EditorWindow extends ProjectRunningWindow {
    * @param {OpenedFile|null} initialFile
    * @param {boolean} isInitiallyFullscreen
    */
-  constructor (initialFile, isInitiallyFullscreen) {
+  constructor(initialFile, isInitiallyFullscreen) {
     super();
 
     /**
@@ -251,7 +251,7 @@ class EditorWindow extends ProjectRunningWindow {
     let processingWillPreventUnload = false;
     this.window.webContents.on('will-prevent-unload', () => {
       // Using showMessageBoxSync synchronously in the event handler causes broken focus on Windows.
-      // See https://github.com/TurboWarp/desktop/issues/1245
+      // See https://github.com/astraeditor/desktop/issues/1245
       // To work around that, we won't cancel that will-prevent-unload event so the window stays
       // open. After a very short delay to let focus get fixed, we'll show a dialog and force close
       // the window ourselves if the user wants.
@@ -312,7 +312,7 @@ class EditorWindow extends ProjectRunningWindow {
 
     this.ipc.handle('get-file', async (event, id) => {
       const file = getFileById(id);
-      const {name, data} = await file.read();
+      const { name, data } = await file.read();
       return {
         name,
         type: file.type,
@@ -411,7 +411,7 @@ class EditorWindow extends ProjectRunningWindow {
             .replace('{APP_NAME}', unsafePath.app)
             .replace('{file}', filePath),
           noLink: true
-        });  
+        });
         return null;
       }
 
@@ -572,26 +572,26 @@ class EditorWindow extends ProjectRunningWindow {
     this.show();
   }
 
-  getPreload () {
+  getPreload() {
     return 'editor';
   }
 
-  getDimensions () {
+  getDimensions() {
     return {
       width: 1280,
       height: 800
     };
   }
 
-  getBackgroundColor () {
+  getBackgroundColor() {
     return '#333333';
   }
 
-  applySettings () {
+  applySettings() {
     this.window.webContents.setBackgroundThrottling(settings.backgroundThrottling);
   }
 
-  enumerateMediaDevices () {
+  enumerateMediaDevices() {
     // Used by desktop settings
     return new Promise((resolve, reject) => {
       this.ipc.once('enumerated-media-devices', (event, result) => {
@@ -605,7 +605,7 @@ class EditorWindow extends ProjectRunningWindow {
     });
   }
 
-  handleWindowOpen (details) {
+  handleWindowOpen(details) {
     const url = new URL(details.url);
     const params = new URLSearchParams(url.search);
 
@@ -627,7 +627,7 @@ class EditorWindow extends ProjectRunningWindow {
 
     // Open extension documentation in-app
     const extensionsDocsMatch = details.url.match(
-      /^https:\/\/extensions\.turbowarp\.org\/([\w_\-.\/]+)$/
+      /^https:\/\/extensions\.astraeditor\.org\/([\w_\-.\/]+)$/
     );
     if (extensionsDocsMatch) {
       ExtensionDocumentationWindow.open(extensionsDocsMatch[1]);
@@ -639,11 +639,11 @@ class EditorWindow extends ProjectRunningWindow {
     return super.handleWindowOpen(details);
   }
 
-  canExitFullscreenByPressingEscape () {
+  canExitFullscreenByPressingEscape() {
     return !this.isInEditorFullScreen;
   }
 
-  updateRichPresence () {
+  updateRichPresence() {
     RichPresence.setActivity(this.projectTitle, this.openedProjectAt);
   }
 
@@ -652,7 +652,7 @@ class EditorWindow extends ProjectRunningWindow {
    * @param {boolean} fullscreen
    * @param {string|null} workingDirectory
    */
-  static openFiles (files, fullscreen, workingDirectory) {
+  static openFiles(files, fullscreen, workingDirectory) {
     if (files.length === 0) {
       EditorWindow.newWindow(fullscreen);
     } else {
@@ -666,7 +666,7 @@ class EditorWindow extends ProjectRunningWindow {
    * Open a new window with the default project.
    * @param {boolean} fullscreen
    */
-  static newWindow (fullscreen) {
+  static newWindow(fullscreen) {
     new EditorWindow(null, fullscreen);
   }
 }

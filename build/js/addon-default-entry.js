@@ -88,7 +88,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 exports.i(__webpack_require__(/*! -!../../../../node_modules/css-loader!../editor-theme3/compatibility.css */ "./node_modules/css-loader/index.js!./src/addons/addons/editor-theme3/compatibility.css"), "");
 
 // module
-exports.push([module.i, ".sa-find-bar {\n  display: flex;\n  align-items: center;\n  white-space: nowrap;\n  font-family: \"Helvetica Neue\", Helvetica, Arial, sans-serif;\n  width: 100%;\n  height: 100%;\n  margin-left: 1em;\n}\n.sa-find-bar[hidden] {\n  /* !important to override displayNoneWhileDisabled */\n  display: none !important;\n}\n\n.sa-find-wrapper {\n  overflow: visible;\n  position: relative;\n  height: 2rem;\n  width: 100%;\n  max-width: 16em;\n}\n\n.sa-find-dropdown-out {\n  display: block;\n  top: -6px;\n  z-index: 100;\n  width: 100%;\n  max-width: 16em;\n  position: relative;\n  padding: 4px;\n  border: none;\n  border-radius: 4px;\n  margin-top: 6px;\n}\n\n.sa-find-dropdown-out.visible {\n  position: absolute;\n  width: 16em;\n  box-shadow: 0px 0px 8px 1px rgba(0, 0, 0, 0.3);\n  background-color: var(--ui-modal-background);\n  outline: 1px solid var(--ui-black-transparent);\n}\n\n/* We need to modify Scratch styles so that the place where the find bar is injected */\n/* has actually correct size information, which is used to make the find bar not cover up controls */\n[class*=\"gui_tab-list_\"] {\n  width: 100%;\n}\n[class*=\"gui_tab_\"] {\n  flex-grow: 0;\n}\n\n.sa-find-input {\n  width: 100%;\n  box-sizing: border-box !important;\n  /* !important required for extension, because CSS injection method (and hence order) differs from addon */\n  height: 1.5rem;\n\n  /* Change Scratch default styles */\n  border-radius: 0.25rem;\n  font-size: 0.75rem;\n  padding-left: 0.4em;\n}\n\n.sa-find-input:focus {\n  /* Change Scratch default styles */\n  box-shadow: none;\n}\n\n.sa-find-dropdown {\n  display: none;\n  position: relative;\n  padding: 0.2em 0;\n  font-size: 0.75rem;\n  line-height: 1;\n  overflow-y: auto;\n  min-height: 128px;\n  max-height: 65vh;\n  user-select: none;\n  max-width: 100%;\n  margin-top: 6px;\n  border: none;\n}\n\n.sa-find-dropdown-out.visible > .sa-find-dropdown {\n  display: block;\n}\n\n.sa-find-dropdown > li {\n  display: block;\n  padding: 0.5em 0.3em;\n  white-space: nowrap;\n  margin: 0;\n  font-weight: bold;\n  text-overflow: ellipsis;\n  overflow: hidden;\n}\n\n.sa-find-dropdown > li > b {\n  background-color: #aaffaa;\n  color: black;\n}\n\n/* Drop down items */\n.sa-find-dropdown > li:hover,\n.sa-find-dropdown > li.sel {\n  color: var(--sa-block-text-on-bright-background);\n  cursor: pointer;\n}\n\n.sa-find-dropdown > li::before {\n  content: \"\\25CF   \"; /* ● */\n}\n\n.sa-find-flag {\n  color: #4cbf56;\n}\n/* .sa-find-dropdown added for specificity */\n.sa-find-dropdown > .sa-find-flag:hover,\n.sa-find-dropdown > .sa-find-flag.sel {\n  background-color: #4cbf56;\n  color: white;\n}\n\n.sa-find-dropdown .sa-block-color {\n  color: var(--sa-block-colored-text);\n}\n.sa-find-dropdown .sa-block-color:hover,\n.sa-find-dropdown .sa-block-color.sel {\n  background-color: var(--sa-block-bright-background);\n}\n\n.sa-find-carousel {\n  font-weight: normal;\n  position: absolute;\n  right: 0;\n  white-space: nowrap;\n  background-color: inherit;\n  z-index: 1;\n  padding: 0;\n}\n\n.sa-find-carousel-control {\n  padding: 0 6px;\n}\n\n.sa-find-carousel-control:hover {\n  color: #ffff80;\n}\n", ""]);
+exports.push([module.i, ".sa-find-bar {\n  display: flex;\n  align-items: center;\n  white-space: nowrap;\n  font-family: \"Helvetica Neue\", Helvetica, Arial, sans-serif;\n  width: 100%;\n  height: 100%;\n  margin-left: 1em;\n}\n.sa-find-bar[hidden] {\n  /* !important to override displayNoneWhileDisabled */\n  display: none !important;\n}\n\n.sa-find-wrapper {\n  overflow: visible;\n  position: relative;\n  height: 2rem;\n  width: 100%;\n  max-width: 16em;\n}\n\n.sa-find-dropdown-out {\n  display: block;\n  top: -6px;\n  z-index: 100;\n  width: 100%;\n  max-width: 16em;\n  position: relative;\n  padding: 4px;\n  border: none;\n  border-radius: 4px;\n  margin-top: 6px;\n}\n\n.sa-find-dropdown-out.visible {\n  position: absolute;\n  width: 16em;\n  box-shadow: 0px 0px 8px 1px rgba(0, 0, 0, 0.3);\n  background-color: var(--ui-modal-background);\n  outline: 1px solid var(--ui-black-transparent);\n}\n\n/* We need to modify Scratch styles so that the place where the find bar is injected */\n/* has actually correct size information, which is used to make the find bar not cover up controls */\n[class*=\"gui_tab-list_\"] {\n  width: 100%;\n}\n[class*=\"gui_tab_\"] {\n  flex-grow: 0;\n}\n\n.sa-find-input {\n  width: 100%;\n  box-sizing: border-box !important;\n  /* !important required for extension, because CSS injection method (and hence order) differs from addon */\n  height: 1.5rem;\n\n  /* Change Scratch default styles */\n  border-radius: 0.25rem;\n  font-size: 0.75rem;\n  padding-left: 0.4em;\n}\n\n.sa-find-input:focus {\n  /* Change Scratch default styles */\n  box-shadow: none;\n}\n\n.sa-find-dropdown {\n  display: none;\n  position: relative;\n  padding: 0.2em 0;\n  font-size: 0.75rem;\n  line-height: 1;\n  overflow-y: auto;\n  min-height: 128px;\n  max-height: 65vh;\n  user-select: none;\n  max-width: 100%;\n  margin-top: 6px;\n  border: none;\n}\n\n.sa-find-dropdown-out.visible > .sa-find-dropdown {\n  display: block;\n}\n\n.sa-find-dropdown > li {\n  display: block;\n  padding: 0.5em 0.3em;\n  white-space: nowrap;\n  margin: 0;\n  font-weight: bold;\n  text-overflow: ellipsis;\n  overflow: hidden;\n  background-color: transparent !important; /* 强制移除背景颜色 */\n}\n\n.sa-find-dropdown > li > b {\n  background-color: #aaffaa;\n  color: black;\n}\n\n/* Drop down items */\n.sa-find-dropdown > li:hover,\n.sa-find-dropdown > li.sel {\n  color: var(--sa-block-text-on-bright-background);\n  cursor: pointer;\n  background-color: transparent !important; /* 强制移除悬停和选中时的背景颜色 */\n  filter: brightness(0.9); /* 使用亮度变化 */\n}\n\n.sa-find-dropdown > li::before {\n  content: \"\\25CF   \"; /* ● */\n}\n\n.sa-find-flag {\n  color: #4cbf56;\n}\n/* .sa-find-dropdown added for specificity */\n.sa-find-dropdown > .sa-find-flag:hover,\n.sa-find-dropdown > .sa-find-flag.sel {\n  background-color: #4cbf56;\n  color: white;\n}\n\n.sa-find-dropdown .sa-block-color {\n  color: var(--sa-block-colored-text);\n  background-color: transparent; /* 确保没有背景颜色 */\n}\n.sa-find-dropdown .sa-block-color:hover,\n.sa-find-dropdown .sa-block-color.sel {\n  background-color: transparent; /* 悬停和选中时也没有背景颜色 */\n  filter: brightness(0.9); /* 使用亮度变化代替背景色 */\n}\n\n.sa-find-carousel {\n  font-weight: normal;\n  position: absolute;\n  right: 0;\n  white-space: nowrap;\n  background-color: inherit;\n  z-index: 1;\n  padding: 0;\n}\n\n.sa-find-carousel-control {\n  padding: 0 6px;\n}\n\n.sa-find-carousel-control:hover {\n  color: #ffff80;\n}\n", ""]);
 
 // exports
 
@@ -2974,7 +2974,7 @@ const resources = {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return BlockItem; });
 class BlockItem {
-  constructor(cls, procCode, labelID, y) {
+  constructor(cls, procCode, labelID, y, colour) {
     this.cls = cls;
     this.procCode = procCode;
     this.labelID = labelID;
@@ -2986,6 +2986,7 @@ class BlockItem {
      */
     this.clones = null;
     this.eventName = null;
+    this.colour_ = colour; // 积木颜色
   }
 
   /**
@@ -3057,7 +3058,9 @@ __webpack_require__.r(__webpack_exports__);
       this.findWrapper.className = "sa-find-wrapper";
       this.dropdownOut = this.findWrapper.appendChild(document.createElement("label"));
       this.dropdownOut.className = "sa-find-dropdown-out";
+      this.dropdownOut.style.borderRadius = "16px";
       this.findInput = this.dropdownOut.appendChild(document.createElement("input"));
+      this.findInput.style.borderRadius = "20px";
       this.findInput.className = addon.tab.scratchClass("input_input-form", {
         others: "sa-find-input"
       });
@@ -3103,20 +3106,29 @@ __webpack_require__.r(__webpack_exports__);
         let i = li.data.lower.indexOf(val);
         if (i >= 0) {
           li.style.display = "block";
-          while (li.firstChild) {
-            li.removeChild(li.firstChild);
-          }
-          if (i > 0) {
-            li.appendChild(document.createTextNode(procCode.substring(0, i)));
-          }
-          let bText = document.createElement("b");
-          bText.appendChild(document.createTextNode(procCode.substr(i, val.length)));
-          li.appendChild(bText);
-          if (i + val.length < procCode.length) {
-            li.appendChild(document.createTextNode(procCode.substr(i + val.length)));
+          li.style.borderRadius = "16px";
+
+          // 只在有搜索词时才高亮
+          if (val.length > 0) {
+            while (li.firstChild) {
+              li.removeChild(li.firstChild);
+            }
+            if (i > 0) {
+              li.appendChild(document.createTextNode(procCode.substring(0, i)));
+            }
+            let bText = document.createElement("b");
+            bText.appendChild(document.createTextNode(procCode.substr(i, val.length)));
+            li.appendChild(bText);
+            if (i + val.length < procCode.length) {
+              li.appendChild(document.createTextNode(procCode.substr(i + val.length)));
+            }
+          } else {
+            // 没有搜索词时，只显示文本，不高亮
+            li.innerText = procCode;
           }
         } else {
           li.style.display = "none";
+          li.style.borderRadius = "16px";
         }
       }
     }
@@ -3186,7 +3198,8 @@ __webpack_require__.r(__webpack_exports__);
       this.prevValue = focusID ? "" : null; // Clear the previous value of the input search
 
       this.dropdownOut.classList.add("visible");
-      let scratchBlocks = this.selectedTab === 0 ? this.getScratchBlocks() : this.selectedTab === 1 ? this.getScratchCostumes() : this.selectedTab === 2 ? this.getScratchSounds() : [];
+      let scratchBlocks = this.selectedTab === 0 ? this.getAllScratchBlocks() : []; // 只在代码标签页显示积木，不在造型和声音标签页显示
+
       this.dropdown.empty();
       for (const proc of scratchBlocks) {
         let item = this.dropdown.addItem(proc);
@@ -3207,10 +3220,154 @@ __webpack_require__.r(__webpack_exports__);
     get selectedTab() {
       return addon.tab.redux.state.scratchGui.editorTab.activeTabIndex;
     }
-    getScratchBlocks() {
+
+    // 新增：提取积木颜色的方法
+    extractBlockColour(block) {
+      try {
+        // 尝试多种方式获取积木颜色
+
+        // 1. 尝试直接获取 colour_ 属性（标准积木）
+        if (block.colour_ !== undefined && block.colour_ !== null) {
+          return this.normalizeColour(block.colour_);
+        }
+
+        // 2. 尝试从 style 对象获取（扩展积木）
+        if (block.style && block.style.colourPrimary !== undefined) {
+          return this.normalizeColour(block.style.colourPrimary);
+        }
+
+        // 3. 尝试从 colour_ 的字符串值获取
+        if (typeof block.colour_ === 'string' && block.colour_) {
+          return this.normalizeColour(block.colour_);
+        }
+
+        // 4. 对于扩展积木，尝试其他可能的属性
+        if (block.getColour) {
+          const colour = block.getColour();
+          if (colour) {
+            return this.normalizeColour(colour);
+          }
+        }
+
+        // 5. 尝试从 block.colour 获取（某些版本使用这个）
+        if (block.colour !== undefined && block.colour !== null) {
+          return this.normalizeColour(block.colour);
+        }
+        return null;
+      } catch (error) {
+        console.error('提取积木颜色时出错:', error);
+        return null;
+      }
+    }
+
+    // 新增：颜色标准化方法
+    normalizeColour(colour) {
+      if (!colour) return null;
+
+      // 如果是数字，转换为十六进制
+      if (typeof colour === 'number') {
+        return '#' + colour.toString(16).padStart(6, '0');
+      }
+
+      // 如果是字符串，确保是十六进制格式
+      if (typeof colour === 'string') {
+        // 如果已经是十六进制格式
+        if (colour.startsWith('#')) {
+          return colour;
+        }
+
+        // 如果是 RGB 格式 (rgb(r, g, b))
+        if (colour.startsWith('rgb(')) {
+          const rgb = colour.match(/\d+/g);
+          if (rgb && rgb.length >= 3) {
+            const r = parseInt(rgb[0]);
+            const g = parseInt(rgb[1]);
+            const b = parseInt(rgb[2]);
+            return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+          }
+        }
+
+        // 如果是 HSL 格式 (hsl(h, s%, l%))
+        if (colour.startsWith('hsl(')) {
+          const hsl = colour.match(/\d+/g);
+          if (hsl && hsl.length >= 3) {
+            const h = parseInt(hsl[0]) / 360;
+            const s = parseInt(hsl[1]) / 100;
+            const l = parseInt(hsl[2]) / 100;
+
+            // HSL 转 RGB
+            let r, g, b;
+            if (s === 0) {
+              r = g = b = l;
+            } else {
+              const hue2rgb = (p, q, t) => {
+                if (t < 0) t += 1;
+                if (t > 1) t -= 1;
+                if (t < 1 / 6) return p + (q - p) * 6 * t;
+                if (t < 1 / 2) return q;
+                if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+                return p;
+              };
+              const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+              const p = 2 * l - q;
+              r = hue2rgb(p, q, h + 1 / 3);
+              g = hue2rgb(p, q, h);
+              b = hue2rgb(p, q, h - 1 / 3);
+            }
+            return '#' + ((1 << 24) + (Math.round(r * 255) << 16) + (Math.round(g * 255) << 8) + Math.round(b * 255)).toString(16).slice(1);
+          }
+        }
+
+        // 如果是颜色名称，转换为十六进制
+        const colourNames = {
+          'red': '#FF0000',
+          'blue': '#0000FF',
+          'green': '#00FF00',
+          'yellow': '#FFFF00',
+          'orange': '#FFA500',
+          'purple': '#800080',
+          'pink': '#FFC0CB'
+        };
+        if (colourNames[colour.toLowerCase()]) {
+          return colourNames[colour.toLowerCase()];
+        }
+
+        // 尝试解析为数字
+        const num = parseInt(colour);
+        if (!isNaN(num)) {
+          return '#' + num.toString(16).padStart(6, '0');
+        }
+      }
+      return null;
+    }
+
+    // 新增：从样式中提取颜色
+    getColourFromStyle(style) {
+      try {
+        if (!style) return null;
+
+        // 样式可能包含颜色信息
+        if (style.colourPrimary) {
+          return this.normalizeColour(style.colourPrimary);
+        }
+        if (style.colourSecondary) {
+          return this.normalizeColour(style.colourSecondary);
+        }
+        if (style.colourTertiary) {
+          return this.normalizeColour(style.colourTertiary);
+        }
+        return null;
+      } catch (error) {
+        console.error('从样式中提取颜色时出错:', error);
+        return null;
+      }
+    }
+
+    // 修改：获取所有积木的方法
+    getAllScratchBlocks() {
       let myBlocks = [];
       let myBlocksByProcCode = {};
-      let topBlocks = this.workspace.getTopBlocks();
+      let allBlocks = this.workspace.getAllBlocks(); // 获取所有积木，包括嵌套的
 
       /**
        * @param cls
@@ -3218,72 +3375,124 @@ __webpack_require__.r(__webpack_exports__);
        * @param root
        * @returns BlockItem
        */
-      function addBlock(cls, txt, root) {
-        let id = root.id ? root.id : root.getId ? root.getId() : null;
-        let clone = myBlocksByProcCode[txt];
-        if (clone) {
-          if (!clone.clones) {
-            clone.clones = [];
+      const addBlock = (cls, txt, root) => {
+        try {
+          let id = root.id ? root.id : root.getId ? root.getId() : null;
+          let clone = myBlocksByProcCode[txt];
+          if (clone) {
+            if (!clone.clones) {
+              clone.clones = [];
+            }
+            clone.clones.push(id);
+            return clone;
           }
-          clone.clones.push(id);
-          return clone;
+
+          // 获取积木颜色
+          const blockColour = this.extractBlockColour(root);
+          let items = new _blockly_BlockItem_js__WEBPACK_IMPORTED_MODULE_0__["default"](cls, txt, id, 0, blockColour);
+          items.y = root.getRelativeToSurfaceXY ? root.getRelativeToSurfaceXY().y : null;
+          myBlocks.push(items);
+          myBlocksByProcCode[txt] = items;
+          return items;
+        } catch (error) {
+          console.error('添加积木时出错:', error, '积木类型:', root.type, '积木ID:', root.id);
+          return null;
         }
-        let items = new _blockly_BlockItem_js__WEBPACK_IMPORTED_MODULE_0__["default"](cls, txt, id, 0);
-        items.y = root.getRelativeToSurfaceXY ? root.getRelativeToSurfaceXY().y : null;
-        myBlocks.push(items);
-        myBlocksByProcCode[txt] = items;
-        return items;
-      }
-      function getDescFromField(root) {
-        let fields = root.inputList[0];
-        let desc;
-        for (const fieldRow of fields.fieldRow) {
-          desc = desc ? desc + " " : "";
-          if (fieldRow instanceof Blockly.FieldImage && fieldRow.src_.endsWith("green-flag.svg")) {
-            desc += msg("/_general/blocks/green-flag");
-          } else {
-            desc += fieldRow.getText();
+      };
+      const getBlockDisplayText = block => {
+        try {
+          // 对于变量积木
+          if (block.type === 'data_variable' || block.type === 'data_changevariableby' || block.type === 'data_setvariableto') {
+            const vars = block.getVars();
+            if (vars && vars.length > 0) {
+              const variable = this.workspace.getVariableById(vars[0]);
+              if (variable) {
+                return '变量 ' + variable.name;
+              }
+            }
           }
+
+          // 特殊处理 control_if，显示为 "如果...那么"
+          if (block.type === 'control_if') {
+            return '如果...那么';
+          }
+          if (block.type === 'control_if_else') {
+            return '如果...那么...否则';
+          }
+          if (block.type === 'control_repeat') {
+            return '重复执行';
+          }
+          if (block.type === 'control_forever') {
+            return '重复执行';
+          }
+
+          // 使用 getProcCode 获取积木的标准文本（不包含输入值）
+          if (typeof block.getProcCode === 'function') {
+            const procCode = block.getProcCode();
+
+            // 对于其他积木，移除输入占位符 %s, %n, %b
+            return procCode.replace(/%[sbnd]/g, '').trim();
+          }
+
+          // 如果没有 getProcCode，尝试使用 toString
+          if (typeof block.toString === 'function') {
+            const text = block.toString();
+            // 移除输入框的值
+            const bracketIndex = text.indexOf('[');
+            if (bracketIndex > 0) {
+              return text.substring(0, bracketIndex).trim();
+            }
+            return text;
+          }
+
+          // 最后 fallback 到类型
+          return block.type;
+        } catch (error) {
+          console.error('获取积木显示文本时出错:', error);
+          return block.type || '未知积木';
         }
-        return desc;
-      }
-      for (const root of topBlocks) {
-        if (root.type === "procedures_definition") {
-          const label = root.getChildren()[0];
-          const procCode = label.getProcCode();
-          if (!procCode) {
+      };
+      const getBlockCategory = type => {
+        if (!type) return 'other';
+        if (type === "procedures_definition") return "define";
+        if (type === "event_whenflagclicked") return "flag";
+        if (type === "event_whenbroadcastreceived") return "receive";
+        if (type.substr(0, 10) === "event_when") return "event";
+        if (type === "control_start_as_clone") return "event";
+        if (type.startsWith("motion_")) return "motion";
+        if (type.startsWith("looks_")) return "looks";
+        if (type.startsWith("sound_")) return "sound";
+        if (type.startsWith("control_")) return "control";
+        if (type.startsWith("sensing_")) return "sensing";
+        if (type.startsWith("operator_")) return "operator";
+        if (type.startsWith("data_")) return "data";
+        if (type.startsWith("argument_") || type.startsWith("text2speech_") || type.startsWith("music_") || type.startsWith("videoSensing_") || type.startsWith("pen_")) return "extension";
+        return "other";
+      };
+      for (const root of allBlocks) {
+        try {
+          if (!root || !root.type) continue;
+
+          // 跳过ID为"@"的问题积木
+          if (root.id === "@") {
+            console.warn('跳过ID为"@"的问题积木:', root.type);
             continue;
           }
-          const indexOfLabel = root.inputList.findIndex(i => i.fieldRow.length > 0);
-          if (indexOfLabel === -1) {
-            continue;
+          const category = getBlockCategory(root.type);
+          const displayText = getBlockDisplayText(root); // 使用显示文本
+
+          // 过滤掉纯数字和纯占位符的结果（这些是输入框的值，不是积木类型）
+          if (/^\d+$/.test(displayText) || /^\?+$/.test(displayText)) {
+            continue; // 跳过纯数字和纯问号
           }
-          const translatedDefine = root.inputList[indexOfLabel].fieldRow[0].getText();
-          const message = indexOfLabel === 0 ? "".concat(translatedDefine, " ").concat(procCode) : "".concat(procCode, " ").concat(translatedDefine);
-          addBlock("define", message, root);
-          continue;
-        }
-        if (root.type === "event_whenflagclicked") {
-          addBlock("flag", getDescFromField(root), root); // "When Flag Clicked"
-          continue;
-        }
-        if (root.type === "event_whenbroadcastreceived") {
-          const fieldRow = root.inputList[0].fieldRow;
-          let eventName = fieldRow.find(input => input.name === "BROADCAST_OPTION").getText();
-          addBlock("receive", msg("event", {
-            name: eventName
-          }), root).eventName = eventName;
-          continue;
-        }
-        if (root.type.substr(0, 10) === "event_when") {
-          addBlock("event", getDescFromField(root), root); // "When Flag Clicked"
-          continue;
-        }
-        if (root.type === "control_start_as_clone") {
-          addBlock("event", getDescFromField(root), root); // "when I start as a clone"
+          addBlock(category, displayText, root);
+        } catch (e) {
+          console.error('处理积木时出错:', e, '积木:', root);
           continue;
         }
       }
+
+      // 变量和列表的处理
       let map = this.workspace.getVariableMap();
       let vars = map.getVariablesOfType("");
       for (const row of vars) {
@@ -3301,12 +3510,14 @@ __webpack_require__.r(__webpack_exports__);
           name: row.name
         }), row);
       }
-      const events = this.getCallsToEvents();
-      for (const event of events) {
-        addBlock("receive", msg("event", {
-          name: event.eventName
-        }), event.block).eventName = event.eventName;
-      }
+
+      // 注释掉这行，不添加广播消息作为独立搜索结果
+      // const events = this.getCallsToEvents();
+      // for (const event of events) {
+      //   addBlock("receive", msg("event", { name: event.eventName }), event.block).eventName = event.eventName;
+      // }
+
+      // 扩展排序顺序
       const clsOrder = {
         flag: 0,
         receive: 1,
@@ -3315,7 +3526,16 @@ __webpack_require__.r(__webpack_exports__);
         var: 4,
         VAR: 5,
         list: 6,
-        LIST: 7
+        LIST: 7,
+        motion: 8,
+        looks: 9,
+        sound: 10,
+        control: 11,
+        sensing: 12,
+        operator: 13,
+        data: 14,
+        extension: 15,
+        other: 16
       };
       myBlocks.sort((a, b) => {
         let t = clsOrder[a.cls] - clsOrder[b.cls];
@@ -3337,7 +3557,7 @@ __webpack_require__.r(__webpack_exports__);
       let items = [];
       let i = 0;
       for (const costume of costumes) {
-        let item = new _blockly_BlockItem_js__WEBPACK_IMPORTED_MODULE_0__["default"]("costume", costume.name, costume.assetId, i);
+        let item = new _blockly_BlockItem_js__WEBPACK_IMPORTED_MODULE_0__["default"]("costume", costume.name, costume.assetId, i, null); // 造型不需要特殊颜色
         items.push(item);
         i++;
       }
@@ -3348,7 +3568,7 @@ __webpack_require__.r(__webpack_exports__);
       let items = [];
       let i = 0;
       for (const sound of sounds) {
-        let item = new _blockly_BlockItem_js__WEBPACK_IMPORTED_MODULE_0__["default"]("sound", sound.name, sound.assetId, i);
+        let item = new _blockly_BlockItem_js__WEBPACK_IMPORTED_MODULE_0__["default"]("sound", sound.name, sound.assetId, i, null); // 声音不需要特殊颜色
         items.push(item);
         i++;
       }
@@ -3446,6 +3666,8 @@ __webpack_require__.r(__webpack_exports__);
       const item = document.createElement("li");
       item.innerText = proc.procCode;
       item.data = proc;
+
+      // 只使用边框颜色，不设置背景颜色
       const colorIds = {
         receive: "events",
         event: "events",
@@ -3455,7 +3677,15 @@ __webpack_require__.r(__webpack_exports__);
         list: "data-lists",
         LIST: "data-lists",
         costume: "looks",
-        sound: "sounds"
+        sound: "sounds",
+        motion: "motion",
+        looks: "looks",
+        control: "control",
+        sensing: "sensing",
+        operator: "operators",
+        data: "data",
+        extension: "pen",
+        other: "more"
       };
       if (proc.cls === "flag") {
         item.className = "sa-find-flag";
@@ -3463,6 +3693,15 @@ __webpack_require__.r(__webpack_exports__);
         const colorId = colorIds[proc.cls];
         item.className = "sa-block-color sa-block-color-".concat(colorId);
       }
+
+      // 添加悬停效果（亮度变化）
+      item.style.transition = 'filter 0.2s ease';
+      item.addEventListener('mouseenter', () => {
+        item.style.filter = 'brightness(0.9)';
+      });
+      item.addEventListener('mouseleave', () => {
+        item.style.filter = 'brightness(1)';
+      });
       item.addEventListener("mousedown", e => {
         this.onItemClick(item);
         e.preventDefault();
@@ -3472,6 +3711,48 @@ __webpack_require__.r(__webpack_exports__);
       this.items.push(item);
       this.el.appendChild(item);
       return item;
+    }
+
+    // 辅助方法：加深颜色
+    darkenColor(color, factor) {
+      try {
+        let r, g, b;
+        if (color.startsWith('#')) {
+          r = parseInt(color.slice(1, 3), 16);
+          g = parseInt(color.slice(3, 5), 16);
+          b = parseInt(color.slice(5, 7), 16);
+        } else {
+          return color;
+        }
+        r = Math.floor(r * (1 - factor));
+        g = Math.floor(g * (1 - factor));
+        b = Math.floor(b * (1 - factor));
+        return "#".concat(r.toString(16).padStart(2, '0')).concat(g.toString(16).padStart(2, '0')).concat(b.toString(16).padStart(2, '0'));
+      } catch (error) {
+        console.error('加深颜色时出错:', error);
+        return color;
+      }
+    }
+
+    // 辅助方法：根据背景色确定文字颜色
+    getTextColor(bgColor) {
+      try {
+        let r, g, b;
+        if (bgColor.startsWith('#')) {
+          r = parseInt(bgColor.slice(1, 3), 16);
+          g = parseInt(bgColor.slice(3, 5), 16);
+          b = parseInt(bgColor.slice(5, 7), 16);
+        } else {
+          return '#000000';
+        }
+
+        // 计算亮度
+        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+        return brightness > 128 ? '#000000' : '#FFFFFF';
+      } catch (error) {
+        console.error('计算文字颜色时出错:', error);
+        return '#000000';
+      }
     }
     onItemClick(item, instanceBlock) {
       if (this.selected && this.selected !== item) {
@@ -3508,16 +3789,6 @@ __webpack_require__.r(__webpack_exports__);
         let blocks = this.getCallsToProcedureById(item.data.labelID);
         this.carousel.build(item, blocks, instanceBlock);
       } else if (cls === "receive") {
-        /*
-          let blocks = [this.workspace.getBlockById(li.data.labelID)];
-          if (li.data.clones) {
-              for (const cloneID of li.data.clones) {
-                  blocks.push(this.workspace.getBlockById(cloneID))
-              }
-          }
-          blocks = blocks.concat(getCallsToEventsByName(li.data.eventName));
-        */
-        // Now, fetch the events from the scratch runtime instead of blockly
         let blocks = this.getCallsToEventsByName(item.data.eventName);
         if (!instanceBlock) {
           // Can we start by selecting the first block on 'this' sprite
@@ -3696,7 +3967,7 @@ __webpack_require__.r(__webpack_exports__);
     }
     navSideways(e, dir) {
       if (this.blocks.length > 0) {
-        this.idx = (this.idx + dir + this.blocks.length) % this.blocks.length; // + length to fix negative modulo js issue.
+        this.idx = (this.idx + dir + this.blocks.length) % this.blocks.length;
         this.count.innerText = this.idx + 1 + " / " + this.blocks.length;
         this.utils.scrollBlockIntoView(this.blocks[this.idx]);
       }
@@ -3717,8 +3988,6 @@ __webpack_require__.r(__webpack_exports__);
   const _doBlockClick_ = Blockly.Gesture.prototype.doBlockClick_;
   Blockly.Gesture.prototype.doBlockClick_ = function () {
     if (!addon.self.disabled && (this.mostRecentEvent_.button === 1 || this.mostRecentEvent_.shiftKey)) {
-      // Wheel button...
-      // Intercept clicks to allow jump to...?
       let block = this.startBlock_;
       for (; block; block = block.getSurroundParent()) {
         if (block.type === "procedures_definition" || !this.jumpToDef && block.type === "procedures_call") {
@@ -3735,7 +4004,6 @@ __webpack_require__.r(__webpack_exports__);
           return;
         }
         if (block.type === "event_whenbroadcastreceived" || block.type === "event_broadcastandwait" || block.type === "event_broadcast") {
-          // todo: actually index the broadcasts...!
           let id = block.id;
           findBar.findInput.focus();
           findBar.showDropDown(id, block);

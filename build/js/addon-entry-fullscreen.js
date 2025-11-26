@@ -31,7 +31,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 
 // module
-exports.push([module.i, "[class*=\"stage-wrapper_full-screen\"] {\n  display: none;\n  top: 0rem !important;\n}\n\n[class*=\"stage-header_stage-header-wrapper-overlay\"] {\n  display: block;\n  transform: translateY(-101%);\n  transition: transform 0.3s;\n}\n\n.phantom-header {\n  position: absolute;\n  top: 0px;\n  left: 0px;\n  right: 0px;\n  height: 8px;\n  display: block;\n  z-index: 5000;\n}\n\n.stage-header-hover {\n  transform: translateY(0%);\n  transition: transform 0.3s 0.25s;\n}\n", ""]);
+exports.push([module.i, "[class*=\"stage-wrapper_full-screen\"] {\r\n  display: none;\r\n  top: 0rem !important;\r\n}\r\n\r\n[class*=\"stage-header_stage-header-wrapper-overlay\"] {\r\n  display: block;\r\n  transform: translateY(-101%);\r\n  transition: transform 0.3s;\r\n}\r\n\r\n.phantom-header {\r\n  position: absolute;\r\n  top: 0px;\r\n  left: 0px;\r\n  right: 0px;\r\n  height: 8px;\r\n  display: block;\r\n  z-index: 486; /* Below stage (487) to avoid interference */\r\n}\r\n\r\n.stage-header-hover {\r\n  transform: translateY(0%);\r\n  transition: transform 0.3s 0.25s;\r\n}\r\n", ""]);
 
 // exports
 
