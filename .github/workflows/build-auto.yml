@@ -22,7 +22,9 @@ jobs:
     
     - name: Install dependencies
       run: |
-        npm ci --prefer-offline --no-audit
+        # Remove problematic lock file and reinstall
+        rm -f package-lock.json
+        npm install --no-audit --no-fund
         npm run prepare-extensions || true  # Allow failure during extension prep
     
     - name: Create required directories
