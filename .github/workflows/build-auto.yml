@@ -24,6 +24,13 @@ jobs:
       run: |
         # Remove problematic lock file and reinstall
         rm -f package-lock.json
+        
+        # Clone scratch-gui from parent directory structure
+        cd ..
+        git clone https://github.com/LLK/scratch-gui.git
+        cd Desktop
+        
+        # Install dependencies
         npm install --no-audit --no-fund
         npm run prepare-extensions || true  # Allow failure during extension prep
     
