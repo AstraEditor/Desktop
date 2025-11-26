@@ -23,6 +23,7 @@ jobs:
         npm cache clean --force
         rm -rf node_modules package-lock.json
         npm install
+        npm install spdx-expression-parse --save-dev
     - name: Prepare extensions
       # Don't need to do a full fetch, that would just cause a lot of unnecessary traffic
       run: node scripts/prepare-extensions.mjs
