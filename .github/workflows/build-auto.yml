@@ -141,7 +141,12 @@ jobs:
         npm ci --no-audit --no-fund
         
         echo "Preparing extensions..."
-        npm run prepare-extensions
+        if [ "${{ runner.os }}" = "Windows" ]; then
+          echo "Using optimized extension preparation for Windows..."
+          npm run prepare-extensions-optimized
+        else
+          npm run prepare-extensions
+        fi
         
         echo "Desktop dependencies installed successfully"
       shell: bash

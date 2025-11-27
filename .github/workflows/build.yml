@@ -108,7 +108,9 @@ jobs:
       run: npm ci --loglevel=info
     - name: Fetch
       working-directory: D:\repo
-      run: npm run fetch
+      run: |
+        npm run prepare-extensions-optimized
+        npm run fetch
     - name: Compile
       working-directory: D:\repo
       run: npm run webpack:prod
