@@ -90,7 +90,7 @@
       },
       {
         "from": "art/icon.svg",
-        "to": "tools"
+        "to": "tools-svg"
       }
     ],
     "nsis": {
