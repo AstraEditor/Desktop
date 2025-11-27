@@ -73,6 +73,7 @@ jobs:
         
         # Install Desktop dependencies
         npm install --no-audit --no-fund
+        npm install classnames --no-audit --no-fund
         npm run prepare-extensions || true  # Allow failure during extension prep
     
     - name: Create required directories
@@ -90,7 +91,7 @@ jobs:
         echo "Webpack compilation completed with exit code: $?"
     
     - name: Package
-      run: npm run electron:package:dir
+      run: npm run electron:package -- --linux
     
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
@@ -135,6 +136,7 @@ jobs:
         
         # Install Desktop dependencies
         npm install --no-audit --no-fund
+        npm install classnames --no-audit --no-fund
         npm run prepare-extensions || true
     
     - name: Create required directories
@@ -194,6 +196,7 @@ jobs:
         
         # Install Desktop dependencies
         npm install --no-audit --no-fund
+        npm install classnames --no-audit --no-fund
         npm run prepare-extensions || true
     
     - name: Create required directories
