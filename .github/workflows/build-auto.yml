@@ -5,7 +5,7 @@ on:
   pull_request:
 
 jobs:
-  build:
+  build-linux:
     runs-on: ubuntu-latest
 
     steps:
@@ -96,8 +96,126 @@ jobs:
       uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: build-output
+        name: build-output-linux
         path: |
           dist/
           dist-renderer-webpack/
+        retention-days: 7
+
+  build-windows:
+    runs-on: windows-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        persist-credentials: false
+        
+    - name: Install Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 24
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: |
+        # Remove problematic lock file and reinstall
+        rm -f package-lock.json
+        
+        # Clone all required scratch repositories to parent directory structure
+        cd ..
+        git clone https://github.com/AstraEditor/scratch-gui.git
+        git clone https://github.com/AstraEditor/scratch-vm.git
+        git clone https://github.com/AstraEditor/scratch-audio.git
+        git clone https://github.com/AstraEditor/scratch-blocks.git
+        git clone https://github.com/AstraEditor/scratch-paint.git
+        git clone https://github.com/AstraEditor/scratch-render.git
+        
+        cd Desktop
+        
+        # Install Desktop dependencies
+        npm install --no-audit --no-fund
+        npm run prepare-extensions || true
+    
+    - name: Create required directories
+      run: |
+        mkdir -p dist-library-files dist-extensions dist-renderer-webpack
+    
+    - name: Compile
+      run: |
+        echo "Starting webpack compilation..."
+        echo "Increasing Node.js memory limit..."
+        $env:NODE_OPTIONS="--max-old-space-size=4096"
+        npm run webpack:compile
+        echo "Webpack compilation completed with exit code: $LASTEXITCODE"
+    
+    - name: Package
+      run: npm run electron:package -- --win
+    
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: build-output-windows
+        path: |
+          dist/
+        retention-days: 7
+
+  build-mac:
+    runs-on: macos-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        persist-credentials: false
+        
+    - name: Install Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 24
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: |
+        # Remove problematic lock file and reinstall
+        rm -f package-lock.json
+        
+        # Clone all required scratch repositories to parent directory structure
+        cd ..
+        git clone https://github.com/AstraEditor/scratch-gui.git
+        git clone https://github.com/AstraEditor/scratch-vm.git
+        git clone https://github.com/AstraEditor/scratch-audio.git
+        git clone https://github.com/AstraEditor/scratch-blocks.git
+        git clone https://github.com/AstraEditor/scratch-paint.git
+        git clone https://github.com/AstraEditor/scratch-render.git
+        
+        cd Desktop
+        
+        # Install Desktop dependencies
+        npm install --no-audit --no-fund
+        npm run prepare-extensions || true
+    
+    - name: Create required directories
+      run: |
+        mkdir -p dist-library-files dist-extensions dist-renderer-webpack
+    
+    - name: Compile
+      run: |
+        echo "Starting webpack compilation..."
+        echo "Increasing Node.js memory limit..."
+        export NODE_OPTIONS="--max-old-space-size=4096"
+        npm run webpack:compile
+        echo "Webpack compilation completed with exit code: $?"
+    
+    - name: Package
+      run: npm run electron:package -- --mac
+    
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: build-output-mac
+        path: |
+          dist/
         retention-days: 7
