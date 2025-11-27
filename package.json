@@ -171,7 +171,7 @@
     "linux": {
       "executableName": "astra-editor-desktop",
       "artifactName": "${productName}-${os}-${arch}-${version}.${ext}",
-      "icon": "./build/",
+      "icon": "./art/",
       "synopsis": "Mod of Scratch with a compiler and more features.",
       "description": "astra-editor is a Scratch mod with a compiler to run projects faster, dark mode for your eyes, a bunch of addons to improve the editor, and more.",
       "category": "Development",
