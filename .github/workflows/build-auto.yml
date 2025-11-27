@@ -28,6 +28,8 @@ jobs:
         # Clone scratch-gui to parent directory structure
         cd ..
         git clone https://github.com/AstraEditor/scratch-gui.git
+        echo "Scratch-gui cloned successfully"
+        ls -la scratch-gui
         cd Desktop
         
         # Install dependencies
@@ -41,7 +43,10 @@ jobs:
     
         
     - name: Compile
-      run: npm run webpack:compile
+      run: |
+        echo "Starting webpack compilation..."
+        npm run webpack:compile
+        echo "Webpack compilation completed with exit code: $?"
     
     - name: Package
       run: npm run electron:package:dir
