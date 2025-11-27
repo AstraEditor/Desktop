@@ -1,0 +1,1 @@
+Fix webpack module resolution for scratch dependencies
