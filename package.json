@@ -27,7 +27,7 @@
     "semver": "^7.7.3"
   },
   "devDependencies": {
-    "@astra-editor/extensions": "github:AstraEditor/extensions#master",
+    "@turbowarp/extensions": "github:AstraEditor/extensions#master",
     "@babel/core": "^7.28.4",
     "@babel/preset-env": "^7.12.16",
     "@babel/preset-react": "^7.13.13",
