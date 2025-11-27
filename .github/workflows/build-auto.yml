@@ -30,7 +30,10 @@ jobs:
         git clone https://github.com/AstraEditor/scratch-gui.git
         echo "Scratch-gui cloned successfully"
         ls -la scratch-gui
-        cd Desktop
+        echo "Installing scratch-gui dependencies..."
+        cd scratch-gui
+        npm install --no-audit --no-fund
+        cd ../Desktop
         
         # Install dependencies
         npm install --no-audit --no-fund
