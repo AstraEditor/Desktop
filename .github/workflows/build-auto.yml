@@ -25,17 +25,53 @@ jobs:
         # Remove problematic lock file and reinstall
         rm -f package-lock.json
         
-        # Clone scratch-gui to parent directory structure
+        # Clone all required scratch repositories to parent directory structure
         cd ..
         git clone https://github.com/AstraEditor/scratch-gui.git
-        echo "Scratch-gui cloned successfully"
-        ls -la scratch-gui
+        git clone https://github.com/AstraEditor/scratch-vm.git
+        git clone https://github.com/AstraEditor/scratch-audio.git
+        git clone https://github.com/AstraEditor/scratch-blocks.git
+        git clone https://github.com/AstraEditor/scratch-paint.git
+        git clone https://github.com/AstraEditor/scratch-render.git
+        
+        echo "Repositories cloned successfully"
+        ls -la
+        
+        # Install scratch-gui dependencies
         echo "Installing scratch-gui dependencies..."
         cd scratch-gui
         npm install --no-audit --no-fund
-        cd ../Desktop
+        cd ..
         
-        # Install dependencies
+        # Install dependencies for other repositories
+        echo "Installing scratch-vm dependencies..."
+        cd scratch-vm
+        npm install --no-audit --no-fund
+        cd ..
+        
+        echo "Installing scratch-audio dependencies..."
+        cd scratch-audio
+        npm install --no-audit --no-fund
+        cd ..
+        
+        echo "Installing scratch-blocks dependencies..."
+        cd scratch-blocks
+        npm install --no-audit --no-fund
+        cd ..
+        
+        echo "Installing scratch-paint dependencies..."
+        cd scratch-paint
+        npm install --no-audit --no-fund
+        cd ..
+        
+        echo "Installing scratch-render dependencies..."
+        cd scratch-render
+        npm install --no-audit --no-fund
+        cd ..
+        
+        cd Desktop
+        
+        # Install Desktop dependencies
         npm install --no-audit --no-fund
         npm run prepare-extensions || true  # Allow failure during extension prep
     

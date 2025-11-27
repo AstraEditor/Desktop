@@ -110,11 +110,19 @@ module.exports = [
         resolve: {
             modules: [
                 'node_modules',
-                path.resolve(__dirname, 'node_modules')
+                path.resolve(__dirname, 'node_modules'),
+                path.resolve(__dirname, '../scratch-gui/node_modules')
             ],
             alias: {
-                'scratch-gui/src': path.resolve(__dirname, 'node_modules/scratch-gui/src'),
-                'scratch-gui': path.resolve(__dirname, 'node_modules/scratch-gui/src'),
+                'scratch-gui/src': path.resolve(__dirname, '../scratch-gui/src'),
+                'scratch-gui': path.resolve(__dirname, '../scratch-gui/src'),
+                'scratch-vm': path.resolve(__dirname, '../scratch-vm/src'),
+                'scratch-audio': path.resolve(__dirname, '../scratch-audio/src'),
+                'scratch-blocks': path.resolve(__dirname, '../scratch-blocks'),
+                'scratch-paint': path.resolve(__dirname, '../scratch-paint/src'),
+                'scratch-render': path.resolve(__dirname, '../scratch-render/src'),
+                '@turbowarp/l10n': path.resolve(__dirname, '../scratch-gui/node_modules/@turbowarp/scratch-l10n'),
+                '@turbowarp/scratch-l10n': path.resolve(__dirname, '../scratch-gui/node_modules/@turbowarp/scratch-l10n'),
                 'react': path.resolve(__dirname, 'node_modules/react'),
                 'react-dom': path.resolve(__dirname, 'node_modules/react-dom')
             },
