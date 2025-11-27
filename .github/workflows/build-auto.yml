@@ -25,8 +25,10 @@ jobs:
         # Remove problematic lock file and reinstall
         rm -f package-lock.json
         
-        # Use existing scratch-gui from parent directory structure
-        # No need to clone as scratch-gui already exists in parent directory
+        # Clone scratch-gui to parent directory structure
+        cd ..
+        git clone https://github.com/AstraEditor/scratch-gui.git
+        cd Desktop
         
         # Install dependencies
         npm install --no-audit --no-fund
