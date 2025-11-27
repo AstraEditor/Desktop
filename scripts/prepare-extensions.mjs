@@ -9,8 +9,8 @@ console.log('Current directory:', process.cwd());
 console.log('Script directory:', import.meta.dirname);
 
 try {
-  console.log('Importing Builder from @astra-editor/extensions/builder...');
-  const Builder = await import('@astra-editor/extensions/builder');
+  console.log('Importing Builder from @turbowarp/extensions/builder...');
+  const Builder = await import('@turbowarp/extensions/builder');
   console.log('Builder imported successfully');
   
   const mode = 'desktop';
