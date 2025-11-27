@@ -37,70 +37,57 @@ jobs:
     
     - name: Setup environment variables
       run: |
-        if [ "${{ matrix.os }}" = "windows-latest" ]; then
+        if [ "${{ runner.os }}" = "Windows" ]; then
           echo "WORKSPACE_PARENT=$(dirname $GITHUB_WORKSPACE)" >> $GITHUB_ENV
         else
           echo "WORKSPACE_PARENT=$(dirname $GITHUB_WORKSPACE)" >> $GITHUB_ENV
         fi
       shell: bash
     
-    # Validate all package.json files before cloning
-    - name: Validate package.json files
+    # Clone scratch repositories first
+    - name: Clone scratch repositories
       run: |
         REPO_PARENT="${{ env.WORKSPACE_PARENT }}"
         
-        # Function to validate package.json
-        validate_package_json() {
-          local package_path=$1
-          if [ -f "$package_path" ]; then
-            echo "Validating $package_path..."
-            node -e "
-              try {
-                const pkg = require('$package_path');
-                if (!pkg.name || !pkg.version) {
-                  console.error('Missing name or version in $package_path');
-                  process.exit(1);
-                }
-                // Validate version format
-                if (!/^[0-9]+\.[0-9]+\.[0-9]+/.*/.test(pkg.version)) {
-                  console.error('Invalid version format in $package_path: ' + pkg.version);
-                  process.exit(1);
-                }
-                console.log('✓ $package_path is valid');
-              } catch (e) {
-                console.error('Error parsing $package_path:', e.message);
-                process.exit(1);
-              }
-            "
-          fi
-        }
-        
-        # Validate Desktop package.json
-        validate_package_json "package.json"
-        
-        # Function to clone and validate repository
-        clone_and_validate() {
+        # Function to clone repository
+        clone_repo() {
           local repo_name=$1
           local repo_url="https://github.com/AstraEditor/${repo_name}.git"
           local repo_path="${REPO_PARENT}/${repo_name}"
           
           echo "Cloning ${repo_name}..."
           git clone --depth 1 "$repo_url" "$repo_path"
-          
-          if [ -f "$repo_path/package.json" ]; then
-            validate_package_json "$repo_path/package.json"
-          else
-            echo "Warning: ${repo_name}/package.json not found"
-          fi
         }
         
-        # Clone and validate all repositories
-        clone_and_validate "scratch-gui"
-        clone_and_validate "scratch-vm"
-        clone_and_validate "scratch-audio"
-        clone_and_validate "scratch-blocks"
-        clone_and_validate "scratch-paint"
-        clone_and_validate "scratch-render"
+        # Clone all required repositories
+        clone_repo "scratch-gui"
+        clone_repo "scratch-vm"
+        clone_repo "scratch-audio"
+        clone_repo "scratch-blocks"
+        clone_repo "scratch-paint"
+        clone_repo "scratch-render"
+        
+        echo "All repositories cloned successfully"
+      shell: bash
+    
+    # Validate all package.json files after cloning
+    - name: Validate package.json files
+      run: |
+        REPO_PARENT="${{ env.WORKSPACE_PARENT }}"
+        
+        # Validate Desktop package.json
+        node scripts/validate-package.js package.json
+        
+        # Validate scratch repositories
+        repos=("scratch-gui" "scratch-vm" "scratch-audio" "scratch-blocks" "scratch-paint" "scratch-render")
+        for repo in "${repos[@]}"; do
+          package_path="${REPO_PARENT}/${repo}/package.json"
+          if [ -f "$package_path" ]; then
+            node scripts/validate-package.js "$package_path"
+          else
+            echo "Warning: ${repo}/package.json not found"
+          fi
+        done
         
         echo "All package.json files validated successfully"
       shell: bash
@@ -177,8 +164,8 @@ jobs:
     - name: Compile
       run: |
         echo "Starting webpack compilation..."
-        if [ "${{ matrix.os }}" = "windows-latest" ]; then
-          $env:NODE_OPTIONS="--max-old-space-size=4096"
+        if [ "${{ runner.os }}" = "Windows" ]; then
+          export NODE_OPTIONS="--max-old-space-size=4096"
         else
           export NODE_OPTIONS="--max-old-space-size=4096"
         fi
@@ -193,9 +180,9 @@ jobs:
       run: |
         echo "Packaging for ${{ matrix.platform }}..."
         
-        if [ "${{ matrix.os }}" = "windows-latest" ]; then
+        if [ "${{ runner.os }}" = "Windows" ]; then
           npm run electron:package -- --win --publish never
-        elif [ "${{ matrix.os }}" = "macos-latest" ]; then
+        elif [ "${{ runner.os }}" = "macOS" ]; then
           npm run electron:package -- --mac --publish never
         else
           npm run electron:package -- --linux --publish never
