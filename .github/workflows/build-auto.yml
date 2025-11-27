@@ -5,90 +5,121 @@ on:
   pull_request:
 
 jobs:
-  build-linux:
+  prepare:
     runs-on: ubuntu-latest
-
+    outputs:
+      cache-key: ${{ steps.cache-key.outputs.key }}
+    
     steps:
     - uses: actions/checkout@v4
       with:
         submodules: recursive
         persist-credentials: false
-    
+        
     - name: Install Node.js
       uses: actions/setup-node@v4
       with:
         node-version: 24
         cache: 'npm'
     
-    - name: Install dependencies
+    - name: Generate cache key
+      id: cache-key
+      run: echo "key=deps-${{ hashFiles('package-lock.json') }}" >> $GITHUB_OUTPUT
+    
+    - name: Cache dependencies
+      uses: actions/cache@v3
+      with:
+        path: |
+          node_modules
+          ../scratch-gui/node_modules
+          ../scratch-vm/node_modules
+          ../scratch-audio/node_modules
+          ../scratch-blocks/node_modules
+          ../scratch-paint/node_modules
+          ../scratch-render/node_modules
+        key: ${{ steps.cache-key.outputs.key }}
+
+  build-linux:
+    needs: prepare
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        persist-credentials: false
+        
+    - name: Install Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 24
+        cache: 'npm'
+    
+    - name: Restore dependencies cache
+      uses: actions/cache@v3
+      with:
+        path: |
+          node_modules
+          ../scratch-gui/node_modules
+          ../scratch-vm/node_modules
+          ../scratch-audio/node_modules
+          ../scratch-blocks/node_modules
+          ../scratch-paint/node_modules
+          ../scratch-render/node_modules
+        key: ${{ needs.prepare.outputs.cache-key }}
+    
+    - name: Setup dependencies
       run: |
-        # Remove problematic lock file and reinstall
-        rm -f package-lock.json
+        # Clone scratch repositories if not cached
+        if [ ! -d "../scratch-gui" ]; then
+          cd ..
+          git clone --depth 1 https://github.com/AstraEditor/scratch-gui.git
+          git clone --depth 1 https://github.com/AstraEditor/scratch-vm.git
+          git clone --depth 1 https://github.com/AstraEditor/scratch-audio.git
+          git clone --depth 1 https://github.com/AstraEditor/scratch-blocks.git
+          git clone --depth 1 https://github.com/AstraEditor/scratch-paint.git
+          git clone --depth 1 https://github.com/AstraEditor/scratch-render.git
+          cd Desktop
+        fi
         
-        # Clone all required scratch repositories to parent directory structure
-        cd ..
-        git clone https://github.com/AstraEditor/scratch-gui.git
-        git clone https://github.com/AstraEditor/scratch-vm.git
-        git clone https://github.com/AstraEditor/scratch-audio.git
-        git clone https://github.com/AstraEditor/scratch-blocks.git
-        git clone https://github.com/AstraEditor/scratch-paint.git
-        git clone https://github.com/AstraEditor/scratch-render.git
+        # Install dependencies only if not cached
+        if [ ! -d "node_modules" ]; then
+          npm ci --no-audit --no-fund
+          npm run prepare-extensions || true
+        fi
         
-        echo "Repositories cloned successfully"
-        ls -la
+        if [ ! -d "../scratch-gui/node_modules" ]; then
+          cd ../scratch-gui && npm ci --no-audit --no-fund && cd ..
+        fi
         
-        # Install scratch-gui dependencies
-        echo "Installing scratch-gui dependencies..."
-        cd scratch-gui
-        npm install --no-audit --no-fund
-        cd ..
+        if [ ! -d "../scratch-vm/node_modules" ]; then
+          cd ../scratch-vm && npm ci --no-audit --no-fund && cd ..
+        fi
         
-        # Install dependencies for other repositories
-        echo "Installing scratch-vm dependencies..."
-        cd scratch-vm
-        npm install --no-audit --no-fund
-        cd ..
+        if [ ! -d "../scratch-audio/node_modules" ]; then
+          cd ../scratch-audio && npm ci --no-audit --no-fund && cd ..
+        fi
         
-        echo "Installing scratch-audio dependencies..."
-        cd scratch-audio
-        npm install --no-audit --no-fund
-        cd ..
+        if [ ! -d "../scratch-blocks/node_modules" ]; then
+          cd ../scratch-blocks && npm ci --no-audit --no-fund && cd ..
+        fi
         
-        echo "Installing scratch-blocks dependencies..."
-        cd scratch-blocks
-        npm install --no-audit --no-fund
-        cd ..
+        if [ ! -d "../scratch-paint/node_modules" ]; then
+          cd ../scratch-paint && npm ci --no-audit --no-fund && cd ..
+        fi
         
-        echo "Installing scratch-paint dependencies..."
-        cd scratch-paint
-        npm install --no-audit --no-fund
-        cd ..
-        
-        echo "Installing scratch-render dependencies..."
-        cd scratch-render
-        npm install --no-audit --no-fund
-        cd ..
-        
-        cd Desktop
-        
-        # Install Desktop dependencies
-        npm install --no-audit --no-fund
-        npm install classnames --no-audit --no-fund
-        npm run prepare-extensions || true  # Allow failure during extension prep
+        if [ ! -d "../scratch-render/node_modules" ]; then
+          cd ../scratch-render && npm ci --no-audit --no-fund && cd ..
+        fi
     
     - name: Create required directories
-      run: |
-        mkdir -p dist-library-files dist-extensions dist-renderer-webpack
+      run: mkdir -p dist-library-files dist-extensions dist-renderer-webpack
     
-    
-        
     - name: Compile
       run: |
         echo "Starting webpack compilation..."
-        echo "Increasing Node.js memory limit..."
         export NODE_OPTIONS="--max-old-space-size=4096"
         npm run webpack:compile
-        echo "Webpack compilation completed with exit code: $?"
     
     - name: Package
       run: npm run electron:package -- --linux
@@ -100,10 +131,10 @@ jobs:
         name: build-output-linux
         path: |
           dist/
-          dist-renderer-webpack/
         retention-days: 7
 
   build-windows:
+    needs: prepare
     runs-on: windows-latest
     
     steps:
@@ -118,40 +149,77 @@ jobs:
         node-version: 24
         cache: 'npm'
     
-    - name: Install dependencies
+    - name: Restore dependencies cache
+      uses: actions/cache@v3
+      with:
+        path: |
+          node_modules
+          ../scratch-gui/node_modules
+          ../scratch-vm/node_modules
+          ../scratch-audio/node_modules
+          ../scratch-blocks/node_modules
+          ../scratch-paint/node_modules
+          ../scratch-render/node_modules
+        key: ${{ needs.prepare.outputs.cache-key }}
+    
+    - name: Setup dependencies
+      shell: powershell
       run: |
-        # Remove problematic lock file and reinstall
-        rm -f package-lock.json
+        # Clone scratch repositories if not cached
+        if (-not (Test-Path "..\scratch-gui")) {
+          Set-Location ..
+          git clone --depth 1 https://github.com/AstraEditor/scratch-gui.git
+          git clone --depth 1 https://github.com/AstraEditor/scratch-vm.git
+          git clone --depth 1 https://github.com/AstraEditor/scratch-audio.git
+          git clone --depth 1 https://github.com/AstraEditor/scratch-blocks.git
+          git clone --depth 1 https://github.com/AstraEditor/scratch-paint.git
+          git clone --depth 1 https://github.com/AstraEditor/scratch-render.git
+          Set-Location Desktop
+        }
         
-        # Clone all required scratch repositories to parent directory structure
-        cd ..
-        git clone https://github.com/AstraEditor/scratch-gui.git
-        git clone https://github.com/AstraEditor/scratch-vm.git
-        git clone https://github.com/AstraEditor/scratch-audio.git
-        git clone https://github.com/AstraEditor/scratch-blocks.git
-        git clone https://github.com/AstraEditor/scratch-paint.git
-        git clone https://github.com/AstraEditor/scratch-render.git
+        # Install dependencies only if not cached
+        if (-not (Test-Path "node_modules")) {
+          npm ci --no-audit --no-fund
+          npm run prepare-extensions
+        }
         
-        cd Desktop
+        if (-not (Test-Path "..\scratch-gui\node_modules")) {
+          Set-Location ..\scratch-gui; npm ci --no-audit --no-fund; Set-Location ..\Desktop
+        }
         
-        # Install Desktop dependencies
-        npm install --no-audit --no-fund
-        npm install classnames --no-audit --no-fund
-        npm run prepare-extensions || true
+        if (-not (Test-Path "..\scratch-vm\node_modules")) {
+          Set-Location ..\scratch-vm; npm ci --no-audit --no-fund; Set-Location ..\Desktop
+        }
+        
+        if (-not (Test-Path "..\scratch-audio\node_modules")) {
+          Set-Location ..\scratch-audio; npm ci --no-audit --no-fund; Set-Location ..\Desktop
+        }
+        
+        if (-not (Test-Path "..\scratch-blocks\node_modules")) {
+          Set-Location ..\scratch-blocks; npm ci --no-audit --no-fund; Set-Location ..\Desktop
+        }
+        
+        if (-not (Test-Path "..\scratch-paint\node_modules")) {
+          Set-Location ..\scratch-paint; npm ci --no-audit --no-fund; Set-Location ..\Desktop
+        }
+        
+        if (-not (Test-Path "..\scratch-render\node_modules")) {
+          Set-Location ..\scratch-render; npm ci --no-audit --no-fund; Set-Location ..\Desktop
+        }
     
     - name: Create required directories
-      run: |
-        mkdir -p dist-library-files dist-extensions dist-renderer-webpack
+      shell: powershell
+      run: mkdir -p dist-library-files dist-extensions dist-renderer-webpack
     
     - name: Compile
+      shell: powershell
       run: |
         echo "Starting webpack compilation..."
-        echo "Increasing Node.js memory limit..."
         $env:NODE_OPTIONS="--max-old-space-size=4096"
         npm run webpack:compile
-        echo "Webpack compilation completed with exit code: $LASTEXITCODE"
     
     - name: Package
+      shell: powershell
       run: npm run electron:package -- --win
     
     - name: Upload build artifacts
@@ -164,6 +232,7 @@ jobs:
         retention-days: 7
 
   build-mac:
+    needs: prepare
     runs-on: macos-latest
     
     steps:
@@ -178,38 +247,71 @@ jobs:
         node-version: 24
         cache: 'npm'
     
-    - name: Install dependencies
+    - name: Restore dependencies cache
+      uses: actions/cache@v3
+      with:
+        path: |
+          node_modules
+          ../scratch-gui/node_modules
+          ../scratch-vm/node_modules
+          ../scratch-audio/node_modules
+          ../scratch-blocks/node_modules
+          ../scratch-paint/node_modules
+          ../scratch-render/node_modules
+        key: ${{ needs.prepare.outputs.cache-key }}
+    
+    - name: Setup dependencies
       run: |
-        # Remove problematic lock file and reinstall
-        rm -f package-lock.json
+        # Clone scratch repositories if not cached
+        if [ ! -d "../scratch-gui" ]; then
+          cd ..
+          git clone --depth 1 https://github.com/AstraEditor/scratch-gui.git
+          git clone --depth 1 https://github.com/AstraEditor/scratch-vm.git
+          git clone --depth 1 https://github.com/AstraEditor/scratch-audio.git
+          git clone --depth 1 https://github.com/AstraEditor/scratch-blocks.git
+          git clone --depth 1 https://github.com/AstraEditor/scratch-paint.git
+          git clone --depth 1 https://github.com/AstraEditor/scratch-render.git
+          cd Desktop
+        fi
         
-        # Clone all required scratch repositories to parent directory structure
-        cd ..
-        git clone https://github.com/AstraEditor/scratch-gui.git
-        git clone https://github.com/AstraEditor/scratch-vm.git
-        git clone https://github.com/AstraEditor/scratch-audio.git
-        git clone https://github.com/AstraEditor/scratch-blocks.git
-        git clone https://github.com/AstraEditor/scratch-paint.git
-        git clone https://github.com/AstraEditor/scratch-render.git
+        # Install dependencies only if not cached
+        if [ ! -d "node_modules" ]; then
+          npm ci --no-audit --no-fund
+          npm run prepare-extensions || true
+        fi
         
-        cd Desktop
+        if [ ! -d "../scratch-gui/node_modules" ]; then
+          cd ../scratch-gui && npm ci --no-audit --no-fund && cd ..
+        fi
         
-        # Install Desktop dependencies
-        npm install --no-audit --no-fund
-        npm install classnames --no-audit --no-fund
-        npm run prepare-extensions || true
+        if [ ! -d "../scratch-vm/node_modules" ]; then
+          cd ../scratch-vm && npm ci --no-audit --no-fund && cd ..
+        fi
+        
+        if [ ! -d "../scratch-audio/node_modules" ]; then
+          cd ../scratch-audio && npm ci --no-audit --no-fund && cd ..
+        fi
+        
+        if [ ! -d "../scratch-blocks/node_modules" ]; then
+          cd ../scratch-blocks && npm ci --no-audit --no-fund && cd ..
+        fi
+        
+        if [ ! -d "../scratch-paint/node_modules" ]; then
+          cd ../scratch-paint && npm ci --no-audit --no-fund && cd ..
+        fi
+        
+        if [ ! -d "../scratch-render/node_modules" ]; then
+          cd ../scratch-render && npm ci --no-audit --no-fund && cd ..
+        fi
     
     - name: Create required directories
-      run: |
-        mkdir -p dist-library-files dist-extensions dist-renderer-webpack
+      run: mkdir -p dist-library-files dist-extensions dist-renderer-webpack
     
     - name: Compile
       run: |
         echo "Starting webpack compilation..."
-        echo "Increasing Node.js memory limit..."
         export NODE_OPTIONS="--max-old-space-size=4096"
         npm run webpack:compile
-        echo "Webpack compilation completed with exit code: $?"
     
     - name: Package
       run: npm run electron:package -- --mac
