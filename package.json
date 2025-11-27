@@ -103,7 +103,7 @@
     },
     "win": {
       "artifactName": "${productName} Portable ${version} ${arch}.${ext}",
-      "icon": "build/icon.ico",
+      "icon": "art/logo.png",
       "target": [
         {
           "target": "nsis",
@@ -140,7 +140,7 @@
     },
     "mac": {
       "artifactName": "${productName}-Setup-${version}.${ext}",
-      "icon": "build/icon.icns",
+      "icon": "art/logo.png",
       "category": "public.app-category.education",
       "darkModeSupport": true,
       "gatekeeperAssess": false,
