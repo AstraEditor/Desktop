@@ -6,6 +6,10 @@ const base = {
     mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
     devtool: process.env.NODE_ENV === 'production' ? false : 'cheap-source-map',
     target: 'web',
+    optimization: {
+        splitChunks: false,
+        minimize: false
+    },
     module: {
         rules: [
             {

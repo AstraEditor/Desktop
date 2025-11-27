@@ -45,6 +45,8 @@ jobs:
     - name: Compile
       run: |
         echo "Starting webpack compilation..."
+        echo "Increasing Node.js memory limit..."
+        export NODE_OPTIONS="--max-old-space-size=4096"
         npm run webpack:compile
         echo "Webpack compilation completed with exit code: $?"
     
