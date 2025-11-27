@@ -109,11 +109,14 @@ module.exports = [
         ],
         resolve: {
             modules: [
+                path.resolve(__dirname, '../scratch-gui/node_modules'),
                 'node_modules',
-                path.resolve(__dirname, 'node_modules'),
-                path.resolve(__dirname, '../scratch-gui/node_modules')
+                path.resolve(__dirname, 'node_modules')
             ],
             alias: {
+                'scratch-paint/src/lib/fonts': path.resolve(__dirname, '../scratch-paint/src/lib/fonts.js'),
+                'scratch-vm/src/extension-support/argument-type': path.resolve(__dirname, '../scratch-vm/src/extension-support/argument-type.js'),
+                'scratch-vm/src/extension-support/block-type': path.resolve(__dirname, '../scratch-vm/src/extension-support/block-type.js'),
                 'scratch-gui/src': path.resolve(__dirname, '../scratch-gui/src'),
                 'scratch-gui': path.resolve(__dirname, '../scratch-gui/src'),
                 'scratch-vm': path.resolve(__dirname, '../scratch-vm/src'),
