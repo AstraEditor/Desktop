@@ -10,6 +10,7 @@
   "type": "commonjs",
   "scripts": {
     "fetch": "node scripts/download-library-files.mjs && node scripts/download-packager.mjs && node scripts/prepare-extensions.mjs",
+    "prepare-extensions": "node scripts/prepare-extensions.mjs",
     "webpack:compile": "webpack",
     "webpack:watch": "webpack --watch",
     "webpack:prod": "cross-env NODE_ENV=production webpack",
