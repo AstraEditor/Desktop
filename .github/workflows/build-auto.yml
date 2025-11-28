@@ -420,7 +420,7 @@ jobs:
     
     - name: Clone scratch repositories
       run: |
-        REPO_PARENT="D:\"
+        $REPO_PARENT = "D:\"
         
         # Function to clone repository
         function Clone-Repo($repoName) {
@@ -444,7 +444,7 @@ jobs:
     
     - name: Validate package.json files
       run: |
-        REPO_PARENT="D:\"
+        $REPO_PARENT = "D:\"
         
         # Validate Desktop package.json
         node D:\repo\scripts\validate-package.js D:\repo\package.json
@@ -490,7 +490,7 @@ jobs:
       run: |
         # Function to install and build dependencies
         function Install-Build-Dep($repoName) {
-          $repoPath = "D:\${repoName}"
+          $repoPath = "D:\$repoName"
           
           if (Test-Path $repoPath) {
             $packagePath = "${repoPath}\package.json"
