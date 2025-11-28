@@ -20,169 +20,20 @@ jobs:
         node-version: 24
         cache: 'npm'
     
-    - name: Clone scratch repositories
-      run: |
-        REPO_PARENT="$(dirname $GITHUB_WORKSPACE)"
-        
-        # Function to clone repository
-        clone_repo() {
-          local repo_name=$1
-          local repo_url="https://github.com/AstraEditor/${repo_name}.git"
-          local repo_path="${REPO_PARENT}/${repo_name}"
-          
-          echo "Cloning ${repo_name}..."
-          git clone --depth 1 --single-branch "$repo_url" "$repo_path"
-        }
-        
-        # Clone all required repositories
-        clone_repo "scratch-gui"
-        clone_repo "scratch-vm"
-        clone_repo "scratch-audio"
-        clone_repo "scratch-blocks"
-        clone_repo "scratch-paint"
-        clone_repo "scratch-render"
-        
-        echo "All repositories cloned successfully"
-      shell: bash
-    
-    - name: Validate package.json files
-      run: |
-        REPO_PARENT="$(dirname $GITHUB_WORKSPACE)"
-        
-        # Validate Desktop package.json
-        node scripts/validate-package.js package.json
-        
-        # Validate scratch repositories
-        repos=("scratch-gui" "scratch-vm" "scratch-audio" "scratch-blocks" "scratch-paint" "scratch-render")
-        for repo in "${repos[@]}"; do
-          package_path="${REPO_PARENT}/${repo}/package.json"
-          if [ -f "$package_path" ]; then
-            node scripts/validate-package.js "$package_path"
-          else
-            echo "Warning: ${repo}/package.json not found"
-          fi
-        done
-        
-        echo "All package.json files validated successfully"
-      shell: bash
-    
-    - name: Install scratch-gui dependencies
-      run: |
-        cd "$(dirname $GITHUB_WORKSPACE)/scratch-gui"
-        echo "Installing scratch-gui dependencies..."
-        npm ci --no-audit --no-fund
-        echo "scratch-gui dependencies installed successfully"
-      shell: bash
-    
-    - name: Install and build scratch-vm
-      run: |
-        REPO_PARENT="$(dirname $GITHUB_WORKSPACE)"
-        cd "${REPO_PARENT}/scratch-vm"
-        
-        echo "Installing scratch-vm dependencies..."
-        npm ci --no-audit --no-fund
-        
-        echo "Building scratch-vm..."
-        npm run build
-        
-        echo "Creating npm link for scratch-vm..."
-        npm link
-        echo "scratch-vm processed successfully"
-      shell: bash
-    
-    - name: Install and build other scratch dependencies
-      run: |
-        REPO_PARENT="$(dirname $GITHUB_WORKSPACE)"
-        
-        # Function to install and build dependencies
-        install_and_build_deps() {
-          local repo_name=$1
-          local repo_path="${REPO_PARENT}/${repo_name}"
-          
-          if [ -d "$repo_path" ] && [ -f "$repo_path/package.json" ]; then
-            echo "Installing ${repo_name} dependencies..."
-            cd "$repo_path"
-            npm ci --no-audit --no-fund
-            echo "${repo_name} dependencies installed successfully"
-            
-            # Build the module if it has a build script
-            if [ "$repo_name" = "scratch-audio" ]; then
-              echo "Building ${repo_name}..."
-              npm run build
-            elif [ "$repo_name" = "scratch-blocks" ]; then
-              echo "Building ${repo_name}..."
-              npm run prepublish
-            elif [ "$repo_name" = "scratch-paint" ]; then
-              echo "Building ${repo_name}..."
-              npm run build
-            elif [ "$repo_name" = "scratch-render" ]; then
-              echo "Building ${repo_name}..."
-              npm run build
-            fi
-            
-            # Create npm link
-            echo "Creating npm link for ${repo_name}..."
-            npm link
-            echo "${repo_name} processed successfully"
-          fi
-        }
-        
-        # Install and build dependencies
-        for repo in "scratch-audio" "scratch-blocks" "scratch-paint" "scratch-render"; do
-          install_and_build_deps "$repo"
-        done
-        
-        echo "All other scratch dependencies processed"
-      shell: bash
-    
-    - name: Link scratch modules to scratch-gui
-      run: |
-        cd "$(dirname $GITHUB_WORKSPACE)/scratch-gui"
-        echo "Linking scratch modules to scratch-gui..."
-        npm link scratch-audio scratch-blocks scratch-paint scratch-render scratch-vm
-        echo "All scratch modules linked successfully"
-      shell: bash
-    
     - name: Install strip-nondeterminism
       run: sudo apt-get install strip-nondeterminism
     
-    - name: Install Desktop dependencies
+    - name: Build project
       run: |
-        echo "Installing Desktop dependencies..."
+        export CI="true"
         npm ci --no-audit --no-fund
-        echo "Desktop dependencies installed successfully"
-      shell: bash
-    
-    - name: Prepare extensions
-      run: |
-        echo "Preparing extensions..."
-        npm run prepare-extensions
-        echo "Extensions prepared successfully"
-      shell: bash
-    
-    - name: Fetch library files
-      run: |
-        echo "Fetching library files..."
-        npm run fetch
-        echo "Library files fetched successfully"
-      shell: bash
-    
-    - name: Compile
-      run: |
-        echo "Starting webpack compilation..."
-        npm run webpack:prod
-        echo "Webpack compilation completed successfully"
+        npm run build-simplified
       shell: bash
     
     - name: Package
       run: |
         echo "Packaging for Linux..."
-        
-        # Build with error handling
-        echo "Building Linux packages..."
         node release-automation/build.mjs --debian --tarball --appimage --x64 --armv7l --arm64 || echo "Linux packaging may have warnings"
-        
-        echo "Linux packaging completed successfully"
       shell: bash
     
     - name: Print file tree
@@ -212,155 +63,11 @@ jobs:
         node-version: 24
         cache: 'npm'
     
-    - name: Clone scratch repositories
+    - name: Build project
       run: |
-        REPO_PARENT="$(dirname $GITHUB_WORKSPACE)"
-        
-        # Function to clone repository
-        clone_repo() {
-          local repo_name=$1
-          local repo_url="https://github.com/AstraEditor/${repo_name}.git"
-          local repo_path="${REPO_PARENT}/${repo_name}"
-          
-          echo "Cloning ${repo_name}..."
-          git clone --depth 1 --single-branch "$repo_url" "$repo_path"
-        }
-        
-        # Clone all required repositories
-        clone_repo "scratch-gui"
-        clone_repo "scratch-vm"
-        clone_repo "scratch-audio"
-        clone_repo "scratch-blocks"
-        clone_repo "scratch-paint"
-        clone_repo "scratch-render"
-        
-        echo "All repositories cloned successfully"
-      shell: bash
-    
-    - name: Validate package.json files
-      run: |
-        REPO_PARENT="$(dirname $GITHUB_WORKSPACE)"
-        
-        # Validate Desktop package.json
-        node scripts/validate-package.js package.json
-        
-        # Validate scratch repositories
-        repos=("scratch-gui" "scratch-vm" "scratch-audio" "scratch-blocks" "scratch-paint" "scratch-render")
-        for repo in "${repos[@]}"; do
-          package_path="${REPO_PARENT}/${repo}/package.json"
-          if [ -f "$package_path" ]; then
-            node scripts/validate-package.js "$package_path"
-          else
-            echo "Warning: ${repo}/package.json not found"
-          fi
-        done
-        
-        echo "All package.json files validated successfully"
-      shell: bash
-    
-    - name: Install scratch-gui dependencies
-      run: |
-        cd "$(dirname $GITHUB_WORKSPACE)/scratch-gui"
-        echo "Installing scratch-gui dependencies..."
+        export CI="true"
         npm ci --no-audit --no-fund
-        echo "scratch-gui dependencies installed successfully"
-      shell: bash
-    
-    - name: Install and build scratch-vm
-      run: |
-        REPO_PARENT="$(dirname $GITHUB_WORKSPACE)"
-        cd "${REPO_PARENT}/scratch-vm"
-        
-        echo "Installing scratch-vm dependencies..."
-        npm ci --no-audit --no-fund
-        
-        echo "Building scratch-vm..."
-        npm run build
-        
-        echo "Creating npm link for scratch-vm..."
-        npm link
-        echo "scratch-vm processed successfully"
-      shell: bash
-    
-    - name: Install and build other scratch dependencies
-      run: |
-        REPO_PARENT="$(dirname $GITHUB_WORKSPACE)"
-        
-        # Function to install and build dependencies
-        install_and_build_deps() {
-          local repo_name=$1
-          local repo_path="${REPO_PARENT}/${repo_name}"
-          
-          if [ -d "$repo_path" ] && [ -f "$repo_path/package.json" ]; then
-            echo "Installing ${repo_name} dependencies..."
-            cd "$repo_path"
-            npm ci --no-audit --no-fund
-            echo "${repo_name} dependencies installed successfully"
-            
-            # Build the module if it has a build script
-            if [ "$repo_name" = "scratch-audio" ]; then
-              echo "Building ${repo_name}..."
-              npm run build
-            elif [ "$repo_name" = "scratch-blocks" ]; then
-              echo "Building ${repo_name}..."
-              npm run prepublish
-            elif [ "$repo_name" = "scratch-paint" ]; then
-              echo "Building ${repo_name}..."
-              npm run build
-            elif [ "$repo_name" = "scratch-render" ]; then
-              echo "Building ${repo_name}..."
-              npm run build
-            fi
-            
-            # Create npm link
-            echo "Creating npm link for ${repo_name}..."
-            npm link
-            echo "${repo_name} processed successfully"
-          fi
-        }
-        
-        # Install and build dependencies
-        for repo in "scratch-audio" "scratch-blocks" "scratch-paint" "scratch-render"; do
-          install_and_build_deps "$repo"
-        done
-        
-        echo "All other scratch dependencies processed"
-      shell: bash
-    
-    - name: Link scratch modules to scratch-gui
-      run: |
-        cd "$(dirname $GITHUB_WORKSPACE)/scratch-gui"
-        echo "Linking scratch modules to scratch-gui..."
-        npm link scratch-audio scratch-blocks scratch-paint scratch-render scratch-vm
-        echo "All scratch modules linked successfully"
-      shell: bash
-    
-    - name: Install Desktop dependencies
-      run: |
-        echo "Installing Desktop dependencies..."
-        npm ci --no-audit --no-fund
-        echo "Desktop dependencies installed successfully"
-      shell: bash
-    
-    - name: Prepare extensions
-      run: |
-        echo "Preparing extensions..."
-        npm run prepare-extensions
-        echo "Extensions prepared successfully"
-      shell: bash
-    
-    - name: Fetch library files
-      run: |
-        echo "Fetching library files..."
-        npm run fetch
-        echo "Library files fetched successfully"
-      shell: bash
-    
-    - name: Compile
-      run: |
-        echo "Starting webpack compilation..."
-        npm run webpack:prod
-        echo "Webpack compilation completed successfully"
+        npm run build-simplified
       shell: bash
     
     - name: Package
@@ -370,18 +77,9 @@ jobs:
         export CSC_IDENTITY=
         export CSC_NAME=
         
-        # Need to run the universal builds as separate commands or it breaks when @electron/universal
-        # diffs the ASARs and finds spurious differences. Not clear why.
-        echo "Building macOS universal..."
         node release-automation/build.mjs --mac --universal --production || echo "Universal build may have warnings"
-        
-        echo "Building macOS legacy 11..."
         node release-automation/build.mjs --mac-legacy-11 --universal --production || echo "Legacy 11 build may have warnings"
-        
-        echo "Building macOS legacy 10.13-10.15..."
         node release-automation/build.mjs --mac-legacy-10.13-10.14 --mac-legacy-10.15 --x64 || echo "Legacy build may have warnings"
-        
-        echo "macOS packaging completed successfully"
       shell: bash
     
     - name: Print file tree
@@ -401,175 +99,29 @@ jobs:
       with:
         submodules: recursive
         persist-credentials: false
-        path: repo
+      path: repo
     
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: 24
     
-    - name: "Move repository to D: drive"
+    - name: Move repository to D: drive
       run: |
         Copy-Item -Path repo -Destination D:\repo -Recurse
         Remove-Item -Path repo -Recurse -Force
     
-    - name: "Configure npm to use D: drive"
+    - name: Configure npm to use D: drive
       run: |
         npm config set cache D:\npm-cache
         npm config set prefix D:\npm-prefix
     
-    - name: Clone scratch repositories
-      run: |
-        $REPO_PARENT = "D:\"
-        
-        # Function to clone repository
-        function Clone-Repo($repoName) {
-          $repoUrl = "https://github.com/AstraEditor/${repoName}.git"
-          $repoPath = "${REPO_PARENT}${repoName}"
-          
-          Write-Host "Cloning ${repoName}..."
-          git clone --depth 1 --single-branch $repoUrl $repoPath
-        }
-        
-        # Clone all required repositories
-        Clone-Repo "scratch-gui"
-        Clone-Repo "scratch-vm"
-        Clone-Repo "scratch-audio"
-        Clone-Repo "scratch-blocks"
-        Clone-Repo "scratch-paint"
-        Clone-Repo "scratch-render"
-        
-        Write-Host "All repositories cloned successfully"
-      shell: powershell
-    
-    - name: Validate package.json files
-      run: |
-        $REPO_PARENT = "D:\"
-        
-        # Validate Desktop package.json
-        node D:\repo\scripts\validate-package.js D:\repo\package.json
-        
-        # Validate scratch repositories
-        $repos = @("scratch-gui", "scratch-vm", "scratch-audio", "scratch-blocks", "scratch-paint", "scratch-render")
-        foreach ($repo in $repos) {
-          $packagePath = "${REPO_PARENT}${repo}\package.json"
-          if (Test-Path $packagePath) {
-            node D:\repo\scripts\validate-package.js $packagePath
-          } else {
-            Write-Host "Warning: ${repo}/package.json not found"
-          }
-        }
-        
-        Write-Host "All package.json files validated successfully"
-      shell: powershell
-    
-    - name: Install scratch-gui dependencies
-      run: |
-        cd D:\scratch-gui
-        Write-Host "Installing scratch-gui dependencies..."
-        npm ci --no-audit --no-fund
-        Write-Host "scratch-gui dependencies installed successfully"
-      shell: powershell
-    
-    - name: Install and build scratch-vm
-      run: |
-        cd D:\scratch-vm
-        
-        Write-Host "Installing scratch-vm dependencies..."
-        npm ci --no-audit --no-fund
-        
-        Write-Host "Building scratch-vm..."
-        npm run build
-        
-        Write-Host "Creating npm link for scratch-vm..."
-        npm link
-        Write-Host "scratch-vm processed successfully"
-      shell: powershell
-    
-    - name: Install and build other scratch dependencies
-      run: |
-        # Function to install and build dependencies
-        function Install-Build-Dep($repoName) {
-          $repoPath = "D:\$repoName"
-          
-          if (Test-Path $repoPath) {
-            $packagePath = "${repoPath}\package.json"
-            if (Test-Path $packagePath) {
-              Write-Host "Installing ${repoName} dependencies..."
-              cd $repoPath
-              npm ci --no-audit --no-fund
-              Write-Host "${repoName} dependencies installed successfully"
-              
-              # Build the module if it has a build script
-              if ($repoName -eq "scratch-audio") {
-                Write-Host "Building ${repoName}..."
-                npm run build
-              } elseif ($repoName -eq "scratch-blocks") {
-                Write-Host "Building ${repoName}..."
-                npm run prepublish
-              } elseif ($repoName -eq "scratch-paint") {
-                Write-Host "Building ${repoName}..."
-                npm run build
-              } elseif ($repoName -eq "scratch-render") {
-                Write-Host "Building ${repoName}..."
-                npm run build
-              }
-              
-              # Create npm link
-              Write-Host "Creating npm link for ${repoName}..."
-              npm link
-              Write-Host "${repoName} processed successfully"
-            }
-          }
-        }
-        
-        # Install and build dependencies
-        $repos = @("scratch-audio", "scratch-blocks", "scratch-paint", "scratch-render")
-        foreach ($repo in $repos) {
-          Install-Build-Dep $repo
-        }
-        
-        Write-Host "All other scratch dependencies processed"
-      shell: powershell
-    
-    - name: Link scratch modules to scratch-gui
-      run: |
-        cd D:\scratch-gui
-        Write-Host "Linking scratch modules to scratch-gui..."
-        npm link scratch-audio scratch-blocks scratch-paint scratch-render scratch-vm
-        Write-Host "All scratch modules linked successfully"
-      shell: powershell
-    
-    - name: Install Desktop dependencies
+    - name: Build project
       run: |
         cd D:\repo
-        Write-Host "Installing Desktop dependencies..."
+        $env:CI = "true"
         npm ci --no-audit --no-fund --cache D:\npm-cache
-        Write-Host "Desktop dependencies installed successfully"
-      shell: powershell
-    
-    - name: Prepare extensions
-      run: |
-        cd D:\repo
-        Write-Host "Preparing extensions..."
-        npm run prepare-extensions-optimized
-        Write-Host "Extensions prepared successfully"
-      shell: powershell
-    
-    - name: Fetch library files
-      run: |
-        cd D:\repo
-        Write-Host "Fetching library files..."
-        npm run fetch
-        Write-Host "Library files fetched successfully"
-      shell: powershell
-    
-    - name: Compile
-      run: |
-        cd D:\repo
-        Write-Host "Starting webpack compilation..."
-        npm run webpack:prod
-        Write-Host "Webpack compilation completed successfully"
+        npm run build-simplified
       shell: powershell
     
     - name: Package
@@ -601,8 +153,6 @@ jobs:
         } catch {
           Write-Host "Legacy build may have warnings, continuing..."
         }
-        
-        Write-Host "Windows packaging completed successfully"
       shell: powershell
     
     - name: Print file tree

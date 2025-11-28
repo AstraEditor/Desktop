@@ -9,9 +9,11 @@
   },
   "type": "commonjs",
   "scripts": {
-    "fetch": "node scripts/download-library-files.mjs && node scripts/download-packager.mjs && node scripts/prepare-extensions.mjs",
+    "fetch": "node scripts/download-library-files.mjs && node scripts/download-packager.mjs && node scripts/prepare-extensions-optimized.mjs",
     "prepare-extensions": "node scripts/prepare-extensions.mjs",
     "prepare-extensions-optimized": "node scripts/prepare-extensions-optimized.mjs",
+    "build-unified": "node scripts/build-common.mjs",
+    "build-simplified": "node scripts/build-simplified.mjs",
     "webpack:compile": "webpack",
     "webpack:watch": "webpack --watch",
     "webpack:prod": "cross-env NODE_ENV=production webpack",
