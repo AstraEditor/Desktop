@@ -108,51 +108,60 @@ jobs:
         echo "scratch-gui dependencies installed successfully"
       shell: bash
     
-    # Install and build scratch-vm first (most time-consuming) - with optimization
+    # Install and build scratch-vm first with aggressive optimizations
     - name: Install and build scratch-vm
-      timeout-minutes: 30
+      timeout-minutes: 45
       run: |
         REPO_PARENT="${{ env.WORKSPACE_PARENT }}"
         repo_path="${REPO_PARENT}/scratch-vm"
         
-        echo "Installing scratch-vm dependencies with optimizations..."
+        echo "Installing scratch-vm dependencies with aggressive optimizations..."
         cd "$repo_path"
         
-        # Set optimized environment variables for speed and memory
-        export NODE_OPTIONS="--max-old-space-size=8192"
+        # Set aggressive optimization environment variables
+        export NODE_OPTIONS="--max-old-space-size=12288"
         export npm_config_progress=false
         export npm_config_silent=false
+        export npm_config_foreground_scripts=true
         
-        # Use faster npm ci with minimal output
-        npm ci --no-audit --no-fund --prefer-offline --no-audit --no-fund
+        # Use ultra-fast npm ci with all optimizations
+        npm ci --no-audit --no-fund --prefer-offline --no-audit --no-fund --cache /tmp/npm-cache
         echo "scratch-vm dependencies installed successfully"
         
-        echo "Building scratch-vm with optimizations (this may take a while)..."
-        # Use production build optimizations
+        echo "Building scratch-vm with aggressive optimizations..."
+        # Use maximum production build optimizations
         export NODE_ENV=production
         export CI=true
+        export npm_config_unsafe_perm=true
         
-        # Build with increased memory and optimized settings
-        npm run build -- --max-old-space-size=8192
-        echo "scratch-vm built successfully"
+        # Try to use pre-built dist if available, otherwise build
+        if [ -d "dist" ] && [ "$(ls -A dist)" ]; then
+          echo "Found existing scratch-vm dist, skipping build..."
+        else
+          echo "Building scratch-vm from scratch (this will take time)..."
+          # Build with maximum memory and all optimizations
+          npm run build -- --max-old-space-size=12288 --optimize-for-size
+          echo "scratch-vm built successfully"
+        fi
         
         echo "Creating npm link for scratch-vm..."
         npm link
         echo "scratch-vm linked successfully"
       shell: bash
     
-    # Install and build other scratch dependencies with optimizations
+    # Install and build other scratch dependencies with conditional logic
     - name: Install and build other scratch dependencies
-      timeout-minutes: 20
+      timeout-minutes: 25
       run: |
         REPO_PARENT="${{ env.WORKSPACE_PARENT }}"
         
         # Set optimized environment variables
-        export NODE_OPTIONS="--max-old-space-size=6144"
+        export NODE_OPTIONS="--max-old-space-size=8192"
         export npm_config_progress=false
         export NODE_ENV=production
+        export npm_config_foreground_scripts=true
         
-        # Function to install and build dependencies
+        # Function to install and build dependencies with conditional logic
         install_and_build_deps() {
           local repo_name=$1
           local repo_path="${REPO_PARENT}/${repo_name}"
@@ -160,22 +169,44 @@ jobs:
           if [ -d "$repo_path" ] && [ -f "$repo_path/package.json" ]; then
             echo "Installing ${repo_name} dependencies with optimizations..."
             cd "$repo_path"
-            npm ci --no-audit --no-fund --prefer-offline
+            npm ci --no-audit --no-fund --prefer-offline --cache /tmp/npm-cache
             echo "${repo_name} dependencies installed successfully"
             
-            # Build the module if it has a build script
+            # Check if already built to save time
+            local should_build=false
+            
             if [ "$repo_name" = "scratch-audio" ]; then
-              echo "Building ${repo_name}..."
-              npm run build
+              if [ ! -d "dist" ] || [ -z "$(ls -A dist 2>/dev/null)" ]; then
+                echo "Building ${repo_name}..."
+                npm run build
+                should_build=true
+              else
+                echo "${repo_name} already built, skipping..."
+              fi
             elif [ "$repo_name" = "scratch-blocks" ]; then
-              echo "Building ${repo_name}..."
-              npm run prepublish
+              if [ ! -d "dist" ] || [ -z "$(ls -A dist 2>/dev/null)" ]; then
+                echo "Building ${repo_name}..."
+                npm run prepublish
+                should_build=true
+              else
+                echo "${repo_name} already built, skipping..."
+              fi
             elif [ "$repo_name" = "scratch-paint" ]; then
-              echo "Building ${repo_name}..."
-              npm run build
+              if [ ! -d "build" ] || [ -z "$(ls -A build 2>/dev/null)" ]; then
+                echo "Building ${repo_name}..."
+                npm run build
+                should_build=true
+              else
+                echo "${repo_name} already built, skipping..."
+              fi
             elif [ "$repo_name" = "scratch-render" ]; then
-              echo "Building ${repo_name}..."
-              npm run build
+              if [ ! -d "dist" ] || [ -z "$(ls -A dist 2>/dev/null)" ]; then
+                echo "Building ${repo_name}..."
+                npm run build
+                should_build=true
+              else
+                echo "${repo_name} already built, skipping..."
+              fi
             fi
             
             # Create npm link
@@ -185,12 +216,20 @@ jobs:
           fi
         }
         
-        # Install and build dependencies in parallel with controlled concurrency
-        echo "Building scratch dependencies in parallel..."
+        # Install and build dependencies with staggered parallel execution
+        echo "Building scratch dependencies with staggered execution..."
+        
+        # Start with the fastest builds first
         install_and_build_deps "scratch-audio" &
-        install_and_build_deps "scratch-blocks" &
-        install_and_build_deps "scratch-paint" &
+        sleep 5  # Small delay to stagger starts
+        
         install_and_build_deps "scratch-render" &
+        sleep 5
+        
+        install_and_build_deps "scratch-paint" &
+        sleep 5
+        
+        install_and_build_deps "scratch-blocks" &
         
         # Wait for all installations and builds to complete
         wait
@@ -238,33 +277,47 @@ jobs:
         echo "Library files fetched successfully"
       shell: bash
     
-    # Compile with increased memory and optimizations
+    # Compile with maximum memory and aggressive optimizations
     - name: Compile
-      timeout-minutes: 25
+      timeout-minutes: 35
       run: |
-        echo "Starting webpack compilation with optimizations..."
+        echo "Starting webpack compilation with aggressive optimizations..."
+        
+        # Create temp directories for caching
+        mkdir -p /tmp/webpack-cache /tmp/npm-cache
+        
         if [ "${{ runner.os }}" = "Windows" ]; then
-          export NODE_OPTIONS="--max-old-space-size=10240"
-          # Windows specific optimizations
-          echo "Using Windows optimizations with 10GB memory..."
+          export NODE_OPTIONS="--max-old-space-size=12288"
+          echo "Using Windows optimizations with 12GB memory..."
         else
-          export NODE_OPTIONS="--max-old-space-size=8192"
-          echo "Using Unix optimizations with 8GB memory..."
+          export NODE_OPTIONS="--max-old-space-size=10240"
+          echo "Using Unix optimizations with 10GB memory..."
         fi
         
-        # Additional optimizations
+        # Maximum optimizations
         export NODE_ENV=production
         export OPTIMIZE_FOR_SIZE=true
         export npm_config_progress=false
+        export npm_config_foreground_scripts=true
         
-        # Webpack specific optimizations
+        # Webpack aggressive optimizations
         export WEBPACK_PARALLELISM=1
         export WEBPACK_CACHE=true
+        export WEBPACK_CACHE_COMPRESSION=true
+        
+        # Additional performance settings
+        export UV_THREADPOOL_SIZE=8
+        export NODE_ICU_DATA=/node_modules/full-icu
         
         echo "Memory limit set to: $NODE_OPTIONS"
-        echo "Starting webpack compilation..."
+        echo "Starting webpack compilation with maximum optimizations..."
         
-        # Run webpack with optimized settings
+        # Clear any existing cache to ensure clean build
+        if [ -d "node_modules/.cache" ]; then
+          rm -rf node_modules/.cache
+        fi
+        
+        # Run webpack with all optimizations
         npm run webpack:compile
         
         echo "Webpack compilation completed successfully"
