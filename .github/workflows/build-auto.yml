@@ -103,13 +103,13 @@ jobs:
         echo "scratch-gui dependencies installed successfully"
       shell: bash
     
-    # Install other scratch dependencies in parallel
-    - name: Install scratch dependencies
+    # Install and build other scratch dependencies in parallel
+    - name: Install and build scratch dependencies
       run: |
         REPO_PARENT="${{ env.WORKSPACE_PARENT }}"
         
-        # Function to install dependencies
-        install_deps() {
+        # Function to install and build dependencies
+        install_and_build_deps() {
           local repo_name=$1
           local repo_path="${REPO_PARENT}/${repo_name}"
           
@@ -118,20 +118,52 @@ jobs:
             cd "$repo_path"
             npm ci --no-audit --no-fund
             echo "${repo_name} dependencies installed successfully"
+            
+            # Build the module if it has a build script
+            if [ "$repo_name" = "scratch-audio" ]; then
+              echo "Building ${repo_name}..."
+              npm run build
+            elif [ "$repo_name" = "scratch-blocks" ]; then
+              echo "Building ${repo_name}..."
+              npm run prepublish
+            elif [ "$repo_name" = "scratch-paint" ]; then
+              echo "Building ${repo_name}..."
+              npm run build
+            elif [ "$repo_name" = "scratch-render" ]; then
+              echo "Building ${repo_name}..."
+              npm run build
+            elif [ "$repo_name" = "scratch-vm" ]; then
+              echo "Building ${repo_name}..."
+              npm run build
+            fi
+            
+            # Create npm link
+            echo "Creating npm link for ${repo_name}..."
+            npm link
+            echo "${repo_name} built and linked successfully"
           fi
         }
         
-        # Install dependencies in parallel
-        install_deps "scratch-vm" &
-        install_deps "scratch-audio" &
-        install_deps "scratch-blocks" &
-        install_deps "scratch-paint" &
-        install_deps "scratch-render" &
+        # Install and build dependencies in parallel
+        install_and_build_deps "scratch-vm" &
+        install_and_build_deps "scratch-audio" &
+        install_and_build_deps "scratch-blocks" &
+        install_and_build_deps "scratch-paint" &
+        install_and_build_deps "scratch-render" &
         
-        # Wait for all installations to complete
+        # Wait for all installations and builds to complete
         wait
         
-        echo "All scratch dependencies installed"
+        echo "All scratch dependencies installed and built"
+      shell: bash
+    
+    # Link scratch modules to scratch-gui
+    - name: Link scratch modules to scratch-gui
+      run: |
+        cd "${{ env.WORKSPACE_PARENT }}/scratch-gui"
+        echo "Linking scratch modules to scratch-gui..."
+        npm link scratch-audio scratch-blocks scratch-paint scratch-render scratch-vm
+        echo "All scratch modules linked successfully"
       shell: bash
     
     # Install Desktop dependencies
