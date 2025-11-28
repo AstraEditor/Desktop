@@ -103,8 +103,28 @@ jobs:
         echo "scratch-gui dependencies installed successfully"
       shell: bash
     
+    # Install and build scratch-vm first (most time-consuming)
+    - name: Install and build scratch-vm
+      run: |
+        REPO_PARENT="${{ env.WORKSPACE_PARENT }}"
+        repo_path="${REPO_PARENT}/scratch-vm"
+        
+        echo "Installing scratch-vm dependencies..."
+        cd "$repo_path"
+        npm ci --no-audit --no-fund
+        echo "scratch-vm dependencies installed successfully"
+        
+        echo "Building scratch-vm (this may take a while)..."
+        npm run build
+        echo "scratch-vm built successfully"
+        
+        echo "Creating npm link for scratch-vm..."
+        npm link
+        echo "scratch-vm linked successfully"
+      shell: bash
+    
     # Install and build other scratch dependencies in parallel
-    - name: Install and build scratch dependencies
+    - name: Install and build other scratch dependencies
       run: |
         REPO_PARENT="${{ env.WORKSPACE_PARENT }}"
         
@@ -132,9 +152,6 @@ jobs:
             elif [ "$repo_name" = "scratch-render" ]; then
               echo "Building ${repo_name}..."
               npm run build
-            elif [ "$repo_name" = "scratch-vm" ]; then
-              echo "Building ${repo_name}..."
-              npm run build
             fi
             
             # Create npm link
@@ -145,7 +162,6 @@ jobs:
         }
         
         # Install and build dependencies in parallel
-        install_and_build_deps "scratch-vm" &
         install_and_build_deps "scratch-audio" &
         install_and_build_deps "scratch-blocks" &
         install_and_build_deps "scratch-paint" &
@@ -154,7 +170,7 @@ jobs:
         # Wait for all installations and builds to complete
         wait
         
-        echo "All scratch dependencies installed and built"
+        echo "All other scratch dependencies installed and built"
       shell: bash
     
     # Link scratch modules to scratch-gui
@@ -202,11 +218,19 @@ jobs:
       run: |
         echo "Starting webpack compilation..."
         if [ "${{ runner.os }}" = "Windows" ]; then
-          export NODE_OPTIONS="--max-old-space-size=4096"
+          export NODE_OPTIONS="--max-old-space-size=8192"
+          # Windows specific optimizations
+          echo "Using Windows optimizations..."
         else
-          export NODE_OPTIONS="--max-old-space-size=4096"
+          export NODE_OPTIONS="--max-old-space-size=6144"
+          echo "Using Unix optimizations..."
         fi
         
+        # Additional optimizations
+        export NODE_ENV=production
+        export OPTIMIZE_FOR_SIZE=true
+        
+        echo "Memory limit set to: $NODE_OPTIONS"
         npm run webpack:compile
         
         echo "Webpack compilation completed successfully"
