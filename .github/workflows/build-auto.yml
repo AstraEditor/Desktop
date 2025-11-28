@@ -5,23 +5,8 @@ on:
   pull_request:
 
 jobs:
-  build:
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        include:
-          - os: ubuntu-latest
-            platform: linux
-            artifact-name: build-output-linux
-          - os: windows-latest
-            platform: win
-            artifact-name: build-output-windows
-          - os: macos-latest
-            platform: mac
-            artifact-name: build-output-mac
-    
-    runs-on: ${{ matrix.os }}
-    
+  build-linux:
+    runs-on: ubuntu-latest
     steps:
     - name: Checkout
       uses: actions/checkout@v4
@@ -35,50 +20,34 @@ jobs:
         node-version: 24
         cache: 'npm'
     
-    - name: Setup environment variables
-      run: |
-        if [ "${{ runner.os }}" = "Windows" ]; then
-          echo "WORKSPACE_PARENT=$(dirname $GITHUB_WORKSPACE)" >> $GITHUB_ENV
-        else
-          echo "WORKSPACE_PARENT=$(dirname $GITHUB_WORKSPACE)" >> $GITHUB_ENV
-        fi
-      shell: bash
-    
-    # Clone scratch repositories first with caching
     - name: Clone scratch repositories
       run: |
-        REPO_PARENT="${{ env.WORKSPACE_PARENT }}"
+        REPO_PARENT="$(dirname $GITHUB_WORKSPACE)"
         
-        # Function to clone repository with optimizations
+        # Function to clone repository
         clone_repo() {
           local repo_name=$1
           local repo_url="https://github.com/AstraEditor/${repo_name}.git"
           local repo_path="${REPO_PARENT}/${repo_name}"
           
-          echo "Cloning ${repo_name} with optimizations..."
-          # Use shallow clone with single branch for speed
+          echo "Cloning ${repo_name}..."
           git clone --depth 1 --single-branch "$repo_url" "$repo_path"
         }
         
         # Clone all required repositories
-        echo "Starting parallel repository cloning..."
-        clone_repo "scratch-gui" &
-        clone_repo "scratch-vm" &
-        clone_repo "scratch-audio" &
-        clone_repo "scratch-blocks" &
-        clone_repo "scratch-paint" &
-        clone_repo "scratch-render" &
-        
-        # Wait for all cloning to complete
-        wait
+        clone_repo "scratch-gui"
+        clone_repo "scratch-vm"
+        clone_repo "scratch-audio"
+        clone_repo "scratch-blocks"
+        clone_repo "scratch-paint"
+        clone_repo "scratch-render"
         
         echo "All repositories cloned successfully"
       shell: bash
     
-    # Validate all package.json files after cloning
     - name: Validate package.json files
       run: |
-        REPO_PARENT="${{ env.WORKSPACE_PARENT }}"
+        REPO_PARENT="$(dirname $GITHUB_WORKSPACE)"
         
         # Validate Desktop package.json
         node scripts/validate-package.js package.json
@@ -97,179 +66,100 @@ jobs:
         echo "All package.json files validated successfully"
       shell: bash
     
-    # Install scratch-gui dependencies first (core dependency)
     - name: Install scratch-gui dependencies
       run: |
-        cd "${{ env.WORKSPACE_PARENT }}/scratch-gui"
-        
+        cd "$(dirname $GITHUB_WORKSPACE)/scratch-gui"
         echo "Installing scratch-gui dependencies..."
         npm ci --no-audit --no-fund
-        
         echo "scratch-gui dependencies installed successfully"
       shell: bash
     
-    # Install and build scratch-vm first with aggressive optimizations
     - name: Install and build scratch-vm
-      timeout-minutes: 45
       run: |
-        REPO_PARENT="${{ env.WORKSPACE_PARENT }}"
-        repo_path="${REPO_PARENT}/scratch-vm"
+        REPO_PARENT="$(dirname $GITHUB_WORKSPACE)"
+        cd "${REPO_PARENT}/scratch-vm"
         
-        echo "Installing scratch-vm dependencies with aggressive optimizations..."
-        cd "$repo_path"
+        echo "Installing scratch-vm dependencies..."
+        npm ci --no-audit --no-fund
         
-        # Set aggressive optimization environment variables
-        export NODE_OPTIONS="--max-old-space-size=12288"
-        export npm_config_progress=false
-        export npm_config_silent=false
-        export npm_config_foreground_scripts=true
-        
-        # Use ultra-fast npm ci with all optimizations
-        npm ci --no-audit --no-fund --prefer-offline --no-audit --no-fund --cache /tmp/npm-cache
-        echo "scratch-vm dependencies installed successfully"
-        
-        echo "Building scratch-vm with aggressive optimizations..."
-        # Use maximum production build optimizations
-        export NODE_ENV=production
-        export CI=true
-        export npm_config_unsafe_perm=true
-        
-        # Try to use pre-built dist if available, otherwise build
-        if [ -d "dist" ] && [ "$(ls -A dist)" ]; then
-          echo "Found existing scratch-vm dist, skipping build..."
-        else
-          echo "Building scratch-vm from scratch (this will take time)..."
-          # Build with maximum memory and all optimizations
-          npm run build -- --max-old-space-size=12288 --optimize-for-size
-          echo "scratch-vm built successfully"
-        fi
+        echo "Building scratch-vm..."
+        npm run build
         
         echo "Creating npm link for scratch-vm..."
         npm link
-        echo "scratch-vm linked successfully"
+        echo "scratch-vm processed successfully"
       shell: bash
     
-    # Install and build other scratch dependencies with conditional logic
     - name: Install and build other scratch dependencies
-      timeout-minutes: 25
       run: |
-        REPO_PARENT="${{ env.WORKSPACE_PARENT }}"
+        REPO_PARENT="$(dirname $GITHUB_WORKSPACE)"
         
-        # Set optimized environment variables
-        export NODE_OPTIONS="--max-old-space-size=8192"
-        export npm_config_progress=false
-        export NODE_ENV=production
-        export npm_config_foreground_scripts=true
-        
-        # Function to install and build dependencies with conditional logic
+        # Function to install and build dependencies
         install_and_build_deps() {
           local repo_name=$1
           local repo_path="${REPO_PARENT}/${repo_name}"
           
           if [ -d "$repo_path" ] && [ -f "$repo_path/package.json" ]; then
-            echo "Installing ${repo_name} dependencies with optimizations..."
+            echo "Installing ${repo_name} dependencies..."
             cd "$repo_path"
-            npm ci --no-audit --no-fund --prefer-offline --cache /tmp/npm-cache
+            npm ci --no-audit --no-fund
             echo "${repo_name} dependencies installed successfully"
             
-            # Check if already built to save time
-            local should_build=false
-            
+            # Build the module if it has a build script
             if [ "$repo_name" = "scratch-audio" ]; then
-              if [ ! -d "dist" ] || [ -z "$(ls -A dist 2>/dev/null)" ]; then
-                echo "Building ${repo_name}..."
-                npm run build
-                should_build=true
-              else
-                echo "${repo_name} already built, skipping..."
-              fi
+              echo "Building ${repo_name}..."
+              npm run build
             elif [ "$repo_name" = "scratch-blocks" ]; then
-              if [ ! -d "dist" ] || [ -z "$(ls -A dist 2>/dev/null)" ]; then
-                echo "Building ${repo_name}..."
-                npm run prepublish
-                should_build=true
-              else
-                echo "${repo_name} already built, skipping..."
-              fi
+              echo "Building ${repo_name}..."
+              npm run prepublish
             elif [ "$repo_name" = "scratch-paint" ]; then
-              if [ ! -d "build" ] || [ -z "$(ls -A build 2>/dev/null)" ]; then
-                echo "Building ${repo_name}..."
-                npm run build
-                should_build=true
-              else
-                echo "${repo_name} already built, skipping..."
-              fi
+              echo "Building ${repo_name}..."
+              npm run build
             elif [ "$repo_name" = "scratch-render" ]; then
-              if [ ! -d "dist" ] || [ -z "$(ls -A dist 2>/dev/null)" ]; then
-                echo "Building ${repo_name}..."
-                npm run build
-                should_build=true
-              else
-                echo "${repo_name} already built, skipping..."
-              fi
+              echo "Building ${repo_name}..."
+              npm run build
             fi
             
             # Create npm link
             echo "Creating npm link for ${repo_name}..."
             npm link
-            echo "${repo_name} built and linked successfully"
+            echo "${repo_name} processed successfully"
           fi
         }
         
-        # Install and build dependencies with staggered parallel execution
-        echo "Building scratch dependencies with staggered execution..."
+        # Install and build dependencies
+        for repo in "scratch-audio" "scratch-blocks" "scratch-paint" "scratch-render"; do
+          install_and_build_deps "$repo"
+        done
         
-        # Start with the fastest builds first
-        install_and_build_deps "scratch-audio" &
-        sleep 5  # Small delay to stagger starts
-        
-        install_and_build_deps "scratch-render" &
-        sleep 5
-        
-        install_and_build_deps "scratch-paint" &
-        sleep 5
-        
-        install_and_build_deps "scratch-blocks" &
-        
-        # Wait for all installations and builds to complete
-        wait
-        
-        echo "All other scratch dependencies installed and built"
+        echo "All other scratch dependencies processed"
       shell: bash
     
-    # Link scratch modules to scratch-gui
     - name: Link scratch modules to scratch-gui
       run: |
-        cd "${{ env.WORKSPACE_PARENT }}/scratch-gui"
+        cd "$(dirname $GITHUB_WORKSPACE)/scratch-gui"
         echo "Linking scratch modules to scratch-gui..."
         npm link scratch-audio scratch-blocks scratch-paint scratch-render scratch-vm
         echo "All scratch modules linked successfully"
       shell: bash
     
-    # Install Desktop dependencies
+    - name: Install strip-nondeterminism
+      run: sudo apt-get install strip-nondeterminism
+    
     - name: Install Desktop dependencies
       run: |
         echo "Installing Desktop dependencies..."
         npm ci --no-audit --no-fund
-        
-        echo "Preparing extensions..."
-        if [ "${{ runner.os }}" = "Windows" ]; then
-          echo "Using optimized extension preparation for Windows..."
-          npm run prepare-extensions-optimized
-        else
-          npm run prepare-extensions
-        fi
-        
         echo "Desktop dependencies installed successfully"
       shell: bash
     
-    # Create required directories
-    - name: Create build directories
+    - name: Prepare extensions
       run: |
-        mkdir -p dist-library-files dist-extensions dist-renderer-webpack
+        echo "Preparing extensions..."
+        npm run prepare-extensions
+        echo "Extensions prepared successfully"
       shell: bash
     
-    # Fetch library files
     - name: Fetch library files
       run: |
         echo "Fetching library files..."
@@ -277,79 +167,418 @@ jobs:
         echo "Library files fetched successfully"
       shell: bash
     
-    # Compile with maximum memory and aggressive optimizations
     - name: Compile
-      timeout-minutes: 35
       run: |
-        echo "Starting webpack compilation with aggressive optimizations..."
-        
-        # Create temp directories for caching
-        mkdir -p /tmp/webpack-cache /tmp/npm-cache
-        
-        if [ "${{ runner.os }}" = "Windows" ]; then
-          export NODE_OPTIONS="--max-old-space-size=12288"
-          echo "Using Windows optimizations with 12GB memory..."
-        else
-          export NODE_OPTIONS="--max-old-space-size=10240"
-          echo "Using Unix optimizations with 10GB memory..."
-        fi
-        
-        # Maximum optimizations
-        export NODE_ENV=production
-        export OPTIMIZE_FOR_SIZE=true
-        export npm_config_progress=false
-        export npm_config_foreground_scripts=true
-        
-        # Webpack aggressive optimizations
-        export WEBPACK_PARALLELISM=1
-        export WEBPACK_CACHE=true
-        export WEBPACK_CACHE_COMPRESSION=true
-        
-        # Additional performance settings
-        export UV_THREADPOOL_SIZE=8
-        export NODE_ICU_DATA=/node_modules/full-icu
-        
-        echo "Memory limit set to: $NODE_OPTIONS"
-        echo "Starting webpack compilation with maximum optimizations..."
-        
-        # Clear any existing cache to ensure clean build
-        if [ -d "node_modules/.cache" ]; then
-          rm -rf node_modules/.cache
-        fi
-        
-        # Run webpack with all optimizations
-        npm run webpack:compile
-        
+        echo "Starting webpack compilation..."
+        npm run webpack:prod
         echo "Webpack compilation completed successfully"
       shell: bash
     
-    # Package for the specific platform with optimizations
     - name: Package
-      timeout-minutes: 20
       run: |
-        echo "Packaging for ${{ matrix.platform }} with optimizations..."
-        
-        # Optimize memory for packaging
-        if [ "${{ runner.os }}" = "Windows" ]; then
-          export NODE_OPTIONS="--max-old-space-size=8192"
-          npm run electron:package -- --win --publish never
-        elif [ "${{ runner.os }}" = "macOS" ]; then
-          export NODE_OPTIONS="--max-old-space-size=6144"
-          npm run electron:package -- --mac --publish never
-        else
-          export NODE_OPTIONS="--max-old-space-size=6144"
-          npm run electron:package -- --linux --publish never
-        fi
-        
-        echo "Packaging completed successfully"
+        echo "Packaging for Linux..."
+        node release-automation/build.mjs --debian --tarball --appimage --x64 --armv7l --arm64
+        echo "Linux packaging completed successfully"
       shell: bash
     
-    # Upload artifacts
-    - name: Upload build artifacts
+    - name: Print file tree
+      run: node scripts/print-file-tree.mjs dist
+    
+    - name: Upload artifacts
       uses: actions/upload-artifact@v4
-      if: always()
       with:
-        name: ${{ matrix.artifact-name }}
+        name: linux
         path: |
-          dist/
-        retention-days: 7
+          dist/*.deb
+          dist/*.tar.gz
+          dist/*.AppImage
+
+  build-mac:
+    runs-on: macos-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        persist-credentials: false
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 24
+        cache: 'npm'
+    
+    - name: Clone scratch repositories
+      run: |
+        REPO_PARENT="$(dirname $GITHUB_WORKSPACE)"
+        
+        # Function to clone repository
+        clone_repo() {
+          local repo_name=$1
+          local repo_url="https://github.com/AstraEditor/${repo_name}.git"
+          local repo_path="${REPO_PARENT}/${repo_name}"
+          
+          echo "Cloning ${repo_name}..."
+          git clone --depth 1 --single-branch "$repo_url" "$repo_path"
+        }
+        
+        # Clone all required repositories
+        clone_repo "scratch-gui"
+        clone_repo "scratch-vm"
+        clone_repo "scratch-audio"
+        clone_repo "scratch-blocks"
+        clone_repo "scratch-paint"
+        clone_repo "scratch-render"
+        
+        echo "All repositories cloned successfully"
+      shell: bash
+    
+    - name: Validate package.json files
+      run: |
+        REPO_PARENT="$(dirname $GITHUB_WORKSPACE)"
+        
+        # Validate Desktop package.json
+        node scripts/validate-package.js package.json
+        
+        # Validate scratch repositories
+        repos=("scratch-gui" "scratch-vm" "scratch-audio" "scratch-blocks" "scratch-paint" "scratch-render")
+        for repo in "${repos[@]}"; do
+          package_path="${REPO_PARENT}/${repo}/package.json"
+          if [ -f "$package_path" ]; then
+            node scripts/validate-package.js "$package_path"
+          else
+            echo "Warning: ${repo}/package.json not found"
+          fi
+        done
+        
+        echo "All package.json files validated successfully"
+      shell: bash
+    
+    - name: Install scratch-gui dependencies
+      run: |
+        cd "$(dirname $GITHUB_WORKSPACE)/scratch-gui"
+        echo "Installing scratch-gui dependencies..."
+        npm ci --no-audit --no-fund
+        echo "scratch-gui dependencies installed successfully"
+      shell: bash
+    
+    - name: Install and build scratch-vm
+      run: |
+        REPO_PARENT="$(dirname $GITHUB_WORKSPACE)"
+        cd "${REPO_PARENT}/scratch-vm"
+        
+        echo "Installing scratch-vm dependencies..."
+        npm ci --no-audit --no-fund
+        
+        echo "Building scratch-vm..."
+        npm run build
+        
+        echo "Creating npm link for scratch-vm..."
+        npm link
+        echo "scratch-vm processed successfully"
+      shell: bash
+    
+    - name: Install and build other scratch dependencies
+      run: |
+        REPO_PARENT="$(dirname $GITHUB_WORKSPACE)"
+        
+        # Function to install and build dependencies
+        install_and_build_deps() {
+          local repo_name=$1
+          local repo_path="${REPO_PARENT}/${repo_name}"
+          
+          if [ -d "$repo_path" ] && [ -f "$repo_path/package.json" ]; then
+            echo "Installing ${repo_name} dependencies..."
+            cd "$repo_path"
+            npm ci --no-audit --no-fund
+            echo "${repo_name} dependencies installed successfully"
+            
+            # Build the module if it has a build script
+            if [ "$repo_name" = "scratch-audio" ]; then
+              echo "Building ${repo_name}..."
+              npm run build
+            elif [ "$repo_name" = "scratch-blocks" ]; then
+              echo "Building ${repo_name}..."
+              npm run prepublish
+            elif [ "$repo_name" = "scratch-paint" ]; then
+              echo "Building ${repo_name}..."
+              npm run build
+            elif [ "$repo_name" = "scratch-render" ]; then
+              echo "Building ${repo_name}..."
+              npm run build
+            fi
+            
+            # Create npm link
+            echo "Creating npm link for ${repo_name}..."
+            npm link
+            echo "${repo_name} processed successfully"
+          fi
+        }
+        
+        # Install and build dependencies
+        for repo in "scratch-audio" "scratch-blocks" "scratch-paint" "scratch-render"; do
+          install_and_build_deps "$repo"
+        done
+        
+        echo "All other scratch dependencies processed"
+      shell: bash
+    
+    - name: Link scratch modules to scratch-gui
+      run: |
+        cd "$(dirname $GITHUB_WORKSPACE)/scratch-gui"
+        echo "Linking scratch modules to scratch-gui..."
+        npm link scratch-audio scratch-blocks scratch-paint scratch-render scratch-vm
+        echo "All scratch modules linked successfully"
+      shell: bash
+    
+    - name: Install Desktop dependencies
+      run: |
+        echo "Installing Desktop dependencies..."
+        npm ci --no-audit --no-fund
+        echo "Desktop dependencies installed successfully"
+      shell: bash
+    
+    - name: Prepare extensions
+      run: |
+        echo "Preparing extensions..."
+        npm run prepare-extensions
+        echo "Extensions prepared successfully"
+      shell: bash
+    
+    - name: Fetch library files
+      run: |
+        echo "Fetching library files..."
+        npm run fetch
+        echo "Library files fetched successfully"
+      shell: bash
+    
+    - name: Compile
+      run: |
+        echo "Starting webpack compilation..."
+        npm run webpack:prod
+        echo "Webpack compilation completed successfully"
+      shell: bash
+    
+    - name: Package
+      run: |
+        echo "Packaging for macOS..."
+        # Need to run the universal builds as separate commands or it breaks when @electron/universal
+        # diffs the ASARs and finds spurious differences. Not clear why.
+        node release-automation/build.mjs --mac --universal --production
+        node release-automation/build.mjs --mac-legacy-11 --universal --production
+        node release-automation/build.mjs --mac-legacy-10.13-10.14 --mac-legacy-10.15 --x64
+        echo "macOS packaging completed successfully"
+      shell: bash
+    
+    - name: Print file tree
+      run: node scripts/print-file-tree.mjs dist
+    
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: mac
+        path: dist/*.dmg
+
+  build-windows:
+    runs-on: windows-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        persist-credentials: false
+        path: repo
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 24
+        cache: 'npm'
+    
+    - name: "Move repository to D: drive"
+      run: |
+        Copy-Item -Path repo -Destination D:\repo -Recurse
+        Remove-Item -Path repo -Recurse -Force
+    
+    - name: "Configure npm to use D: drive"
+      run: |
+        npm config set cache D:\npm-cache
+        npm config set prefix D:\npm-prefix
+    
+    - name: Clone scratch repositories
+      run: |
+        REPO_PARENT="D:\"
+        
+        # Function to clone repository
+        function Clone-Repo($repoName) {
+          $repoUrl = "https://github.com/AstraEditor/${repoName}.git"
+          $repoPath = "${REPO_PARENT}${repoName}"
+          
+          Write-Host "Cloning ${repoName}..."
+          git clone --depth 1 --single-branch $repoUrl $repoPath
+        }
+        
+        # Clone all required repositories
+        Clone-Repo "scratch-gui"
+        Clone-Repo "scratch-vm"
+        Clone-Repo "scratch-audio"
+        Clone-Repo "scratch-blocks"
+        Clone-Repo "scratch-paint"
+        Clone-Repo "scratch-render"
+        
+        Write-Host "All repositories cloned successfully"
+      shell: powershell
+    
+    - name: Validate package.json files
+      run: |
+        REPO_PARENT="D:\"
+        
+        # Validate Desktop package.json
+        node D:\repo\scripts\validate-package.js D:\repo\package.json
+        
+        # Validate scratch repositories
+        $repos = @("scratch-gui", "scratch-vm", "scratch-audio", "scratch-blocks", "scratch-paint", "scratch-render")
+        foreach ($repo in $repos) {
+          $packagePath = "${REPO_PARENT}${repo}\package.json"
+          if (Test-Path $packagePath) {
+            node D:\repo\scripts\validate-package.js $packagePath
+          } else {
+            Write-Host "Warning: ${repo}/package.json not found"
+          }
+        }
+        
+        Write-Host "All package.json files validated successfully"
+      shell: powershell
+    
+    - name: Install scratch-gui dependencies
+      run: |
+        cd D:\scratch-gui
+        Write-Host "Installing scratch-gui dependencies..."
+        npm ci --no-audit --no-fund
+        Write-Host "scratch-gui dependencies installed successfully"
+      shell: powershell
+    
+    - name: Install and build scratch-vm
+      run: |
+        cd D:\scratch-vm
+        
+        Write-Host "Installing scratch-vm dependencies..."
+        npm ci --no-audit --no-fund
+        
+        Write-Host "Building scratch-vm..."
+        npm run build
+        
+        Write-Host "Creating npm link for scratch-vm..."
+        npm link
+        Write-Host "scratch-vm processed successfully"
+      shell: powershell
+    
+    - name: Install and build other scratch dependencies
+      run: |
+        # Function to install and build dependencies
+        function Install-Build-Dep($repoName) {
+          $repoPath = "D:\${repoName}"
+          
+          if (Test-Path $repoPath) {
+            $packagePath = "${repoPath}\package.json"
+            if (Test-Path $packagePath) {
+              Write-Host "Installing ${repoName} dependencies..."
+              cd $repoPath
+              npm ci --no-audit --no-fund
+              Write-Host "${repoName} dependencies installed successfully"
+              
+              # Build the module if it has a build script
+              if ($repoName -eq "scratch-audio") {
+                Write-Host "Building ${repoName}..."
+                npm run build
+              } elseif ($repoName -eq "scratch-blocks") {
+                Write-Host "Building ${repoName}..."
+                npm run prepublish
+              } elseif ($repoName -eq "scratch-paint") {
+                Write-Host "Building ${repoName}..."
+                npm run build
+              } elseif ($repoName -eq "scratch-render") {
+                Write-Host "Building ${repoName}..."
+                npm run build
+              }
+              
+              # Create npm link
+              Write-Host "Creating npm link for ${repoName}..."
+              npm link
+              Write-Host "${repoName} processed successfully"
+            }
+          }
+        }
+        
+        # Install and build dependencies
+        $repos = @("scratch-audio", "scratch-blocks", "scratch-paint", "scratch-render")
+        foreach ($repo in $repos) {
+          Install-Build-Dep $repo
+        }
+        
+        Write-Host "All other scratch dependencies processed"
+      shell: powershell
+    
+    - name: Link scratch modules to scratch-gui
+      run: |
+        cd D:\scratch-gui
+        Write-Host "Linking scratch modules to scratch-gui..."
+        npm link scratch-audio scratch-blocks scratch-paint scratch-render scratch-vm
+        Write-Host "All scratch modules linked successfully"
+      shell: powershell
+    
+    - name: Install Desktop dependencies
+      run: |
+        cd D:\repo
+        Write-Host "Installing Desktop dependencies..."
+        npm ci --no-audit --no-fund
+        Write-Host "Desktop dependencies installed successfully"
+      shell: powershell
+    
+    - name: Prepare extensions
+      run: |
+        cd D:\repo
+        Write-Host "Preparing extensions..."
+        npm run prepare-extensions-optimized
+        Write-Host "Extensions prepared successfully"
+      shell: powershell
+    
+    - name: Fetch library files
+      run: |
+        cd D:\repo
+        Write-Host "Fetching library files..."
+        npm run fetch
+        Write-Host "Library files fetched successfully"
+      shell: powershell
+    
+    - name: Compile
+      run: |
+        cd D:\repo
+        Write-Host "Starting webpack compilation..."
+        npm run webpack:prod
+        Write-Host "Webpack compilation completed successfully"
+      shell: powershell
+    
+    - name: Package
+      run: |
+        cd D:\repo
+        Write-Host "Packaging for Windows..."
+        node release-automation/build.mjs --windows --microsoft-store --x64 --ia32 --arm64
+        node release-automation/build.mjs --windows-portable --x64
+        node release-automation/build.mjs --windows-legacy --ia32 --x64
+        Write-Host "Windows packaging completed successfully"
+      shell: powershell
+    
+    - name: Print file tree
+      run: |
+        cd D:\repo
+        node scripts/print-file-tree.mjs dist
+      shell: powershell
+    
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: windows
+        path: |
+          D:\repo\dist\*.exe
+          D:\repo\dist\*.appx
