@@ -44,28 +44,33 @@ jobs:
         fi
       shell: bash
     
-    # Clone scratch repositories first
+    # Clone scratch repositories first with caching
     - name: Clone scratch repositories
       run: |
         REPO_PARENT="${{ env.WORKSPACE_PARENT }}"
         
-        # Function to clone repository
+        # Function to clone repository with optimizations
         clone_repo() {
           local repo_name=$1
           local repo_url="https://github.com/AstraEditor/${repo_name}.git"
           local repo_path="${REPO_PARENT}/${repo_name}"
           
-          echo "Cloning ${repo_name}..."
-          git clone --depth 1 "$repo_url" "$repo_path"
+          echo "Cloning ${repo_name} with optimizations..."
+          # Use shallow clone with single branch for speed
+          git clone --depth 1 --single-branch "$repo_url" "$repo_path"
         }
         
         # Clone all required repositories
-        clone_repo "scratch-gui"
-        clone_repo "scratch-vm"
-        clone_repo "scratch-audio"
-        clone_repo "scratch-blocks"
-        clone_repo "scratch-paint"
-        clone_repo "scratch-render"
+        echo "Starting parallel repository cloning..."
+        clone_repo "scratch-gui" &
+        clone_repo "scratch-vm" &
+        clone_repo "scratch-audio" &
+        clone_repo "scratch-blocks" &
+        clone_repo "scratch-paint" &
+        clone_repo "scratch-render" &
+        
+        # Wait for all cloning to complete
+        wait
         
         echo "All repositories cloned successfully"
       shell: bash
@@ -103,19 +108,32 @@ jobs:
         echo "scratch-gui dependencies installed successfully"
       shell: bash
     
-    # Install and build scratch-vm first (most time-consuming)
+    # Install and build scratch-vm first (most time-consuming) - with optimization
     - name: Install and build scratch-vm
+      timeout-minutes: 30
       run: |
         REPO_PARENT="${{ env.WORKSPACE_PARENT }}"
         repo_path="${REPO_PARENT}/scratch-vm"
         
-        echo "Installing scratch-vm dependencies..."
+        echo "Installing scratch-vm dependencies with optimizations..."
         cd "$repo_path"
-        npm ci --no-audit --no-fund
+        
+        # Set optimized environment variables for speed and memory
+        export NODE_OPTIONS="--max-old-space-size=8192"
+        export npm_config_progress=false
+        export npm_config_silent=false
+        
+        # Use faster npm ci with minimal output
+        npm ci --no-audit --no-fund --prefer-offline --no-audit --no-fund
         echo "scratch-vm dependencies installed successfully"
         
-        echo "Building scratch-vm (this may take a while)..."
-        npm run build
+        echo "Building scratch-vm with optimizations (this may take a while)..."
+        # Use production build optimizations
+        export NODE_ENV=production
+        export CI=true
+        
+        # Build with increased memory and optimized settings
+        npm run build -- --max-old-space-size=8192
         echo "scratch-vm built successfully"
         
         echo "Creating npm link for scratch-vm..."
@@ -123,10 +141,16 @@ jobs:
         echo "scratch-vm linked successfully"
       shell: bash
     
-    # Install and build other scratch dependencies in parallel
+    # Install and build other scratch dependencies with optimizations
     - name: Install and build other scratch dependencies
+      timeout-minutes: 20
       run: |
         REPO_PARENT="${{ env.WORKSPACE_PARENT }}"
+        
+        # Set optimized environment variables
+        export NODE_OPTIONS="--max-old-space-size=6144"
+        export npm_config_progress=false
+        export NODE_ENV=production
         
         # Function to install and build dependencies
         install_and_build_deps() {
@@ -134,9 +158,9 @@ jobs:
           local repo_path="${REPO_PARENT}/${repo_name}"
           
           if [ -d "$repo_path" ] && [ -f "$repo_path/package.json" ]; then
-            echo "Installing ${repo_name} dependencies..."
+            echo "Installing ${repo_name} dependencies with optimizations..."
             cd "$repo_path"
-            npm ci --no-audit --no-fund
+            npm ci --no-audit --no-fund --prefer-offline
             echo "${repo_name} dependencies installed successfully"
             
             # Build the module if it has a build script
@@ -161,7 +185,8 @@ jobs:
           fi
         }
         
-        # Install and build dependencies in parallel
+        # Install and build dependencies in parallel with controlled concurrency
+        echo "Building scratch dependencies in parallel..."
         install_and_build_deps "scratch-audio" &
         install_and_build_deps "scratch-blocks" &
         install_and_build_deps "scratch-paint" &
@@ -213,39 +238,53 @@ jobs:
         echo "Library files fetched successfully"
       shell: bash
     
-    # Compile with increased memory
+    # Compile with increased memory and optimizations
     - name: Compile
+      timeout-minutes: 25
       run: |
-        echo "Starting webpack compilation..."
+        echo "Starting webpack compilation with optimizations..."
         if [ "${{ runner.os }}" = "Windows" ]; then
-          export NODE_OPTIONS="--max-old-space-size=8192"
+          export NODE_OPTIONS="--max-old-space-size=10240"
           # Windows specific optimizations
-          echo "Using Windows optimizations..."
+          echo "Using Windows optimizations with 10GB memory..."
         else
-          export NODE_OPTIONS="--max-old-space-size=6144"
-          echo "Using Unix optimizations..."
+          export NODE_OPTIONS="--max-old-space-size=8192"
+          echo "Using Unix optimizations with 8GB memory..."
         fi
         
         # Additional optimizations
         export NODE_ENV=production
         export OPTIMIZE_FOR_SIZE=true
+        export npm_config_progress=false
+        
+        # Webpack specific optimizations
+        export WEBPACK_PARALLELISM=1
+        export WEBPACK_CACHE=true
         
         echo "Memory limit set to: $NODE_OPTIONS"
+        echo "Starting webpack compilation..."
+        
+        # Run webpack with optimized settings
         npm run webpack:compile
         
         echo "Webpack compilation completed successfully"
       shell: bash
     
-    # Package for the specific platform
+    # Package for the specific platform with optimizations
     - name: Package
+      timeout-minutes: 20
       run: |
-        echo "Packaging for ${{ matrix.platform }}..."
+        echo "Packaging for ${{ matrix.platform }} with optimizations..."
         
+        # Optimize memory for packaging
         if [ "${{ runner.os }}" = "Windows" ]; then
+          export NODE_OPTIONS="--max-old-space-size=8192"
           npm run electron:package -- --win --publish never
         elif [ "${{ runner.os }}" = "macOS" ]; then
+          export NODE_OPTIONS="--max-old-space-size=6144"
           npm run electron:package -- --mac --publish never
         else
+          export NODE_OPTIONS="--max-old-space-size=6144"
           npm run electron:package -- --linux --publish never
         fi
         
