@@ -121,7 +121,7 @@ module.exports = [
                 'scratch-gui': path.resolve(__dirname, '../scratch-gui/src'),
                 'scratch-vm': path.resolve(__dirname, '../scratch-vm/src'),
                 'scratch-vm/src': path.resolve(__dirname, '../scratch-vm/src'),
-                'scratch-audio': path.resolve(__dirname, '../scratch-audio/src'),
+                'scratch-audio': path.resolve(__dirname, '../scratch-audio/dist.js'),
                 'scratch-blocks': path.resolve(__dirname, '../scratch-blocks'),
                 'scratch-paint': path.resolve(__dirname, '../scratch-paint/src'),
                 'scratch-paint/src': path.resolve(__dirname, '../scratch-paint/src'),
