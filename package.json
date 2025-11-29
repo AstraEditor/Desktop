@@ -16,11 +16,11 @@
     "webpack:watch": "webpack --watch",
     "webpack:prod": "cross-env NODE_ENV=production webpack",
     "electron:start": "electron src-main/entrypoint.js",
-    "electron:package:dir": "electron-builder --dir",
-    "electron:package": "electron-builder",
-    "electron:package:win": "electron-builder --win",
-    "electron:package:mac": "electron-builder --mac",
-    "electron:package:linux": "electron-builder --linux"
+    "electron:package:dir": "node node_modules/electron-builder/cli.js --dir",
+    "electron:package": "node node_modules/electron-builder/cli.js",
+    "electron:package:win": "node node_modules/electron-builder/cli.js --win",
+    "electron:package:mac": "node node_modules/electron-builder/cli.js --mac",
+    "electron:package:linux": "node node_modules/electron-builder/cli.js --linux"
   },
   "dependencies": {
     "react": "^16.14.0",
@@ -218,21 +218,24 @@
         "name": "Scratch 3 Project",
         "description": "Scratch 3 Project",
         "role": "Editor",
-        "mimeType": "application/x.scratch.sb3"
+        "mimeType": "application/x.scratch.sb3",
+        "icon": "art/file.png"
       },
       {
         "ext": "sb2",
         "name": "Scratch 2 Project",
         "description": "Scratch 2 Project",
         "role": "Editor",
-        "mimeType": "application/x.scratch.sb2"
+        "mimeType": "application/x.scratch.sb2",
+        "icon": "art/file.png"
       },
       {
         "ext": "sb",
         "name": "Scratch 1 Project",
         "description": "Scratch 1 Project",
         "role": "Editor",
-        "mimeType": "application/x.scratch.sb"
+        "mimeType": "application/x.scratch.sb",
+        "icon": "art/file.png"
       }
     ]
   },

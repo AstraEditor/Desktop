@@ -1,0 +1,7 @@
+{
+  "scripts": {
+    "electron-builder": "node node_modules/electron-builder/cli.js",
+    "electron:package": "node node_modules/electron-builder/cli.js --publish=never",
+    "electron:package:win": "node node_modules/electron-builder/cli.js --win --publish=never"
+  }
+}
