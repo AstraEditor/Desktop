@@ -127,6 +127,8 @@ module.exports = [
                 'scratch-paint/src': path.resolve(__dirname, '../scratch-paint/src'),
                 'scratch-render': path.resolve(__dirname, '../scratch-render/src'),
                 'scratch-render/src': path.resolve(__dirname, '../scratch-render/src'),
+                'scratch-render-fonts': path.resolve(__dirname, '../scratch-gui/src/lib/tw-scratch-render-fonts'),
+                'scratch-gui/src/addons/generated/addon-entries': path.resolve(__dirname, '../scratch-gui/src/addons/generated/addon-entries'),
                 '@turbowarp/l10n': path.resolve(__dirname, '../scratch-gui/node_modules/@turbowarp/scratch-l10n'),
                 '@turbowarp/scratch-l10n': path.resolve(__dirname, '../scratch-gui/node_modules/@turbowarp/scratch-l10n'),
                 'react': path.resolve(__dirname, 'node_modules/react'),
