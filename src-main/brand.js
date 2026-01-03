@@ -1,6 +1,6 @@
-const PLATFORM_NAME = 'TurboWarp';
-const APP_NAME = 'TurboWarp Desktop';
-const PACKAGER_NAME = 'TurboWarp Packager';
+const PLATFORM_NAME = 'AstraEditor';
+const APP_NAME = 'AstraEditor Desktop';
+const PACKAGER_NAME = 'AstraEditor Packager';
 
 module.exports = {
   PLATFORM_NAME,
