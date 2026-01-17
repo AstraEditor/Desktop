@@ -38,7 +38,10 @@ const FILE_SCHEMES = {
   },
   'tw-about': {
     root: path.resolve(__dirname, '../src-renderer/about'),
-    csp: "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'"
+    csp: "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src *", //用 self 无效
+    standard: true,
+    secure: true //获取语言用
+
   },
   'tw-packager': {
     root: path.resolve(__dirname, '../src-renderer/packager'),

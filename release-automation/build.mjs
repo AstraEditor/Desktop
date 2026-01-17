@@ -5,7 +5,7 @@ import * as builder from 'electron-builder';
 import * as electronFuses from '@electron/fuses';
 import './patch-electron-builder.cjs';
 
-const {Platform, Arch} = builder;
+const { Platform, Arch } = builder;
 
 const isProduction = process.argv.includes('--production');
 

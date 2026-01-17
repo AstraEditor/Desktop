@@ -21,7 +21,8 @@ contextBridge.exposeInMainWorld('EditorPreload', {
   setExportForPackager: (callback) => {
     exportForPackager = callback;
   },
-  setIsFullScreen: (isFullScreen) => ipcRenderer.invoke('set-is-full-screen', isFullScreen)
+  setIsFullScreen: (isFullScreen) => ipcRenderer.invoke('set-is-full-screen', isFullScreen),
+  getLocalStorage: (key) => localStorage.getItem(key)
 });
 
 let exportForPackager = () => Promise.reject(new Error('exportForPackager missing'));

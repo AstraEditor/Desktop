@@ -173,12 +173,12 @@ const getUnsafePaths = () => {
 
     // TurboWarp Desktop defaults
     {
-      path: path.join(appData, 'turbowarp-desktop'),
-      app: 'TurboWarp Desktop'
+      path: path.join(appData, 'astraeditor-desktop'),
+      app: 'AstraEditor Desktop'
     },
     {
-      path: path.join(localPrograms, 'TurboWarp'),
-      app: 'TurboWarp Desktop'
+      path: path.join(localPrograms, 'AstraEditor'),
+      app: 'AstraEditor Desktop'
     },
 
     // Scratch Desktop defaults
@@ -537,6 +537,11 @@ class EditorWindow extends ProjectRunningWindow {
 
     this.ipc.handle('open-about', () => {
       AboutWindow.show();
+    });
+
+    this.ipc.on('get-local-storage', (event, key) => {
+      const result = this.window.webContents.executeJavaScript(`localStorage.getItem('${key}')`);
+      event.returnValue = result;
     });
 
     this.ipc.handle('get-advanced-customizations', async () => {

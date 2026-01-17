@@ -21,6 +21,7 @@ const isUpdateCheckerAllowed = () => {
 };
 
 const checkForUpdates = async () => {
+  return //先去除更新机制
   if (!isUpdateCheckerAllowed() || settings.updateChecker === 'never') {
     return;
   }

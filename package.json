@@ -1,11 +1,11 @@
 {
-  "name": "turbowarp-desktop",
-  "description": "Scratch mod with a compiler, dark mode, a bunch of addons, and more.",
-  "version": "1.15.1",
+  "name": "astraeditor-desktop",
+  "description": "TurboWarp mod with move features.",
+  "version": "1.0.0",
   "license": "GPL-3.0",
   "author": {
-    "email": "contact@turbowarp.org",
-    "name": "Thomas Weber"
+    "email": "2381068747@qq.com",
+    "name": "KOSHINO"
   },
   "type": "commonjs",
   "scripts": {
@@ -17,6 +17,10 @@
     "electron:package:dir": "electron-builder --dir"
   },
   "dependencies": {
+    "https-proxy-agent": "^7.0.6",
+    "react": "^16.0.0",
+    "react-dom": "^16.0.0",
+    "react-redux": "5.0.7",
     "semver": "^7.7.3"
   },
   "devDependencies": {
@@ -24,7 +28,7 @@
     "@babel/preset-env": "^7.12.16",
     "@babel/preset-react": "^7.13.13",
     "@electron/fuses": "^2.0.0",
-    "@turbowarp/extensions": "github:TurboWarp/extensions#master",
+    "@turbowarp/extensions": "github:AstraEditor/extensions#master",
     "adm-zip": "^0.5.16",
     "autoprefixer": "^9.8.8",
     "babel-loader": "^8.4.1",
@@ -38,7 +42,8 @@
     "postcss-import": "^14.0.0",
     "postcss-loader": "^4.2.0",
     "postcss-simple-vars": "^6.0.3",
-    "scratch-gui": "github:TurboWarp/scratch-gui#develop",
+    "scratch-gui": "github:AstraEditor/scratch-gui#develop",
+    "spdx-expression-parse": "^4.0.0",
     "style-loader": "^0.23.0",
     "url-loader": "^4.1.1",
     "webpack": "4.47.0",
@@ -52,16 +57,16 @@
   "homepage": "https://desktop.turbowarp.org/",
   "repository": {
     "type": "git",
-    "url": "https://github.com/TurboWarp/desktop.git"
+    "url": "https://github.com/AstraEditor/desktop.git"
   },
   "bugs": {
-    "url": "https://github.com/TurboWarp/desktop/issues",
+    "url": "https://github.com/AstraEditor/desktop/issues",
     "email": "contact@turbowarp.org"
   },
   "main": "./src-main/entrypoint.js",
   "build": {
-    "appId": "org.turbowarp.desktop",
-    "productName": "TurboWarp",
+    "appId": "org.astraeditor.desktop",
+    "productName": "AstraEditor",
     "files": [
       "node_modules/**/*",
       "src-main/**/*",
@@ -97,12 +102,12 @@
     },
     "appx": {
       "artifactName": "${productName}-MS-Store-${version}-${arch}.${ext}",
-      "applicationId": "TurboWarp",
-      "displayName": "TurboWarp",
-      "identityName": "45747ThomasWeber.TurboWarpDesktop",
+      "applicationId": "AstraEditor",
+      "displayName": "AstraEditor",
+      "identityName": "45747KOSHINO.AstraEditorpDesktop",
       "publisher": "CN=18FA7D4F-01BF-49F2-BF56-782DCEA49C69",
-      "publisherDisplayName": "Thomas Weber",
-      "backgroundColor": "#4c97ff",
+      "publisherDisplayName": "KOSHINO",
+      "backgroundColor": "#0099ff",
       "showNameOnTiles": true,
       "languages": [
         "en-US",

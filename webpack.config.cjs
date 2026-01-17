@@ -71,15 +71,15 @@ module.exports = [
             new CopyWebpackPlugin({
                 patterns: [
                     {
-                        from: 'node_modules/scratch-blocks/media',
+                        from: '../scratch-gui/node_modules/scratch-blocks/media',
                         to: 'static/blocks-media/default'
                     },
                     {
-                        from: 'node_modules/scratch-blocks/media',
+                        from: '../scratch-gui/node_modules/scratch-blocks/media',
                         to: 'static/blocks-media/high-contrast'
                     },
                     {
-                        from: 'node_modules/scratch-gui/src/lib/themes/blocks/high-contrast-media/blocks-media',
+                        from: '../scratch-gui/src/lib/themes/blocks/high-contrast-media/blocks-media',
                         to: 'static/blocks-media/high-contrast',
                         force: true
                     },
@@ -92,8 +92,15 @@ module.exports = [
         ],
         resolve: {
             alias: {
+                // Force single React copy to avoid "Invalid hook call" errors
+                'react': path.resolve(__dirname, 'node_modules/react'),
+                'react-dom': path.resolve(__dirname, 'node_modules/react-dom'),
                 'scratch-gui$': path.resolve(__dirname, 'node_modules/scratch-gui/src/index.js'),
+                'scratch-gui/': path.resolve(__dirname, 'node_modules/scratch-gui/src/'),
                 'scratch-render-fonts$': path.resolve(__dirname, 'node_modules/scratch-gui/src/lib/tw-scratch-render-fonts'),
+                // Aliases for dynamic requires in AppStateHOC
+                '../reducers/gui': path.resolve(__dirname, 'node_modules/scratch-gui/src/reducers/gui.js'),
+                './tw-scratch-paint': path.resolve(__dirname, 'node_modules/scratch-gui/src/lib/tw-scratch-paint.js'),
             }
         }
     },

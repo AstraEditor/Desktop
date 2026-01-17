@@ -3,6 +3,10 @@ const {translate} = require('../l10n');
 const packageJSON = require('../../package.json');
 const {APP_NAME} = require('../brand');
 const {getDist, getPlatform} = require('../platform');
+const {ipcMain, BrowserWindow} = require('electron');
+
+// 全局标志，确保处理器只注册一次
+let isHandlerRegistered = false;
 
 class AboutWindow extends AbstractWindow {
   constructor () {
@@ -22,13 +26,32 @@ class AboutWindow extends AbstractWindow {
       };
     });
 
+    // 注册全局 IPC 处理器（只注册一次）
+    if (!isHandlerRegistered) {
+      ipcMain.handle('get-editor-local-storage', async (event, key) => {
+        console.log('get-editor-local-storage called with key:', key);
+        const windows = BrowserWindow.getAllWindows();
+        console.log('All windows:', windows.map(w => w.webContents.getURL()));
+        const editorWindow = windows.find(w => w.webContents.getURL().startsWith('tw-editor://'));
+        if (editorWindow) {
+          const result = await editorWindow.webContents.executeJavaScript(`localStorage.getItem('${key}')`);
+          console.log('Result:', result);
+          return result;
+        } else {
+          console.log('No editor window found');
+          return null;
+        }
+      });
+      isHandlerRegistered = true;
+    }
+
     this.loadURL('tw-about://./about.html');
   }
 
   getDimensions () {
     return {
-      width: 750,
-      height: 650
+      width: 945,
+      height: 680
     };
   }
 

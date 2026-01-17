@@ -1,8 +1,8 @@
-# TurboWarp Desktop
+# AstraEditor Desktop
 
-TurboWarp as a desktop app.
+AstraEditor as a desktop app.
 
-If you're looking for downloads, head to: https://desktop.turbowarp.org/
+If you're looking for TurboWarp Desktop downloads, head to: https://desktop.turbowarp.org/
 
 Licensed under the GPLv3.0. See LICENSE for more information.
 
