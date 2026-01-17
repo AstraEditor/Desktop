@@ -25,7 +25,7 @@ jobs:
       with:
         node-version: 24
     - name: Install dependencies
-      run: npm ci --loglevel=info
+      run: npm install --loglevel=info
     - name: Fetch
       run: npm run fetch
     - name: Compile
@@ -64,7 +64,7 @@ jobs:
       with:
         node-version: 24
     - name: Install dependencies
-      run: npm ci --loglevel=info
+      run: npm install --loglevel=info
     - name: Fetch
       run: npm run fetch
     - name: Compile
@@ -111,7 +111,7 @@ jobs:
     # GitHub's Windows runners have a C: drive and a D: drive.
     # C: is for the OS and has good read performance but awful write performance.
     # D: has much better faster write performance (>20x faster than C:)
-    # We want to use the D: drive whenever we can. Trying to do "npm ci" on the C:
+    # We want to use the D: drive whenever we can. Trying to do "npm install" on the C:
     # drive has been observed to take over an hour!
     runs-on: windows-latest
     steps:
@@ -141,7 +141,7 @@ jobs:
         npm config set prefix D:\npm-prefix
     - name: Install dependencies
       working-directory: D:\repo
-      run: npm ci --loglevel=info
+      run: npm install --loglevel=info
     - name: Fetch
       working-directory: D:\repo
       run: npm run fetch
