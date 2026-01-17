@@ -24,6 +24,6 @@ jobs:
       # Don't need to do a full fetch, that would just cause a lot of unnecessary traffic
       run: node scripts/prepare-extensions.mjs
     - name: Compile
-      run: npm run webpack:compile
+      run: cd ./node_modules/scratch-gui/ && npm install && cd ../../ && npm run webpack:compile
     - name: Package
       run: npm run electron:package:dir
