@@ -91,6 +91,11 @@ module.exports = [
             })
         ],
         resolve: {
+            modules: [
+                path.resolve(__dirname, 'node_modules'),
+                path.resolve(__dirname, 'node_modules/scratch-gui/node_modules'),
+                'node_modules'
+            ],
             alias: {
                 // Force single React copy to avoid "Invalid hook call" errors
                 'react': path.resolve(__dirname, 'node_modules/react'),
