@@ -26,6 +26,22 @@ jobs:
       run: python --version
     - name: Install dependencies
       run: npm install
+    - name: Manually run prepublish for scratch-blocks
+      run: |
+        echo "=== Manually running prepublish for scratch-blocks ==="
+        cd node_modules/scratch-blocks
+        echo "Current directory: $(pwd)"
+        echo "Python version: $(python --version)"
+        echo "Node version: $(node --version)"
+        echo ""
+        echo "=== Running: node universal-python.js build.py ==="
+        node universal-python.js build.py
+        echo ""
+        echo "=== Running: webpack ==="
+        webpack
+        echo ""
+        echo "=== Checking generated files ==="
+        ls -lh blockly_compressed_vertical.js blocks_compressed_vertical.js || echo "Files not found"
     - name: Verify prepublish ran successfully
       run: |
         echo "=== Checking if prepublish generated the required files ==="
