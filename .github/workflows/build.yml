@@ -12,6 +12,14 @@ jobs:
       with:
         submodules: recursive
         persist-credentials: false
+    - name: Install Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 24
+    - name: Install Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
     - name: Install strip-nondeterminism
       run: sudo apt-get install strip-nondeterminism
     - name: Install dependencies
