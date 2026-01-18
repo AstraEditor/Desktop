@@ -23,11 +23,6 @@ jobs:
     - name: Prepare extensions
       # Don't need to do a full fetch, that would just cause a lot of unnecessary traffic
       run: node scripts/prepare-extensions.mjs
-    - name: Debug scratch-blocks
-      run: |
-        ls scratch-blocks || true
-        ls node_modules/scratch-blocks || true
-        ls node_modules/scratch-blocks/shim || true
     - name: Compile
       run: npm run webpack:compile
     - name: Package
