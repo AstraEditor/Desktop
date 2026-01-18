@@ -71,15 +71,15 @@ module.exports = [
             new CopyWebpackPlugin({
                 patterns: [
                     {
-                        from: '../scratch-gui/node_modules/scratch-blocks/media',
+                        from: 'node_modules/scratch-blocks/media',
                         to: 'static/blocks-media/default'
                     },
                     {
-                        from: '../scratch-gui/node_modules/scratch-blocks/media',
+                        from: 'node_modules/scratch-blocks/media',
                         to: 'static/blocks-media/high-contrast'
                     },
                     {
-                        from: '../scratch-gui/src/lib/themes/blocks/high-contrast-media/blocks-media',
+                        from: 'node_modules/scratch-gui/src/lib/themes/blocks/high-contrast-media/blocks-media',
                         to: 'static/blocks-media/high-contrast',
                         force: true
                     },
