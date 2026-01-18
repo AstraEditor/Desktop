@@ -25,32 +25,20 @@ jobs:
     - name: Verify Python
       run: python --version
     - name: Install dependencies
-      run: npm install
-    - name: Manually run prepublish for scratch-blocks
       run: |
-        echo "=== Manually running prepublish for scratch-blocks ==="
-        cd node_modules/scratch-blocks
-        echo "Current directory: $(pwd)"
-        echo "Python version: $(python --version)"
-        echo "Node version: $(node --version)"
-        echo ""
-        echo "=== Running: node universal-python.js build.py ==="
-        node universal-python.js build.py
-        echo ""
-        echo "=== Running: webpack ==="
-        webpack
-        echo ""
-        echo "=== Checking generated files ==="
-        ls -lh blockly_compressed_vertical.js blocks_compressed_vertical.js || echo "Files not found"
-    - name: Verify prepublish ran successfully
+        echo "=== Removing package-lock.json to use latest git commits ==="
+        rm package-lock.json
+        echo "=== Installing dependencies ==="
+        npm install
+    - name: Verify scratch-blocks has build files
       run: |
-        echo "=== Checking if prepublish generated the required files ==="
+        echo "=== Checking if scratch-blocks has build files ==="
         if [ -f "node_modules/scratch-blocks/blockly_compressed_vertical.js" ]; then
           echo "✓ blockly_compressed_vertical.js exists"
           ls -lh node_modules/scratch-blocks/blockly_compressed_vertical.js
         else
           echo "✗ blockly_compressed_vertical.js NOT FOUND"
-          echo "This means prepublish script failed or didn't run"
+          echo "This means the git commit doesn't have build files"
           exit 1
         fi
         echo ""
@@ -59,7 +47,7 @@ jobs:
           ls -lh node_modules/scratch-blocks/blocks_compressed_vertical.js
         else
           echo "✗ blocks_compressed_vertical.js NOT FOUND"
-          echo "This means prepublish script failed or didn't run"
+          echo "This means the git commit doesn't have build files"
           exit 1
         fi
     - name: Debug - Check package-lock.json
