@@ -22,8 +22,8 @@ jobs:
       run: npm ci
     - name: Build dependencies
       run: |
-        cd node_modules/scratch-blocks && npm run prepublish && cd ../..
-        cd node_modules/@turbowarp/scratch-l10n && npm run build && cd ../..
+        cd node_modules/scratch-blocks && npm install && npm run prepublish && cd ../..
+        cd node_modules/@turbowarp/scratch-l10n && git clone --depth 1 https://github.com/AstraEditor/scratch-l10n.git temp && cp -r temp/locales . && rm -rf temp && cd ../..
     - name: Prepare extensions
       # Don't need to do a full fetch, that would just cause a lot of unnecessary traffic
       run: node scripts/prepare-extensions.mjs
