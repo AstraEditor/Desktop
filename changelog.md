@@ -2,6 +2,20 @@ This document is the authoritative source for TurboWarp's changelogs. Everything
 
 Prefix notes with "Windows:", "macOS:", or "Linux:" as needed. Do not use **formatting** or [links](https://desktop.turbowarp.org/).
 
+# 1.0.0 (2026-1-18)
+
+- 自定义主题颜色
+- 完整可用的“README”功能
+- 制作“AstraEditor Settings”（管理新功能）
+- 制作“一次性同意自定义扩展请求”
+- 修复“自定义扩展的TextArea编码问题”
+- 优化“积木错误的举措”
+- 修复插件"整理＋"（开发者工具）的翻译缺失
+- 制作“扩展管理器”＆扩展预览
+- 修改默认项目 (随机的Title！)
+
+
+<!--  TW's changelog
 # 1.15.1 (2026-01-01)
 
  - Fixed various bugs in new compiler
@@ -357,3 +371,4 @@ Prefix notes with "Windows:", "macOS:", or "Linux:" as needed. Do not use **form
  - Updated integrated packager
  - Various bug fixes
  - Updated translations
+ -->
