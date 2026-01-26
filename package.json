@@ -157,15 +157,15 @@
       "provisioningProfile": "build/development.provisionprofile"
     },
     "linux": {
-      "executableName": "turbowarp-desktop",
+      "executableName": "astraeditor-desktop",
       "artifactName": "${productName}-${os}-${arch}-${version}.${ext}",
       "icon": "./build/",
       "synopsis": "Mod of Scratch with a compiler and more features.",
-      "description": "TurboWarp is a Scratch mod with a compiler to run projects faster, dark mode for your eyes, a bunch of addons to improve the editor, and more.",
+      "description": "AstraEditor is a Scratch mod with a compiler to run projects faster,made by KOSHINOawa,based TurboWarp, dark mode for your eyes, a bunch of addons to improve the editor, and more.",
       "category": "Development",
       "desktop": {
         "entry": {
-          "StartupWMClass": "turbowarp-desktop",
+          "StartupWMClass": "astraeditor-desktop",
           "Keywords": "scratch;"
         }
       },
