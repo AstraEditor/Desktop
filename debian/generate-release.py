@@ -80,7 +80,7 @@ if __name__ == '__main__':
     self_directory = os.path.dirname(os.path.realpath(__file__))
     repository_root = os.path.join(self_directory, 'deb')
 
-    name = 'TurboWarp'
+    name = 'AstraEditor'
     branch = 'stable'
 
     release = generate_release(repository_root, name, branch)
