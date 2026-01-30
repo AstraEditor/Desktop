@@ -100,6 +100,8 @@ module.exports = [
                 // Force single React copy to avoid "Invalid hook call" errors
                 'react': path.resolve(__dirname, 'node_modules/react'),
                 'react-dom': path.resolve(__dirname, 'node_modules/react-dom'),
+                // Add scratch-extension-editor alias
+                'scratch-extension-editor': path.resolve(__dirname, 'node_modules/scratch-gui/node_modules/scratch-extension-editor'),
                 'scratch-gui$': path.resolve(__dirname, 'node_modules/scratch-gui/src/index.js'),
                 'scratch-gui/': path.resolve(__dirname, 'node_modules/scratch-gui/src/'),
                 'scratch-render-fonts$': path.resolve(__dirname, 'node_modules/scratch-gui/src/lib/tw-scratch-render-fonts'),
