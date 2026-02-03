@@ -139,3 +139,4 @@ Create the file `userscript.js` in this folder to configure custom JS. Create th
 ## Uninstall
 
 See https://desktop.turbowarp.org/uninstall
+# Trigger GitHub update
