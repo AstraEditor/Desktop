@@ -29,7 +29,7 @@
         "@babel/preset-env": "^7.12.16",
         "@babel/preset-react": "^7.13.13",
         "@electron/fuses": "^2.0.0",
-        "@turbowarp/extensions": "github:AstraEditor/extensions#master",
+        "@turbowarp/extensions": "github:TurboWarp/extensions#master",
         "adm-zip": "^0.5.16",
         "autoprefixer": "^9.8.8",
         "babel-loader": "^8.4.1",
