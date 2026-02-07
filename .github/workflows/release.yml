@@ -54,9 +54,9 @@ jobs:
           dist/*.AppImage
     - name: Upload artifacts to tag
       run: |
-        node scripts/upload-to-github-releases.mjs TurboWarp desktop "dist/*.deb"
-        node scripts/upload-to-github-releases.mjs TurboWarp desktop "dist/*.tar.gz"
-        node scripts/upload-to-github-releases.mjs TurboWarp desktop "dist/*.AppImage"
+        node scripts/upload-to-github-releases.mjs "${{ github.repository_owner }}" "${{ github.event.repository.name }}" "dist/*.deb"
+        node scripts/upload-to-github-releases.mjs "${{ github.repository_owner }}" "${{ github.event.repository.name }}" "dist/*.tar.gz"
+        node scripts/upload-to-github-releases.mjs "${{ github.repository_owner }}" "${{ github.event.repository.name }}" "dist/*.AppImage"
       env:
         GH_TOKEN: "${{ github.token }}"
 
@@ -89,19 +89,35 @@ jobs:
       run: npm run webpack:prod
     - name: Package
       run: |
+        cleanup() {
+          if [ -n "${APPLE_API_KEY_NAME:-}" ]; then
+            rm -f "$APPLE_API_KEY_NAME"
+          fi
+        }
+        trap cleanup EXIT
+
+        # If signing credentials are not configured (common on forks), build unsigned instead of failing.
+        if [ -z "${CSC_LINK:-}" ] || [ -z "${CSC_KEY_PASSWORD:-}" ]; then
+          echo "CSC_LINK / CSC_KEY_PASSWORD not set; building unsigned (CSC_IDENTITY_AUTO_DISCOVERY=false)."
+          export CSC_IDENTITY_AUTO_DISCOVERY=false
+        fi
+
         # I don't trust GitHub Actions to not accidentally log shell substitutions somewhere, so we
         # use Python instead of "echo $SECRET >" to write the private key to a file as needed by notarytool.
-        python3 -c "import os; open(os.getenv('APPLE_API_KEY_NAME'), 'w').write(os.getenv('APPLE_API_KEY_DATA'))" >/dev/null 2>&1
-        # @electron/notaraize documentation says key should be an absolute path
-        export APPLE_API_KEY="$(pwd)/$APPLE_API_KEY_NAME"
+        if [ -n "${APPLE_API_KEY_NAME:-}" ] && [ -n "${APPLE_API_KEY_DATA:-}" ]; then
+          python3 -c "import os; open(os.getenv('APPLE_API_KEY_NAME'), 'w').write(os.getenv('APPLE_API_KEY_DATA'))" >/dev/null 2>&1 || { echo "Failed to write APPLE_API_KEY file"; exit 1; }
+          # @electron/notarize documentation says key should be an absolute path
+          export APPLE_API_KEY="$(pwd)/$APPLE_API_KEY_NAME"
+        else
+          echo "APPLE_API_KEY_NAME / APPLE_API_KEY_DATA not set; skipping notarization."
+        fi
+
         # Need to run the universal builds as separate commands or it breaks when @electron/universal
         # diffs the ASARs and finds spurious differences. Not clear why.
         node release-automation/build.mjs --mac --universal --production
         node release-automation/build.mjs --mac-legacy-11 --universal --production
         # These macOS versions never ran on an Apple Silicon device, so only need x64
         node release-automation/build.mjs --mac-legacy-10.13-10.14 --mac-legacy-10.15 --x64 --production
-        # for safety
-        rm "$APPLE_API_KEY_NAME"
       env:
         APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
         APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
@@ -121,7 +137,7 @@ jobs:
         path: dist/*.dmg
     - name: Upload artifacts to tag
       run: |
-        node scripts/upload-to-github-releases.mjs TurboWarp desktop "dist/*.dmg"
+        node scripts/upload-to-github-releases.mjs "${{ github.repository_owner }}" "${{ github.event.repository.name }}" "dist/*.dmg"
       env:
         GH_TOKEN: "${{ github.token }}"
 
@@ -204,6 +220,7 @@ jobs:
         path: |
           D:\repo\dist\TurboWarp-Setup*x64.exe
     - name: Sign executables with SignPath
+      if: ${{ secrets.SIGNPATH_API_TOKEN != '' }}
       uses: signpath/github-action-submit-signing-request@4f13d373e8f0cd8d3c0465ff4877feff27aed2ae
       with:
         api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
@@ -216,6 +233,7 @@ jobs:
         # overwrite the unsigned files
         output-artifact-directory: D:\repo\dist
     - name: Upload signed artifacts to GitHub Actions
+      if: ${{ secrets.SIGNPATH_API_TOKEN != '' }}
       uses: actions/upload-artifact@v4
       with:
         name: windows-signed
@@ -225,6 +243,6 @@ jobs:
     - name: Upload signed artifacts to tag
       working-directory: D:\repo
       run: |
-        node scripts/upload-to-github-releases.mjs TurboWarp desktop "dist/*.exe"
+        node scripts/upload-to-github-releases.mjs "${{ github.repository_owner }}" "${{ github.event.repository.name }}" "dist/*.exe"
       env:
         GH_TOKEN: "${{ github.token }}"
