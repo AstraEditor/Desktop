@@ -25,7 +25,16 @@ jobs:
       with:
         node-version: 24
     - name: Install dependencies
-      run: npm install --loglevel=info
+      run: |
+        echo "=== Removing package-lock.json to use latest git commits ==="
+        rm -f package-lock.json
+        echo "=== Installing dependencies ==="
+        npm install --loglevel=info
+    - name: Verify scratch dependencies
+      run: |
+        test -f node_modules/scratch-blocks/blockly_compressed_vertical.js
+        test -f node_modules/scratch-blocks/blocks_compressed_vertical.js
+        node -e "const fs=require('fs'); const paths=['node_modules/@turbowarp/scratch-l10n/locales/editor-msgs.js','node_modules/scratch-gui/node_modules/@turbowarp/scratch-l10n/locales/editor-msgs.js']; if(!paths.some(p=>fs.existsSync(p))){ console.error('Missing editor-msgs.js from @turbowarp/scratch-l10n'); process.exit(1);} "
     - name: Fetch
       run: npm run fetch
     - name: Compile
@@ -64,7 +73,16 @@ jobs:
       with:
         node-version: 24
     - name: Install dependencies
-      run: npm install --loglevel=info
+      run: |
+        echo "=== Removing package-lock.json to use latest git commits ==="
+        rm -f package-lock.json
+        echo "=== Installing dependencies ==="
+        npm install --loglevel=info
+    - name: Verify scratch dependencies
+      run: |
+        test -f node_modules/scratch-blocks/blockly_compressed_vertical.js
+        test -f node_modules/scratch-blocks/blocks_compressed_vertical.js
+        node -e "const fs=require('fs'); const paths=['node_modules/@turbowarp/scratch-l10n/locales/editor-msgs.js','node_modules/scratch-gui/node_modules/@turbowarp/scratch-l10n/locales/editor-msgs.js']; if(!paths.some(p=>fs.existsSync(p))){ console.error('Missing editor-msgs.js from @turbowarp/scratch-l10n'); process.exit(1);} "
     - name: Fetch
       run: npm run fetch
     - name: Compile
@@ -141,7 +159,17 @@ jobs:
         npm config set prefix D:\npm-prefix
     - name: Install dependencies
       working-directory: D:\repo
-      run: npm install --loglevel=info
+      run: |
+        echo "=== Removing package-lock.json to use latest git commits ==="
+        Remove-Item -Path package-lock.json -Force -ErrorAction SilentlyContinue
+        echo "=== Installing dependencies ==="
+        npm install --loglevel=info
+    - name: Verify scratch dependencies
+      working-directory: D:\repo
+      run: |
+        if (!(Test-Path "node_modules\\scratch-blocks\\blockly_compressed_vertical.js")) { throw "Missing node_modules\\scratch-blocks\\blockly_compressed_vertical.js" }
+        if (!(Test-Path "node_modules\\scratch-blocks\\blocks_compressed_vertical.js")) { throw "Missing node_modules\\scratch-blocks\\blocks_compressed_vertical.js" }
+        if (!(Test-Path "node_modules\\@turbowarp\\scratch-l10n\\locales\\editor-msgs.js") -and !(Test-Path "node_modules\\scratch-gui\\node_modules\\@turbowarp\\scratch-l10n\\locales\\editor-msgs.js")) { throw "Missing editor-msgs.js from @turbowarp/scratch-l10n" }
     - name: Fetch
       working-directory: D:\repo
       run: npm run fetch
