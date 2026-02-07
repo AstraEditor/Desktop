@@ -148,6 +148,8 @@ jobs:
     # We want to use the D: drive whenever we can. Trying to do "npm install" on the C:
     # drive has been observed to take over an hour!
     runs-on: windows-latest
+    env:
+      SIGNPATH_API_TOKEN: ${{ secrets.SIGNPATH_API_TOKEN }}
     steps:
     # actions/checkout can only clone to paths in $GITHUB_WORKSPACE which is on the C: drive,
     # so we have to clone to C: then copy to D: after. This repository itself isn't huge so
@@ -220,10 +222,10 @@ jobs:
         path: |
           D:\repo\dist\TurboWarp-Setup*x64.exe
     - name: Sign executables with SignPath
-      if: ${{ secrets.SIGNPATH_API_TOKEN != '' }}
+      if: ${{ env.SIGNPATH_API_TOKEN != '' }}
       uses: signpath/github-action-submit-signing-request@4f13d373e8f0cd8d3c0465ff4877feff27aed2ae
       with:
-        api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+        api-token: ${{ env.SIGNPATH_API_TOKEN }}
         organization-id: 04444052-261e-46eb-8168-ed0eee93c57c
         project-slug: desktop_
         signing-policy-slug: release-signing
@@ -233,7 +235,7 @@ jobs:
         # overwrite the unsigned files
         output-artifact-directory: D:\repo\dist
     - name: Upload signed artifacts to GitHub Actions
-      if: ${{ secrets.SIGNPATH_API_TOKEN != '' }}
+      if: ${{ env.SIGNPATH_API_TOKEN != '' }}
       uses: actions/upload-artifact@v4
       with:
         name: windows-signed
