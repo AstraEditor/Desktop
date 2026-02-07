@@ -6,10 +6,13 @@ import './media-device-chooser-impl.js';
 import '../prompt/prompt.js';
 
 const appTarget = document.getElementById('app');
-document.body.classList.add('tw-loaded');
 GUI.setAppElement(appTarget);
 
 ReactDOM.render(<GUI />, appTarget);
+if (typeof window.SplashEnd === 'function') {
+  window.SplashEnd();
+}
+document.body.classList.add('tw-loaded');
 
 require('./addons');
 
