@@ -4,6 +4,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Unfortunately can't really enforce a CSP due to custom extensions -->
+    <script>
+      // Used by scratch-extension-editor to locate its workers/chunks in builds.
+      window.__SCRATCH_EXTENSION_EDITOR_PUBLIC_PATH__ = 'extension-editor/';
+    </script>
     <style>
       .splash-screen {
         position: absolute;

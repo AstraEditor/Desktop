@@ -119,20 +119,8 @@
       <div>
         <script>
           var language = "en";
-          (async () => {
-            language = await AboutPreload.getEditorLocalStorage('tw:language');
-            console.log(`Editor Language: ${language}`);
-            console.log(translate[language])
-            for (let i = 0; i <= Object.keys(translate[language]).length; i++) {
-              document.querySelector(`.${Object.keys(translate[language])[i]}`).textContent = Object.values(translate[language])[i]
-            };
-          })();
-          var info = AboutPreload.getInfo();
 
-          document.querySelector('.version').textContent = info.version;
-          document.querySelector('.more-version').textContent = `Platform info: Electron Version: ${info.electron}, Platform: ${info.platform} ${info.arch}, Distribution: ${info.dist}`;
-
-          const translate = {
+          var translate = {
             "zh-cn": {
               "thanks-all": "创作者",
               "thanks-you": "您",
@@ -205,7 +193,25 @@ Este proyecto se adhiere a la GNU General Public License v3.0 (GPLv3.0) y ha sid
               "intro_1":"en Github",
               "intro_2":"."
             }
-          }
+          };
+
+          (async () => {
+            language = await AboutPreload.getEditorLocalStorage('tw:language');
+            if(!language){
+              language = navigator.language.toLowerCase();
+            }
+            console.log(`Editor Language: ${language}`);
+            console.log(translate[language])
+            for (let i = 0; i <= Object.keys(translate[language]).length; i++) {
+              document.querySelector(`.${Object.keys(translate[language])[i]}`).textContent = Object.values(translate[language])[i]
+            };
+          })();
+          var info = AboutPreload.getInfo();
+
+          document.querySelector('.version').textContent = info.version;
+          document.querySelector('.more-version').textContent = `Platform info: Electron Version: ${info.electron}, Platform: ${info.platform} ${info.arch}, Distribution: ${info.dist}`;
+
+
 
 
         </script>

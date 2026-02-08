@@ -614,6 +614,19 @@ class EditorWindow extends ProjectRunningWindow {
     const url = new URL(details.url);
     const params = new URLSearchParams(url.search);
 
+    // Open extension library upload page in-app
+    if (
+      url.protocol === 'tw-editor:' &&
+      url.host === '.' &&
+      url.pathname === '/gui/upload.html'
+    ) {
+      const UploadWindow = require('./upload');
+      UploadWindow.open(this.window);
+      return {
+        action: 'deny'
+      };
+    }
+
     // Open extension sample projects in-app
     if (
       url.protocol === 'tw-editor:' &&

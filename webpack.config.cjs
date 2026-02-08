@@ -70,6 +70,21 @@ module.exports = [
             }),
             new CopyWebpackPlugin({
                 patterns: [
+                    // scratch-extension-editor is bundled into scratch-gui, but it still loads additional
+                    // chunks/workers at runtime. Those files must be available at runtime.
+                    {
+                        from: path.resolve(__dirname, 'node_modules/scratch-extension-editor/dist'),
+                        to: 'extension-editor'
+                    },
+                    // Extension library "Upload Your Extension" page and its images
+                    {
+                        from: path.resolve(__dirname, '../scratch-gui/static/upload.html'),
+                        to: 'upload.html'
+                    },
+                    {
+                        from: path.resolve(__dirname, '../scratch-gui/static/submit'),
+                        to: 'submit'
+                    },
                     {
                         from: 'node_modules/scratch-blocks/media',
                         to: 'static/blocks-media/default'
