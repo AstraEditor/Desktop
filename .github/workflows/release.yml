@@ -96,10 +96,24 @@ jobs:
         }
         trap cleanup EXIT
 
-        # If signing credentials are not configured (common on forks), build unsigned instead of failing.
+        signing_ok=true
         if [ -z "${CSC_LINK:-}" ] || [ -z "${CSC_KEY_PASSWORD:-}" ]; then
-          echo "CSC_LINK / CSC_KEY_PASSWORD not set; building unsigned (CSC_IDENTITY_AUTO_DISCOVERY=false)."
+          signing_ok=false
+        fi
+
+        # If CSC_LINK looks like a local path, it must point to an actual file.
+        # Some configs accidentally set it to the workspace directory, which breaks electron-builder.
+        if [ "$signing_ok" = true ] && ([[ "${CSC_LINK:-}" == /* ]] || [[ "${CSC_LINK:-}" == ./* ]] || [[ "${CSC_LINK:-}" == ../* ]]); then
+          if [ ! -f "$CSC_LINK" ]; then
+            echo "CSC_LINK looks like a path but is not a file; building unsigned."
+            signing_ok=false
+          fi
+        fi
+
+        if [ "$signing_ok" != true ]; then
           export CSC_IDENTITY_AUTO_DISCOVERY=false
+          unset CSC_LINK
+          unset CSC_KEY_PASSWORD
         fi
 
         # I don't trust GitHub Actions to not accidentally log shell substitutions somewhere, so we

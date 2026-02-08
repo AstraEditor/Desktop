@@ -2,7 +2,13 @@ This document is the authoritative source for TurboWarp's changelogs. Everything
 
 Prefix notes with "Windows:", "macOS:", or "Linux:" as needed. Do not use **formatting** or [links](https://desktop.turbowarp.org/).
 
-# 1.0.0 (2026-1-18)
+# 1.0.1 (2026-02-09)
+
+- 修复关于扩展编辑器资源丢失的问题
+- 修复“上传扩展”无法打开的问题
+- 修正部分情况下关于界面的翻译问题
+
+# 1.0.0 (2026-02-08)
 
 - 自定义主题颜色
 - 完整可用的“README”功能
