@@ -76,15 +76,6 @@ module.exports = [
                         from: path.resolve(__dirname, 'node_modules/scratch-extension-editor/dist'),
                         to: 'extension-editor'
                     },
-                    // Extension library "Upload Your Extension" page and its images
-                    {
-                        from: path.resolve(__dirname, '../scratch-gui/static/upload.html'),
-                        to: 'upload.html'
-                    },
-                    {
-                        from: path.resolve(__dirname, '../scratch-gui/static/submit'),
-                        to: 'submit'
-                    },
                     {
                         from: 'node_modules/scratch-blocks/media',
                         to: 'static/blocks-media/default'
@@ -97,6 +88,11 @@ module.exports = [
                         from: 'node_modules/scratch-gui/src/lib/themes/blocks/high-contrast-media/blocks-media',
                         to: 'static/blocks-media/high-contrast',
                         force: true
+                    },
+                    {
+                        context: 'src-renderer-webpack/editor/gui/',
+                        from: 'submit',
+                        to: 'submit'
                     },
                     {
                         context: 'src-renderer-webpack/editor/gui/',
