@@ -2,6 +2,11 @@ This document is the authoritative source for TurboWarp's changelogs. Everything
 
 Prefix notes with "Windows:", "macOS:", or "Linux:" as needed. Do not use **formatting** or [links](https://desktop.turbowarp.org/).
 
+# 1.0.2 ()
+
+- 修改导出插件设置的文件名
+- 修改Windows安装程序的完成侧边图
+
 # 1.0.1 (2026-02-09)
 
 - 修复关于扩展编辑器资源丢失的问题
