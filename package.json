@@ -189,7 +189,6 @@
                 }
             ]
         },
-        "afterPack": "scripts/rename-pacman.js",
         "snap": {
             "summary": "Scratch mod with a compiler, dark mode, a bunch of addons, and more.",
             "allowNativeWayland": true,
