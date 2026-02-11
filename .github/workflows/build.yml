@@ -50,7 +50,7 @@ jobs:
           dist/*.deb
           dist/*.tar.gz
           dist/*.AppImage
-          dist/*.pkg.tar.zst
+          dist/*.pacman
   build-mac:
     runs-on: macos-latest
     steps:
