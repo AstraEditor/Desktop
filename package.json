@@ -225,9 +225,7 @@
                 "role": "Editor",
                 "mimeType": "application/x.scratch.sb"
             }
-        {
             "afterPack": "scripts/rename-pacman.js"
-        }
         ]
     },
     "private": true
