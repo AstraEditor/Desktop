@@ -183,11 +183,11 @@
                 },
                 {
                     "target": "tar.gz"
-                }
+                },
                 {
                     "target": "pacman"
                 }
-            ]
+            ],
             "afterPack": "scripts/rename-pacman.js"
         },
         "snap": {
