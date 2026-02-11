@@ -187,6 +187,7 @@
                 {
                     "target": "pacman"
                 }
+            "afterPack": "scripts/rename-pacman.js"
             ]
         },
         "snap": {
@@ -225,7 +226,6 @@
                 "role": "Editor",
                 "mimeType": "application/x.scratch.sb"
             }
-            "afterPack": "scripts/rename-pacman.js"
         ]
     },
     "private": true
