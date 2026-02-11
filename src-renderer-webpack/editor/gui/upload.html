@@ -42,6 +42,13 @@
                 color: #4af;
             }
         }
+
+        .code{
+            background-color: #0000001f;
+            border-radius: 5px;
+            padding: 5px;
+            padding-left: 10px;
+        }
     </style>
 </head>
 
@@ -65,26 +72,27 @@
         <p>审核的日期不定，但大多都能在<strong>一周内</strong>审核完成，请及时关注结果。</p>
         <h3>打包</h3>
         <p>您需要保证您提交的文件可以<strong>让别人看懂</strong>。我们规定了一个简单的目录，方便你我更快的检查和加入您的扩展：</p>
-        <pre class="language-python"><code class="language-python code-highlight"><span class="code-line line-number" line="1">扩展名<span class="token punctuation">.</span><span class="token builtin">zip</span>
+        <div class="code"><pre class="language-python"><code class="language-python code-highlight"><span class="code-line line-number" line="1">扩展名<span class="token punctuation">.</span><span class="token builtin">zip</span>
 </span><span class="code-line line-number" line="2">    <span class="token operator">|</span><span class="token operator">-</span> main<span class="token punctuation">.</span>js      <span class="token comment">#您的扩展文件</span>
 </span><span class="code-line line-number" line="3">    <span class="token operator">|</span><span class="token operator">-</span> featured<span class="token punctuation">.</span>png <span class="token comment">#扩展的头图，在扩展库显示</span>
 </span><span class="code-line line-number" line="4">    <span class="token operator">|</span><span class="token operator">-</span> text<span class="token punctuation">.</span>json    <span class="token comment">#存放您的扩展信息</span>
-</span></code></pre>
+</span></code></pre></div>
         <p>如果您提交的<em>不满足</em>我们的要求，我们可能会<strong>拒绝加入</strong>您的扩展。</p>
         <p>下面我们会展开每个文件具体的规范。</p>
         <h4>main.js</h4>
         <p>这里存放您的扩展主文件，具体扩展该如何编写请参考<em>其它扩展教程</em>。</p>
         <p>说回来，您的扩展开头应有以下内容：</p>
-        <pre class="language-js"><code class="language-js code-highlight"><span class="code-line line-number" line="1"><span class="token comment">// Name: 扩展名称</span>
+        <div class="code"><pre class="language-js"><code class="language-js code-highlight"><span class="code-line line-number" line="1"><span class="token comment">// Name: 扩展名称</span>
 </span><span class="code-line line-number" line="2"><span class="token comment">// ID: 扩展ID</span>
 </span><span class="code-line line-number" line="3"><span class="token comment">// Description: 扩展描述</span>
 </span><span class="code-line line-number" line="4"><span class="token comment">// By: 作者 &lt;链接&gt;</span>
 </span><span class="code-line line-number" line="5"><span class="token comment">// By: 更多作者 &lt;链接&gt;</span>
 </span><span class="code-line line-number" line="6"><span class="token comment">// License: 许可证（MIT、GPLv3等）</span>
-</span></code></pre>
+</span></code></pre></div>
         <p>这<em>在此扩展库</em> <strong>是强制的</strong>，因为它涉及到实际的显示。</p>
+        <p><strong>我们需要您将Name和Description写为英文，这需要作为默认文本于扩展库显示。</strong></p>
         <blockquote>
-            <p>注意，对于多作者要用多个 <code>// By:</code> 而不是逗号</p>
+            <strong><p>注意，对于多作者要用多个 <code>// By:</code> 而不是逗号</p></strong>
         </blockquote>
         <p>此外，我们<em>不要求您的内容包含国际化</em> 。</p>
         <h4>featured.png</h4>
@@ -103,18 +111,18 @@
         </ul>
         <h4>text.json</h4>
         <p>您可以复制这个示例并对其修改</p>
-        <pre class="language-json"><code class="language-json code-highlight"><span class="code-line line-number" line="1"><span class="token punctuation">{</span>
+       <div class="code"> <pre class="language-json"><code class="language-json code-highlight"><span class="code-line line-number" line="1"><span class="token punctuation">{</span>
 </span><span class="code-line line-number" line="2">    <span class="token property">"Name"</span><span class="token operator">:</span><span class="token punctuation">{</span>
-</span><span class="code-line line-number" line="3">        <span class="token property">"en-us"</span><span class="token operator">:</span><span class="token string">"Extension Name"</span><span class="token punctuation">,</span>
 </span><span class="code-line line-number" line="4">        <span class="token property">"zh-cn"</span><span class="token operator">:</span><span class="token string">"扩展名"</span>
+        ...更多语言
 </span><span class="code-line line-number" line="5">    <span class="token punctuation">}</span><span class="token punctuation">,</span>
 </span><span class="code-line line-number" line="6">    <span class="token property">"Description"</span><span class="token operator">:</span><span class="token punctuation">{</span>
-</span><span class="code-line line-number" line="7">        <span class="token property">"en-us"</span><span class="token operator">:</span><span class="token string">"Extension Description"</span><span class="token punctuation">,</span>
 </span><span class="code-line line-number" line="8">        <span class="token property">"zh-cn"</span><span class="token operator">:</span><span class="token string">"扩展描述"</span>
+        ...更多语言
 </span><span class="code-line line-number" line="9">    <span class="token punctuation">}</span><span class="token punctuation">,</span>
-</span><span class="code-line line-number" line="10"><span class="token punctuation">}</span>
-</span></code></pre>
-        <p>我们<strong>硬性要求</strong>您的扩展格式包含以上二项，且<code>Name</code>和<code>Description</code>包含<code>en-us</code>。这对国际化很有帮助。
+}
+</code></pre></div>
+        <p>我们<strong>硬性要求</strong>您的扩展格式包含以上二项，且<code>Name</code>和<code>Description</code>包含<code>zh-cn</code>。这对国际化很有帮助。
         </p>
         <p>我们<em>不要求您的扩展内容包含国际化</em>。</p>
         <h2>准备</h2>
