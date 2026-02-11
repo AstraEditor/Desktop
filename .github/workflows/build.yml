@@ -22,6 +22,11 @@ jobs:
         python-version: '3.x'
     - name: Install strip-nondeterminism
       run: sudo apt-get install strip-nondeterminism
+    - name: Install fpm for pacman
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y ruby ruby-dev rubygems build-essential
+        sudo gem install --no-document fpm
     - name: Install dependencies
       run: |
         echo "=== Removing package-lock.json to use latest git commits ==="
@@ -34,9 +39,14 @@ jobs:
       run: npm run webpack:prod
     - name: Package
       run: |
-        node release-automation/build.mjs --debian --tarball --appimage --x64 --armv7l --arm64
+        node release-automation/build.mjs --debian --tarball --appimage --pacman --x64 --armv7l --arm64
     - name: Print file tree
       run: node scripts/print-file-tree.mjs dist
+    - name: Rename pacman to pkg.tar.zst
+      run: |
+        for f in dist/*.pacman; do
+          [ -e "$f" ] && mv "$f" "${f%.pacman}.pkg.tar.zst"
+        done
     - name: Upload artifacts to GitHub Actions
       uses: actions/upload-artifact@v4
       with:
@@ -45,7 +55,7 @@ jobs:
           dist/*.deb
           dist/*.tar.gz
           dist/*.AppImage
-
+          dist/*.pkg.tar.zst
   build-mac:
     runs-on: macos-latest
     steps:
