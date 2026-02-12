@@ -6,6 +6,8 @@ on:
 jobs:
   build-linux:
     runs-on: ubuntu-latest
+    env:
+      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
     steps:
     - name: Checkout
       uses: actions/checkout@v4
