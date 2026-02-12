@@ -22,10 +22,11 @@ jobs:
         python-version: '3.x'
     - name: Install strip-nondeterminism
       run: sudo apt-get install strip-nondeterminism
-    - name: Install fpm for pacman
+    - name: Install dependencies for pacman
       run: |
         sudo apt-get update
         sudo apt-get install -y ruby ruby-dev rubygems build-essential
+        sudo apt-get install -y strip-nondeterminism fakeroot libarchive-tools
         sudo gem install --no-document fpm
     - name: Install dependencies
       run: |
