@@ -158,6 +158,21 @@
             "type": "development",
             "provisioningProfile": "build/development.provisionprofile"
         },
+        "pacman": {
+            "depends": [
+                "gtk3",
+                "libnotify", 
+                "nss",
+                "libxss",
+                "libxtst",
+                "xdg-utils",
+                "at-spi2-core",
+                "libdrm",
+                "mesa",
+                "libxcb"
+            ],
+            "packageCategory": "devel"
+        },
         "linux": {
             "executableName": "astraeditor-desktop",
             "artifactName": "${productName}-${os}-${arch}-${version}.${ext}",
