@@ -364,6 +364,22 @@ const buildLinuxDir = () => build({
   manageUpdates: true
 });
 
+const buildPacman = () => build({
+  platformName: 'LINUX',
+  platformType: 'pacman',
+  manageUpdates: true,
+  extraConfig: {
+    artifactBuildCompleted: async (artifact) => {
+      // 将 .pacman 重命名为 Arch 标准格式 .pkg.tar.zst
+      if (artifact.file.endsWith('.pacman')) {
+        const newPath = artifact.file.replace(/\.pacman$/, '.pkg.tar.zst');
+        fs.renameSync(artifact.file, newPath);
+        console.log(`[pacman] Renamed: ${pathUtil.basename(artifact.file)} -> ${pathUtil.basename(newPath)}`);
+      }
+    }
+  }
+});
+
 const run = async () => {
   const options = {
     '--windows': buildWindows,
@@ -379,7 +395,8 @@ const run = async () => {
     '--debian': buildDebian,
     '--tarball': buildTarball,
     '--appimage': buildAppImage,
-    '--linux-dir': buildLinuxDir
+    '--linux-dir': buildLinuxDir,
+    '--pacman': buildPacman,
   };
 
   let built = 0;
