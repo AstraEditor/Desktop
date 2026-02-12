@@ -39,9 +39,18 @@ jobs:
       run: npm run webpack:prod
     - name: Package
       run: |
-        node release-automation/build.mjs --debian --tarball --appimage --pacman --x64 --armv7l --arm64
-    - name: Print file tree
-      run: node scripts/print-file-tree.mjs dist
+        # 先构建 deb、appimage、tarball（如果这些参数有效）
+        node release-automation/build.mjs --debian --tarball --appimage --x64 --armv7l --arm64 || true
+        # 单独构建 pacman（使用 electron-builder）
+        npx electron-builder --linux pacman --x64
+        npx electron-builder --linux pacman --armv7l
+        npx electron-builder --linux pacman --arm64
+    - name: Debug dist contents
+      run: |
+        echo "=== All files in dist/ ==="
+        ls -la dist/ || echo "dist directory not found"
+        echo "=== Check for pacman files ==="
+        find dist/ -name "*.pacman" -o -name "*.pkg.tar.zst" -o -name "*pacman*" || echo "No pacman files found"
     - name: Upload artifacts to GitHub Actions
       uses: actions/upload-artifact@v4
       with:
@@ -51,6 +60,7 @@ jobs:
           dist/*.tar.gz
           dist/*.AppImage
           dist/*.pacman
+          dist/*.pkg.tar.zst
   build-mac:
     runs-on: macos-latest
     steps:
