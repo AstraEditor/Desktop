@@ -77,7 +77,8 @@
             "src-renderer/**/*",
             "dist-renderer-webpack/**/*",
             "dist-library-files/**/*",
-            "dist-extensions/**/*"
+            "dist-extensions/**/*",
+            "dist-astra-extensions/**/*"
         ],
         "extraResources": [
             {

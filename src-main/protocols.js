@@ -65,6 +65,15 @@ const FILE_SCHEMES = {
     defaultExtension: '.html',
     csp: "default-src 'none'; img-src 'self' data:; style-src 'unsafe-inline'; script-src 'self' 'unsafe-inline'"
   },
+  'tw-astra-extensions': {
+    root: path.resolve(__dirname, '../dist-astra-extensions'),
+    supportFetch: true,
+    embeddable: true,
+    stream: true,
+    directoryIndex: 'index.html',
+    defaultExtension: '.html',
+    csp: "default-src 'none'; img-src 'self' data:; style-src 'unsafe-inline'; script-src 'self' 'unsafe-inline'"
+  },
   'tw-update': {
     root: path.resolve(__dirname, '../src-renderer/update'),
     csp: "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src https://desktop.turbowarp.org"

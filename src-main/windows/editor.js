@@ -24,10 +24,52 @@ const TYPE_FILE = 'file';
 const TYPE_URL = 'url';
 const TYPE_SCRATCH = 'scratch';
 const TYPE_SAMPLE = 'sample';
+const TYPE_SAMPLE_ASTRA = 'sample-astra';
+const TURBOWARP_EXTENSIONS_ORIGIN = 'https://extensions.turbowarp.org';
+const ASTRA_EXTENSIONS_ORIGIN = 'https://editor.astras.top';
+const ASTRA_EXTENSIONS_PREFIX = '/extensions';
+
+/**
+ * Convert supported online extension-library URLs to local protocol redirects.
+ * @param {string} input
+ * @returns {{protocol: 'tw-extensions'|'tw-astra-extensions', path: string}|null}
+ */
+const getCachedExtensionsRedirect = (input) => {
+  let parsed;
+  try {
+    parsed = new URL(input);
+  } catch (e) {
+    return null;
+  }
+
+  if (parsed.origin === TURBOWARP_EXTENSIONS_ORIGIN) {
+    return {
+      protocol: 'tw-extensions',
+      path: parsed.pathname
+    };
+  }
+
+  if (
+    parsed.origin === ASTRA_EXTENSIONS_ORIGIN &&
+    (
+      parsed.pathname === ASTRA_EXTENSIONS_PREFIX ||
+      parsed.pathname.startsWith(`${ASTRA_EXTENSIONS_PREFIX}/`)
+    )
+  ) {
+    const stripped = parsed.pathname.slice(ASTRA_EXTENSIONS_PREFIX.length);
+    const normalized = (stripped || '/').replace(/\/{2,}/g, '/');
+    return {
+      protocol: 'tw-astra-extensions',
+      path: normalized
+    };
+  }
+
+  return null;
+};
 
 class OpenedFile {
   constructor (type, path) {
-    /** @type {TYPE_FILE|TYPE_URL|TYPE_SCRATCH|TYPE_SAMPLE} */
+    /** @type {TYPE_FILE|TYPE_URL|TYPE_SCRATCH|TYPE_SAMPLE|TYPE_SAMPLE_ASTRA} */
     this.type = type;
 
     /**
@@ -65,27 +107,36 @@ class OpenedFile {
       };
     }
 
-    if (this.type === TYPE_SAMPLE) {
-      const sampleRoot = path.resolve(__dirname, '../../dist-extensions/samples/');
+    if (this.type === TYPE_SAMPLE || this.type === TYPE_SAMPLE_ASTRA) {
+      const isAstraSample = this.type === TYPE_SAMPLE_ASTRA;
+      const sampleRoot = path.resolve(
+        __dirname,
+        isAstraSample ? '../../dist-astra-extensions/samples/' : '../../dist-extensions/samples/'
+      );
       const resolvedPath = path.join(sampleRoot, this.path);
       if (resolvedPath.startsWith(sampleRoot)) {
-        const compressedPath = `${resolvedPath}.br`;
-        const compressedData = await fsPromises.readFile(compressedPath);
+        let data;
+        if (isAstraSample) {
+          data = await fsPromises.readFile(resolvedPath);
+        } else {
+          const compressedPath = `${resolvedPath}.br`;
+          const compressedData = await fsPromises.readFile(compressedPath);
 
-        // dist-extensions is all brotli'd; must decompress
-        const decompressedData = await new Promise((resolve, reject) => {
-          zlib.brotliDecompress(compressedData, (err, res) => {
-            if (err) {
-              reject(err);
-            } else {
-              resolve(res);
-            }
+          // dist-extensions is all brotli'd; must decompress
+          data = await new Promise((resolve, reject) => {
+            zlib.brotliDecompress(compressedData, (err, res) => {
+              if (err) {
+                reject(err);
+              } else {
+                resolve(res);
+              }
+            });
           });
-        });
+        }
 
         return {
           name: this.path,
-          data: decompressedData
+          data
         };
       }
       throw new Error('Unsafe join');
@@ -118,9 +169,15 @@ const parseOpenedFile = (file, workingDirectory) => {
 
       // Need to manually redirect extension samples to the copies we already have offline as the
       // fetching code will not go through web request handlers or custom protocols.
-      const sampleMatch = file.match(/^https?:\/\/extensions\.turbowarp\.org\/samples\/(.+\.sb3)$/);
-      if (sampleMatch) {
-        return new OpenedFile(TYPE_SAMPLE, decodeURIComponent(sampleMatch[1]));
+      const cachedExtensionsRedirect = getCachedExtensionsRedirect(file);
+      if (cachedExtensionsRedirect) {
+        const sampleMatch = cachedExtensionsRedirect.path.match(/^\/samples\/(.+\.sb3)$/);
+        if (sampleMatch) {
+          return new OpenedFile(
+            cachedExtensionsRedirect.protocol === 'tw-astra-extensions' ? TYPE_SAMPLE_ASTRA : TYPE_SAMPLE,
+            decodeURIComponent(sampleMatch[1])
+          );
+        }
       }
 
       return new OpenedFile(TYPE_URL, file);
@@ -635,7 +692,7 @@ class EditorWindow extends ProjectRunningWindow {
     ) {
       const projectUrl = params.get('project_url');
       const parsedFile = parseOpenedFile(projectUrl, null);
-      if (parsedFile.type === TYPE_SAMPLE) {
+      if (parsedFile.type === TYPE_SAMPLE || parsedFile.type === TYPE_SAMPLE_ASTRA) {
         new EditorWindow(parsedFile, null);
         return {
           action: 'deny'
@@ -644,14 +701,15 @@ class EditorWindow extends ProjectRunningWindow {
     }
 
     // Open extension documentation in-app
-    const extensionsDocsMatch = details.url.match(
-      /^https:\/\/extensions\.turbowarp\.org\/([\w_\-.\/]+)$/
-    );
-    if (extensionsDocsMatch) {
-      ExtensionDocumentationWindow.open(extensionsDocsMatch[1]);
-      return {
-        action: 'deny'
-      };
+    const cachedExtensionsRedirect = getCachedExtensionsRedirect(details.url);
+    if (cachedExtensionsRedirect) {
+      const docsPath = cachedExtensionsRedirect.path.replace(/^\//, '');
+      if (docsPath) {
+        ExtensionDocumentationWindow.open(docsPath, cachedExtensionsRedirect.protocol);
+        return {
+          action: 'deny'
+        };
+      }
     }
 
     return super.handleWindowOpen(details);
