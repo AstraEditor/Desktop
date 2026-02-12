@@ -22,11 +22,15 @@ jobs:
         python-version: '3.x'
     - name: Install strip-nondeterminism
       run: sudo apt-get install strip-nondeterminism
-    - name: Install fpm for pacman
+    - name: Install fpm and bsdtar for pacman
       run: |
         sudo apt-get update
-        sudo apt-get install -y ruby ruby-dev rubygems build-essential
+        sudo apt-get install -y ruby ruby-dev rubygems build-essential libarchive-tools
         sudo gem install --no-document fpm
+    - name: Verify tools
+      run: |
+        which fpm && fpm --version
+        which bsdtar && bsdtar --version
     - name: Install dependencies
       run: |
         echo "=== Removing package-lock.json to use latest git commits ==="
