@@ -29,6 +29,11 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: 24
+
+    - name: Install Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
         
     - name: Install dependencies for pacman
       run: |
@@ -57,6 +62,13 @@ jobs:
     - name: Package
       run: |
         node release-automation/build.mjs --debian --tarball --appimage --pacman --x64 --armv7l --arm64 --production
+
+    - name: Verify Linux artifacts
+      run: |
+        ls -lh dist/*.deb
+        ls -lh dist/*.tar.gz
+        ls -lh dist/*.AppImage
+        ls -lh dist/*.pkg.tar.zst
         
     - name: Print file tree
       run: node scripts/print-file-tree.mjs dist
@@ -93,6 +105,11 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: 24
+
+    - name: Install Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
         
     - name: Install dependencies
       run: |
@@ -157,6 +174,10 @@ jobs:
         APPLE_API_KEY_DATA: ${{ secrets.APPLE_API_KEY_DATA }}
         CSC_LINK: ${{ secrets.APPLE_CSC_LINK }}
         CSC_KEY_PASSWORD: ${{ secrets.APPLE_CSC_KEY_PASSWORD }}
+
+    - name: Verify macOS artifacts
+      run: |
+        ls -lh dist/*.dmg
         
     - name: Print file tree
       run: node scripts/print-file-tree.mjs dist
@@ -195,6 +216,11 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: 24
+
+    - name: Install Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
         
     - name: "Configure npm to use D: drive"
       run: |
@@ -230,6 +256,12 @@ jobs:
         node release-automation/build.mjs --windows --microsoft-store --x64 --ia32 --arm64 --production
         node release-automation/build.mjs --windows-portable --x64 --production
         node release-automation/build.mjs --windows-legacy --ia32 --x64 --production
+
+    - name: Verify Windows artifacts
+      working-directory: D:\repo
+      run: |
+        Get-ChildItem dist\*.exe | Format-Table Name, Length
+        Get-ChildItem dist\*.appx | Format-Table Name, Length
         
     - name: Print file tree
       working-directory: D:\repo

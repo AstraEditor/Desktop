@@ -3,140 +3,18 @@ import fs from 'node:fs';
 import fsPromises from 'node:fs/promises';
 import {promisify} from 'node:util';
 import zlib from 'node:zlib';
-import AdmZip from 'adm-zip';
 
 const outputDirectory = pathUtil.join(import.meta.dirname, '../dist-extensions/');
 const astraOutputDirectory = pathUtil.join(import.meta.dirname, '../dist-astra-extensions/');
-const astraExtensionsBaseURL =
-  (process.env.ASTRA_EXTENSIONS_BASE_URL || 'https://editor.astras.top/extensions').replace(/\/+$/, '');
-
-const turboWarpRepoRoot = pathUtil.resolve(import.meta.dirname, '../../TW/extensions/');
-const turboWarpExtensionsRoot = pathUtil.join(turboWarpRepoRoot, 'extensions');
-const turboWarpImagesRoot = pathUtil.join(turboWarpRepoRoot, 'images');
-const turboWarpSamplesRoot = pathUtil.join(turboWarpRepoRoot, 'samples');
-const turboWarpFeaturedListPath = pathUtil.join(turboWarpExtensionsRoot, 'extensions.json');
-const turboWarpMetadataTranslationsPath = pathUtil.join(
-  turboWarpRepoRoot,
-  'translations/extension-metadata.json'
-);
+const turboWarpExtensionsBaseURL = (
+  process.env.TURBOWARP_EXTENSIONS_BASE_URL || 'https://extensions.turbowarp.org'
+).replace(/\/+$/, '');
+const astraExtensionsBaseURL = (
+  process.env.ASTRA_EXTENSIONS_BASE_URL || 'https://editor.astras.top/extensions'
+).replace(/\/+$/, '');
 
 const brotliCompress = promisify(zlib.brotliCompress);
-
-const splitFirst = (string, split) => {
-  const index = string.indexOf(split);
-  if (index === -1) {
-    return [string];
-  }
-  return [string.substring(0, index), string.substring(index + split.length)];
-};
-
-const parsePerson = (value) => {
-  const parts = splitFirst(value, '<');
-  if (parts.length === 1) {
-    return {
-      name: value,
-      link: null
-    };
-  }
-  return {
-    name: parts[0].trim(),
-    link: parts[1].replace('>', '')
-  };
-};
-
-const parseExtensionMetadata = (code) => {
-  const metadata = {
-    id: '',
-    name: '',
-    description: '',
-    by: [],
-    original: [],
-    scratchCompatible: false
-  };
-
-  for (const line of code.split('\n')) {
-    if (!line.startsWith('//')) {
-      break;
-    }
-
-    const withoutComment = line.substring(2).trim();
-    const parts = splitFirst(withoutComment, ':');
-    if (parts.length === 1) {
-      continue;
-    }
-
-    const key = parts[0].toLowerCase().trim();
-    const value = parts[1].trim();
-
-    switch (key) {
-      case 'id':
-        metadata.id = value;
-        break;
-      case 'name':
-        metadata.name = value;
-        break;
-      case 'description':
-        metadata.description = value;
-        break;
-      case 'by':
-        metadata.by.push(parsePerson(value));
-        break;
-      case 'original':
-        metadata.original.push(parsePerson(value));
-        break;
-      case 'scratch-compatible':
-        metadata.scratchCompatible = value === 'true';
-        break;
-      default:
-        break;
-    }
-  }
-
-  return metadata;
-};
-
-const parseJsonWithLineComments = (text) => {
-  const parsed = new Function(`return (${text});`)();
-  if (!Array.isArray(parsed)) {
-    throw new Error('Expected extensions.json to be an array');
-  }
-  return parsed;
-};
-
-const getTranslationMapForId = (allTranslations, id) => {
-  const result = {};
-  for (const [locale, translations] of Object.entries(allTranslations)) {
-    if (translations && typeof translations === 'object' && translations[id]) {
-      result[locale] = translations[id];
-    }
-  }
-  return Object.keys(result).length > 0 ? result : null;
-};
-
-const recursiveListFiles = async (root) => {
-  const result = [];
-  const walk = async (directory) => {
-    const entries = await fsPromises.readdir(directory, {withFileTypes: true});
-    for (const entry of entries) {
-      const fullPath = pathUtil.join(directory, entry.name);
-      if (entry.isDirectory()) {
-        await walk(fullPath);
-      } else if (entry.isFile()) {
-        result.push(fullPath);
-      }
-    }
-  };
-  await walk(root);
-  return result;
-};
-
-const writeCompressed = async (root, relativePath, data) => {
-  const normalizedRelativePath = relativePath.replace(/^\/+/, '').replace(/\\/g, '/');
-  const outputPath = pathUtil.join(root, `${normalizedRelativePath}.br`);
-  await fsPromises.mkdir(pathUtil.dirname(outputPath), {recursive: true});
-  const compressed = await brotliCompress(data);
-  await fsPromises.writeFile(outputPath, compressed);
-};
+const turboWarpMetadataPath = 'generated-metadata/extensions-v0.json';
 
 const normalizeRelativePath = (relativePath) => {
   const normalized = String(relativePath).replace(/^\/+/, '').replace(/\\/g, '/');
@@ -147,17 +25,17 @@ const normalizeRelativePath = (relativePath) => {
   return parts.join('/');
 };
 
-const toAstraRemoteURL = (relativePath) => {
+const toRemoteURL = (baseURL, relativePath) => {
   const normalized = normalizeRelativePath(relativePath);
   const encodedPath = normalized
     .split('/')
     .map(i => encodeURIComponent(i))
     .join('/');
-  return `${astraExtensionsBaseURL}/${encodedPath}`;
+  return `${baseURL}/${encodedPath}`;
 };
 
-const fetchAstraFile = async (relativePath, required = true) => {
-  const url = toAstraRemoteURL(relativePath);
+const fetchRemoteFile = async (baseURL, relativePath, required = true) => {
+  const url = toRemoteURL(baseURL, relativePath);
   const response = await fetch(url);
   if (!response.ok) {
     if (required) {
@@ -168,6 +46,30 @@ const fetchAstraFile = async (relativePath, required = true) => {
   return Buffer.from(await response.arrayBuffer());
 };
 
+const fetchTurboWarpFile = async (relativePath, required = true) =>
+  fetchRemoteFile(turboWarpExtensionsBaseURL, relativePath, required);
+
+const fetchAstraFile = async (relativePath, required = true) =>
+  fetchRemoteFile(astraExtensionsBaseURL, relativePath, required);
+
+const createFetchLogPrefix = (libraryName, type, index = null, total = null) => {
+  if (index === null) {
+    return `[${libraryName} ${type}]`;
+  }
+  if (total === null) {
+    return `[${libraryName} ${type} ${index}]`;
+  }
+  return `[${libraryName} ${type} ${index}/${total}]`;
+};
+
+const writeCompressed = async (root, relativePath, data) => {
+  const normalizedRelativePath = normalizeRelativePath(relativePath);
+  const outputPath = pathUtil.join(root, `${normalizedRelativePath}.br`);
+  await fsPromises.mkdir(pathUtil.dirname(outputPath), {recursive: true});
+  const compressed = await brotliCompress(data);
+  await fsPromises.writeFile(outputPath, compressed);
+};
+
 const writeRaw = async (root, relativePath, data) => {
   const normalized = normalizeRelativePath(relativePath);
   const outputPath = pathUtil.join(root, normalized);
@@ -175,175 +77,162 @@ const writeRaw = async (root, relativePath, data) => {
   await fsPromises.writeFile(outputPath, data);
 };
 
-const getTurboWarpSampleMap = async () => {
-  const files = await recursiveListFiles(turboWarpSamplesRoot);
-  const map = new Map();
-
-  for (const file of files) {
-    if (!file.endsWith('.sb3')) {
+const extractLocalAssetPathsFromHTML = (html) => {
+  const result = new Set();
+  const matchAttribute = /\b(?:src|href)\s*=\s*["']([^"']+)["']/gi;
+  let match;
+  while ((match = matchAttribute.exec(html)) !== null) {
+    const value = match[1].trim();
+    if (!value || value.startsWith('data:') || value.startsWith('#') || value.startsWith('mailto:')) {
       continue;
     }
 
-    const title = pathUtil.basename(file, '.sb3');
-    let project;
-    try {
-      const zip = new AdmZip(file);
-      const projectJsonEntry = zip.getEntry('project.json');
-      if (!projectJsonEntry) {
-        continue;
-      }
-      project = JSON.parse(projectJsonEntry.getData().toString('utf-8'));
-    } catch (error) {
-      console.warn(`Failed to parse sample ${file}`, error);
+    let relativePath = null;
+    if (value.startsWith('/')) {
+      relativePath = value.slice(1);
+    } else if (value.startsWith(`${turboWarpExtensionsBaseURL}/`)) {
+      relativePath = value.slice(turboWarpExtensionsBaseURL.length + 1);
+    } else {
       continue;
     }
 
-    const extensionURLs = Object.values(project.extensionURLs || {});
-    for (const extensionURL of extensionURLs) {
-      if (typeof extensionURL !== 'string') {
-        continue;
-      }
-      const match = extensionURL.match(/^https:\/\/extensions\.turbowarp\.org\/(.+)\.js$/);
-      if (!match) {
-        continue;
-      }
-      const slug = match[1];
-      if (!map.has(slug)) {
-        map.set(slug, []);
-      }
-      const list = map.get(slug);
-      if (!list.includes(title)) {
-        list.push(title);
-      }
-    }
-  }
-
-  return map;
-};
-
-const getTurboWarpImagePath = (slug) => {
-  const candidates = ['.svg', '.png', '.jpg', '.jpeg', '.gif', '.webp'];
-  for (const extension of candidates) {
-    const absolutePath = pathUtil.join(turboWarpImagesRoot, `${slug}${extension}`);
-    if (fs.existsSync(absolutePath)) {
-      return `images/${slug}${extension}`;
-    }
-  }
-  return null;
-};
-
-const buildTurboWarpMetadata = async () => {
-  const featuredSlugsText = await fsPromises.readFile(turboWarpFeaturedListPath, 'utf-8');
-  const featuredSlugs = parseJsonWithLineComments(featuredSlugsText);
-  const metadataTranslations = JSON.parse(
-    await fsPromises.readFile(turboWarpMetadataTranslationsPath, 'utf-8')
-  );
-  const sampleMap = await getTurboWarpSampleMap();
-
-  const extensions = [];
-  for (const slug of featuredSlugs) {
-    const extensionPath = pathUtil.join(turboWarpExtensionsRoot, `${slug}.js`);
-    if (!fs.existsSync(extensionPath)) {
-      console.warn(`Missing TurboWarp extension file for slug: ${slug}`);
+    relativePath = relativePath.split('#')[0].split('?')[0];
+    if (!relativePath || relativePath.endsWith('/')) {
       continue;
     }
-
-    const code = await fsPromises.readFile(extensionPath, 'utf-8');
-    const metadata = parseExtensionMetadata(code);
-    const extension = {
-      slug,
-      id: metadata.id,
-      name: metadata.name,
-      description: metadata.description
-    };
-
-    const nameTranslations = getTranslationMapForId(metadataTranslations, `${slug}@name`);
-    if (nameTranslations) {
-      extension.nameTranslations = nameTranslations;
-    }
-    const descriptionTranslations = getTranslationMapForId(
-      metadataTranslations,
-      `${slug}@description`
-    );
-    if (descriptionTranslations) {
-      extension.descriptionTranslations = descriptionTranslations;
-    }
-
-    const image = getTurboWarpImagePath(slug);
-    if (image) {
-      extension.image = image;
-    }
-    if (metadata.by.length > 0) {
-      extension.by = metadata.by;
-    }
-    if (metadata.original.length > 0) {
-      extension.original = metadata.original;
-    }
-    if (metadata.scratchCompatible) {
-      extension.scratchCompatible = true;
-    }
-
-    const samples = sampleMap.get(slug);
-    if (samples && samples.length > 0) {
-      extension.samples = samples;
-    }
-
-    extensions.push(extension);
+    result.add(normalizeRelativePath(relativePath));
   }
-
-  return {extensions};
+  return result;
 };
 
 const buildTurboWarpOfflineFiles = async () => {
-  if (!fs.existsSync(turboWarpRepoRoot)) {
-    throw new Error(`TurboWarp extensions repository not found: ${turboWarpRepoRoot}`);
-  }
+  console.log(`[TurboWarp] Preparing extension cache from ${turboWarpExtensionsBaseURL}`);
 
   fs.rmSync(outputDirectory, {
     recursive: true,
     force: true
   });
+  console.log('[TurboWarp] Cleared output directory');
 
-  const metadata = await buildTurboWarpMetadata();
-  await writeCompressed(
-    outputDirectory,
-    '/generated-metadata/extensions-v0.json',
-    Buffer.from(JSON.stringify(metadata))
+  console.log(
+    `${createFetchLogPrefix('TurboWarp', 'required', 1, 1)} Fetching ${turboWarpMetadataPath}`
   );
+  const metadataBuffer = await fetchTurboWarpFile(turboWarpMetadataPath, true);
+  const metadata = JSON.parse(metadataBuffer.toString('utf-8'));
+  console.log('[TurboWarp] Parsed metadata');
 
-  const extensionFiles = await recursiveListFiles(turboWarpExtensionsRoot);
-  for (const file of extensionFiles) {
-    const relative = pathUtil.relative(turboWarpExtensionsRoot, file).replace(/\\/g, '/');
-    await writeCompressed(outputDirectory, `/${relative}`, await fsPromises.readFile(file));
-  }
+  const requiredFiles = new Set([
+    turboWarpMetadataPath,
+    'index.html',
+    'docs-internal/scratchblocks.js',
+    'turbowarp.svg'
+  ]);
+  const optionalFiles = new Set([
+    'sitemap.xml',
+    'extensions.json'
+  ]);
 
-  const imageFiles = await recursiveListFiles(turboWarpImagesRoot);
-  for (const file of imageFiles) {
-    const relative = pathUtil.relative(turboWarpImagesRoot, file).replace(/\\/g, '/');
-    await writeCompressed(outputDirectory, `/images/${relative}`, await fsPromises.readFile(file));
-  }
-
-  const sampleFiles = await recursiveListFiles(turboWarpSamplesRoot);
-  for (const file of sampleFiles) {
-    if (!file.endsWith('.sb3')) {
+  for (const extension of metadata.extensions || []) {
+    if (!extension || typeof extension !== 'object') {
       continue;
     }
-    const relative = pathUtil.relative(turboWarpSamplesRoot, file).replace(/\\/g, '/');
-    await writeCompressed(outputDirectory, `/samples/${relative}`, await fsPromises.readFile(file));
+    if (typeof extension.slug === 'string' && extension.slug) {
+      requiredFiles.add(`${extension.slug}.js`);
+      if (extension.docs) {
+        requiredFiles.add(`${extension.slug}.html`);
+      }
+    }
+    if (typeof extension.image === 'string' && extension.image) {
+      requiredFiles.add(extension.image);
+    }
+    if (Array.isArray(extension.samples)) {
+      for (const sample of extension.samples) {
+        if (typeof sample === 'string' && sample) {
+          requiredFiles.add(`samples/${sample}.sb3`);
+        }
+      }
+    }
   }
 
-  console.log(`Exported TurboWarp extensions to ${outputDirectory}`);
+  let requiredCount = 0;
+  let optionalCount = 0;
+  const requiredTotal = requiredFiles.size;
+
+  let requiredIndex = 0;
+  for (const file of requiredFiles) {
+    requiredIndex++;
+    console.log(
+      `${createFetchLogPrefix('TurboWarp', 'required', requiredIndex, requiredTotal)} Fetching ${file}`
+    );
+    const data = await fetchTurboWarpFile(file, true);
+    await writeCompressed(outputDirectory, file, data);
+    requiredCount++;
+
+    if (file.endsWith('.html')) {
+      const html = data.toString('utf-8');
+      for (const discoveredPath of extractLocalAssetPathsFromHTML(html)) {
+        if (!requiredFiles.has(discoveredPath)) {
+          optionalFiles.add(discoveredPath);
+        }
+      }
+    }
+  }
+
+  const downloadedOptionalFiles = new Set();
+  let optionalIndex = 0;
+  while (optionalFiles.size > 0) {
+    const iterator = optionalFiles.values().next();
+    if (iterator.done) {
+      break;
+    }
+    const file = iterator.value;
+    optionalFiles.delete(file);
+
+    if (requiredFiles.has(file) || downloadedOptionalFiles.has(file)) {
+      continue;
+    }
+
+    optionalIndex++;
+    console.log(`${createFetchLogPrefix('TurboWarp', 'optional', optionalIndex)} Fetching ${file}`);
+    const data = await fetchTurboWarpFile(file, false);
+    if (!data) {
+      console.log(`${createFetchLogPrefix('TurboWarp', 'optional', optionalIndex)} Missing ${file}`);
+      continue;
+    }
+
+    await writeCompressed(outputDirectory, file, data);
+    downloadedOptionalFiles.add(file);
+    optionalCount++;
+
+    if (file.endsWith('.html')) {
+      const html = data.toString('utf-8');
+      for (const discoveredPath of extractLocalAssetPathsFromHTML(html)) {
+        if (!requiredFiles.has(discoveredPath) && !downloadedOptionalFiles.has(discoveredPath)) {
+          optionalFiles.add(discoveredPath);
+        }
+      }
+    }
+  }
+
+  console.log(
+    `Fetched TurboWarp extensions to ${outputDirectory} (required: ${requiredCount}, optional: ${optionalCount})`
+  );
 };
 
 const buildAstraOfflineFiles = async () => {
+  console.log(`[Astra] Preparing extension cache from ${astraExtensionsBaseURL}`);
+
   fs.rmSync(astraOutputDirectory, {
     recursive: true,
     force: true
   });
+  console.log('[Astra] Cleared output directory');
 
   const metadataPath = 'generated-metadata/extensions-v0.json';
+  console.log(`${createFetchLogPrefix('Astra', 'required', 1, 1)} Fetching ${metadataPath}`);
   const metadataBuffer = await fetchAstraFile(metadataPath, true);
   const metadata = JSON.parse(metadataBuffer.toString('utf-8'));
+  console.log('[Astra] Parsed metadata');
 
   const requiredFiles = new Set([metadataPath]);
   const optionalFiles = new Set([
@@ -378,18 +267,28 @@ const buildAstraOfflineFiles = async () => {
 
   let requiredCount = 1;
   let optionalCount = 0;
+  const requiredTotal = requiredFiles.size;
+  let requiredIndex = 1;
   for (const file of requiredFiles) {
     if (file === metadataPath) {
       continue;
     }
+    requiredIndex++;
+    console.log(
+      `${createFetchLogPrefix('Astra', 'required', requiredIndex, requiredTotal)} Fetching ${file}`
+    );
     const data = await fetchAstraFile(file, true);
     await writeRaw(astraOutputDirectory, file, data);
     requiredCount++;
   }
 
+  let optionalIndex = 0;
   for (const file of optionalFiles) {
+    optionalIndex++;
+    console.log(`${createFetchLogPrefix('Astra', 'optional', optionalIndex)} Fetching ${file}`);
     const data = await fetchAstraFile(file, false);
     if (!data) {
+      console.log(`${createFetchLogPrefix('Astra', 'optional', optionalIndex)} Missing ${file}`);
       continue;
     }
     await writeRaw(astraOutputDirectory, file, data);

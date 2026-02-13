@@ -57,6 +57,7 @@
             "terser-webpack-plugin": "^4.2.3"
         }
     },
+    "tw_update": true,
     "homepage": "https://desktop.turbowarp.org/",
     "repository": {
         "type": "git",

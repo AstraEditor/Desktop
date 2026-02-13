@@ -2,9 +2,11 @@ This document is the authoritative source for TurboWarp's changelogs. Everything
 
 Prefix notes with "Windows:", "macOS:", or "Linux:" as needed. Do not use **formatting** or [links](https://desktop.turbowarp.org/).
 
-# 1.0.2 ()
+# 1.1.0 (2026-02-13)
 
+- 将桌面版的来自AstraEditor扩展库的扩展改为离线缓存
 - 修改导出插件设置的文件名
+- 修改扩展编辑器的模板开头
 - 修改Windows安装程序的完成侧边图
 - 修正MacOS应用体验
 - 修复扩展管理器的“+”图标可以被选中的问题
@@ -12,6 +14,13 @@ Prefix notes with "Windows:", "macOS:", or "Linux:" as needed. Do not use **form
 - 增加“自制积木+”插件
 - 在扩展管理器增加总加载扩展数
 - 在扩展管理器增加自定义扩展入口
+- 在画板加了一个角度指示器告诉你旋转了多少度
+- 翻转手机布局的界面位置
+- 优化画板的布尔运算
+- 现在加载项目不会保留上一个项目的设置了！（我们不打算移除扩展，因为这可以用于更新扩展）
+- 优化“隐藏菜单栏”插件
+- 优化VSCODE界面的样式
+- 修复一些问题
 
 # 1.0.1 (2026-02-09)
 
