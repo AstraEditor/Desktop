@@ -177,7 +177,7 @@
         "linux": {
             "executableName": "astraeditor-desktop",
             "artifactName": "${productName}-${os}-${arch}-${version}.${ext}",
-            "icon": "./build/",
+            "icon": "./build/icons/",
             "synopsis": "Mod of Scratch with a compiler and more features.",
             "description": "AstraEditor is a TurboWarp mod used to add more practical features to make your writing lightning fast.",
             "category": "Development",
