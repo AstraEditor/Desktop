@@ -30,7 +30,7 @@ jobs:
         depends=('alsa-lib' 'gtk3' 'nss' 'libxss' 'xdg-utils' 'hicolor-icon-theme')
         source_x86_64=("astraeditor-\${pkgver}-x86_64.deb::https://github.com/AstraEditor/Desktop/releases/download/${TAG}/AstraEditor-linux-amd64-\${pkgver}.deb")
         source_armv7h=("astraeditor-\${pkgver}-armv7h.deb::https://github.com/AstraEditor/Desktop/releases/download/${TAG}/AstraEditor-linux-armv7l-\${pkgver}.deb")
-        source_aarch64=("astraeditor-\${pkgver}-aarch64.deb::https://github.com/AstraEditor/Desktop/releases/download/${TAG}/AstraEditor-linux-aarch64-\${pkgver}.deb")
+        source_aarch64=("astraeditor-\${pkgver}-aarch64.deb::https://github.com/AstraEditor/Desktop/releases/download/${TAG}/AstraEditor-linux-arm64-\${pkgver}.deb")
         sha256sums_x86_64=('SKIP')
         sha256sums_armv7h=('SKIP')
         sha256sums_aarch64=('SKIP')
