@@ -1,12 +1,14 @@
 name: Push to AUR
 on:
-  workflow_run:
-    workflows: ["Build (Manual)"]
-    types: [completed]
-    branches: [main]
+  workflow_dispatch:
+#on:
+  #workflow_run:
+    #workflows: ["Build (Manual)"]
+    #types: [completed]
+    #branches: [main]
 jobs:
   push_to_aur:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    #if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     environment: astraeditor-bin
     env:
