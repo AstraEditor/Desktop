@@ -1,11 +1,9 @@
 name: Push to AUR
 on:
-  workflow_dispatch:
-#on:
-  #workflow_run:
-    #workflows: ["Build (Manual)"]
-    #types: [completed]
-    #branches: [main]
+  workflow_run:
+    workflows: ["release-linux"]
+    types: [completed]
+    branches: [main]
 jobs:
   push_to_aur:
     #if: ${{ github.event.workflow_run.conclusion == 'success' }}
