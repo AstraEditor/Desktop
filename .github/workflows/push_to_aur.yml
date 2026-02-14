@@ -2,7 +2,7 @@ name: Push to AUR
 on:
   #workflow_dispatch:
   workflow_run:
-    workflows: ["release-linux"]
+    workflows: ["Release"]
     types: [completed]
     branches: [main]
 jobs:
