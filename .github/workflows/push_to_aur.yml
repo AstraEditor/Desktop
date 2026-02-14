@@ -24,7 +24,7 @@ jobs:
         provides=('astraeditor')
         conflicts=('astraeditor')
         pkgver=${VERSION}
-        pkgrel=2
+        pkgrel=1
         pkgdesc='AstraEditor is a TurboWarp mod used to add more practical features to make your writing lightning fast.'
         arch=('x86_64' 'aarch64' 'armv7h')
         url='https://github.com/AstraEditor/'
@@ -63,7 +63,7 @@ jobs:
         pkgbase = astraeditor-bin
           pkgdesc = AstraEditor is a TurboWarp mod used to add more practical features to make your writing lightning fast.
           pkgver = ${VERSION}
-          pkgrel = 2
+          pkgrel = 1
           url = https://github.com/AstraEditor/
           arch = x86_64
           arch = armv7h
