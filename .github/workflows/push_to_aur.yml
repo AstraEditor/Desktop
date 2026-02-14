@@ -1,19 +1,18 @@
 name: Push to AUR
 on:
-  #workflow_dispatch:
-  workflow_run:
-    workflows: ["Release"]
-    types: [completed]
+  workflow_dispatch:
+  #workflow_run:
+    #workflows: ["Release"]
+    #types: [completed]
 jobs:
   push_to_aur:
     #if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     environment: astraeditor-bin
-    env:
-      TAG: ${{ github.ref_name }}
     steps:
     - name: generate PKGBUILD and .SRCINFO
       run: |
+        TAG=v1.1.1
         echo '${TAG}'
         VERSION=${TAG#v}
         cat > PKGBUILD << EOF
