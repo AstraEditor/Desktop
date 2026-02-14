@@ -125,7 +125,8 @@ const buildTurboWarpOfflineFiles = async () => {
     turboWarpMetadataPath,
     'index.html',
     'docs-internal/scratchblocks.js',
-    'turbowarp.svg'
+    'turbowarp.svg',
+    'images/unknown.svg'
   ]);
   const optionalFiles = new Set([
     'sitemap.xml',

@@ -2,6 +2,22 @@ This document is the authoritative source for TurboWarp's changelogs. Everything
 
 Prefix notes with "Windows:", "macOS:", or "Linux:" as needed. Do not use **formatting** or [links](https://desktop.turbowarp.org/).
 
+# 1.1.2 (2026-02-00)
+
+- 修改部分功能的观感
+- 修改CSP让桌面端能正确获取更新
+- 修复画板会错误的拉伸问题
+- 修复隐藏菜单栏插件不能正确更新blockly积木区
+- 优化扩展编辑器
+- 增加“Astras Copilot”插件（测试中）
+- 同步更新扩展
+- 修复积木拖动时的的图层问题
+
+
+# 1.1.1 (2026-02-14)
+
+- aur测试
+
 # 1.1.0 (2026-02-13)
 
 - 将桌面版的来自AstraEditor扩展库的扩展改为离线缓存
