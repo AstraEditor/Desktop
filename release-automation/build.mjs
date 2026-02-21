@@ -385,6 +385,30 @@ const buildRpm = () => build({
   manageUpdates: true
 });
 
+const buildFlatpak = () => build({
+  platformName: 'LINUX',
+  platformType: 'flatpak',
+  manageUpdates: true,
+  extraConfig: {
+    flatpak: {
+      runtime: 'org.freedesktop.Platform',
+      runtimeVersion: '23.08',
+      sdk: 'org.freedesktop.Sdk',
+      base: 'org.electronjs.Electron2.BaseApp',
+      baseVersion: '23.08',
+      finishArgs: [
+        '--share=ipc',
+        '--socket=x11',
+        '--socket=wayland',
+        '--socket=pulseaudio',
+        '--share=network',
+        '--device=dri',
+        '--filesystem=home'
+      ]
+    }
+  }
+});
+
 const run = async () => {
   const options = {
     '--windows': buildWindows,
@@ -403,6 +427,7 @@ const run = async () => {
     '--linux-dir': buildLinuxDir,
     '--pacman': buildPacman,
     '--rpm': buildRpm,
+    '--flatpak': buildFlatpak
   };
 
   let built = 0;
