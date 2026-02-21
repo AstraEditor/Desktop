@@ -44,10 +44,15 @@ jobs:
       if: matrix.format == 'pacman' || matrix.format == 'rpm'
       run: sudo gem install --no-document fpm
 
+    - name: Configure git to use HTTPS instead of SSH
+      run: |
+        git config --global url."https://${{ secrets.GITHUB_TOKEN }}:x-oauth-basic@github.com/".insteadOf "ssh://git@github.com/"
+        git config --global url."https://${{ secrets.GITHUB_TOKEN }}:x-oauth-basic@github.com/".insteadOf "git@github.com:"
+
     - name: Install dependencies
       run: |
         rm -f package-lock.json
-        npm install --loglevel=info
+        npm install --loglevel=info --ver
 
     - name: Fetch
       run: npm run fetch
@@ -96,6 +101,12 @@ jobs:
       with:
         node-version: 24
         cache: 'npm'
+
+    - name: Configure git to use HTTPS instead of SSH
+      run: |
+        git config --global url."https://${{ secrets.GITHUB_TOKEN }}:x-oauth-basic@github.com/".insteadOf "ssh://git@github.com/"
+        git config --global url."https://${{ secrets.GITHUB_TOKEN }}:x-oauth-basic@github.com/".insteadOf "git@github.com:"
+
 
     - name: Install dependencies
       run: |
@@ -184,6 +195,11 @@ jobs:
       run: |
         npm config set cache D:\npm-cache
         npm config set prefix D:\npm-prefix
+
+    - name: Configure git to use HTTPS instead of SSH
+      run: |
+        git config --global url."https://${{ secrets.GITHUB_TOKEN }}:x-oauth-basic@github.com/".insteadOf "ssh://git@github.com/"
+        git config --global url."https://${{ secrets.GITHUB_TOKEN }}:x-oauth-basic@github.com/".insteadOf "git@github.com:"
 
     - name: Install dependencies
       working-directory: D:\repo
