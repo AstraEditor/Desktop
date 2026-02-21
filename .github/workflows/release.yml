@@ -18,7 +18,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        format: [debian, tarball, appimage, pacman, rpm,flatpak]
+        format: [debian, tarball, appimage, pacman, rpm, flatpak]
         arch: [x64, armv7l, arm64]
         include:
           - format: pacman

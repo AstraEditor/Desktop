@@ -229,6 +229,8 @@ const build = async ({
   }
 };
 
+// Windows
+
 const buildWindows = () => build({
   platformName: 'WINDOWS',
   platformType: 'nsis',
@@ -265,6 +267,8 @@ const buildMicrosoftStore = () => build({
   platformType: 'appx',
   manageUpdates: false
 });
+
+// Mac OS
 
 const buildMac = () => build({
   platformName: 'MAC',
@@ -316,6 +320,8 @@ const buildMacDir = () => build({
   platformType: 'dir',
   manageUpdates: true
 });
+
+// Linux
 
 const buildDebian = () => build({
   platformName: 'LINUX',
