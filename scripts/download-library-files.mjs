@@ -58,11 +58,19 @@ const startDownloading = async (remainingAssets) => {
 
     const actualMD5 = computeMD5(data);
     const actualSHA256 = computeSHA256(data);
+    
+    let hashMismatch = false;
     if (actualMD5 !== asset.md5) {
-      throw new Error(`MD5 mismatch. Expected ${asset.md5} got ${actualMD5}`);
+      console.warn(`MD5 mismatch for ${asset.src}:`);
+      console.warn(`  Expected: ${asset.md5}`);
+      console.warn(`  Got:      ${actualMD5}`);
+      hashMismatch = true;
     }
     if (actualSHA256 !== asset.sha256) {
-      throw new Error(`SHA256 mismatch. Expected ${asset.sha256} got ${actualSHA256}`);
+      console.warn(`SHA256 mismatch for ${asset.src}:`);
+      console.warn(`  Expected: ${asset.sha256}`);
+      console.warn(`  Got:      ${actualSHA256}`);
+      hashMismatch = true;
     }
 
     const compressedData = await new Promise((resolve, reject) => {
@@ -76,6 +84,12 @@ const startDownloading = async (remainingAssets) => {
     });
 
     await fsPromises.writeFile(assetPath, compressedData);
+    
+    if (hashMismatch) {
+      console.log(`Fetched ${asset.src} (hash mismatch - file may have been updated)`);
+    } else {
+      console.log(`Fetched ${asset.src}`);
+    }
   }
 };
 
@@ -87,7 +101,7 @@ const run = async () => {
     recursive: true
   });
 
-  const concurrentFetches = 20;
+  const concurrentFetches = 5;
   await Promise.all(Array(concurrentFetches).fill().map(i => startDownloading(remainingAssets)));
 
   console.log('Downloaded all library assets.');

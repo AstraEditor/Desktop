@@ -35,6 +35,41 @@ const getProtocol = url => {
 };
 
 const WEB_PROTOCOLS = ['http:', 'https:'];
+const TURBOWARP_EXTENSIONS_ORIGIN = 'https://extensions.turbowarp.org';
+const ASTRA_EXTENSIONS_ORIGIN = 'https://editors.astras.top';
+const ASTRA_EXTENSIONS_PREFIX = '/extensions';
+
+/**
+ * Convert supported online extension-library URLs to local protocol redirects.
+ * @param {URL} parsed
+ * @returns {{protocol: 'tw-extensions'|'tw-astra-extensions', path: string}|null}
+ */
+const getCachedExtensionsRedirect = (parsed) => {
+  if (parsed.origin === TURBOWARP_EXTENSIONS_ORIGIN) {
+    return {
+      protocol: 'tw-extensions',
+      path: parsed.pathname
+    };
+  }
+
+  if (
+    parsed.origin === ASTRA_EXTENSIONS_ORIGIN &&
+    (
+      parsed.pathname === ASTRA_EXTENSIONS_PREFIX ||
+      parsed.pathname.startsWith(`${ASTRA_EXTENSIONS_PREFIX}/`)
+    )
+  ) {
+    // Astra library is hosted under /extensions, but local files are rooted at dist-astra-extensions/.
+    const stripped = parsed.pathname.slice(ASTRA_EXTENSIONS_PREFIX.length);
+    const normalized = (stripped || '/').replace(/\/{2,}/g, '/');
+    return {
+      protocol: 'tw-astra-extensions',
+      path: normalized
+    };
+  }
+
+  return null;
+};
 
 class ProjectRunningWindow extends AbtractWindow {
   handlePermissionCheck (permission, details) {
@@ -121,10 +156,10 @@ class ProjectRunningWindow extends AbtractWindow {
       }
     }
 
-    if (parsed.origin === 'https://extensions.turbowarp.org') {
+    const cachedExtensionsRedirect = getCachedExtensionsRedirect(parsed);
+    if (cachedExtensionsRedirect) {
       return callback({
-        // pathname always has a leading / already
-        redirectURL: `tw-extensions://.${parsed.pathname}`
+        redirectURL: `${cachedExtensionsRedirect.protocol}://.${cachedExtensionsRedirect.path}${parsed.search}`
       });
     }
 

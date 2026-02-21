@@ -3,10 +3,11 @@ const {translate} = require('../l10n');
 const {PLATFORM_NAME} = require('../brand');
 
 class ExtensionDocumentationWindow extends AbstractWindow {
-  constructor (path) {
+  constructor (path, protocol) {
     super();
 
     this.path = path;
+    this.protocol = protocol;
 
     const title = translate('extension-documentation.title').replace('{APP_NAME}', PLATFORM_NAME);
     this.window.setTitle(title);
@@ -21,7 +22,7 @@ class ExtensionDocumentationWindow extends AbstractWindow {
     });
 
     // The protocol handler will check for path traversal, so we don't need to check here.
-    this.loadURL(`tw-extensions://./${path}`);
+    this.loadURL(`${protocol}://./${path}`);
   }
 
   getDimensions () {
@@ -40,15 +41,16 @@ class ExtensionDocumentationWindow extends AbstractWindow {
   }
 
   /**
-   * @param {string} path Path part of an https://extensions.turbowarp.org URL, without leading /
+   * @param {string} path Path part of an extension-library URL, without leading /
+   * @param {'tw-extensions'|'tw-astra-extensions'} protocol
    */
-  static open(path) {
+  static open(path, protocol = 'tw-extensions') {
     const windows = AbstractWindow.getWindowsByClass(ExtensionDocumentationWindow);
-    const existingWindow = windows.find(i => i.path === path);
+    const existingWindow = windows.find(i => i.path === path && i.protocol === protocol);
     if (existingWindow) {
       existingWindow.show();
     } else {
-      const newWindow = new ExtensionDocumentationWindow(path);
+      const newWindow = new ExtensionDocumentationWindow(path, protocol);
       newWindow.show();
     }
   }

@@ -2,6 +2,29 @@ const AbstractWindow = require('./abstract');
 const {translate, getLocale, getStrings} = require('../l10n');
 const {APP_NAME} = require('../brand');
 const openExternal = require('../open-external');
+const packageJSON = require('../../package.json');
+
+const getRepositoryInfo = () => {
+  const fallback = {
+    owner: 'AstraEditor',
+    repo: 'desktop'
+  };
+
+  const repositoryURL = packageJSON?.repository?.url;
+  if (typeof repositoryURL !== 'string') {
+    return fallback;
+  }
+
+  const match = /github\.com[/:]([^/]+)\/([^/.]+)(?:\.git)?/i.exec(repositoryURL);
+  if (!match) {
+    return fallback;
+  }
+
+  return {
+    owner: match[1],
+    repo: match[2]
+  };
+};
 
 class UpdateWindow extends AbstractWindow {
   constructor (currentVersion, latestVersion, security) {
@@ -28,10 +51,9 @@ class UpdateWindow extends AbstractWindow {
     this.ipc.handle('download', () => {
       this.window.destroy();
 
-      const params = new URLSearchParams();
-      params.set('from', currentVersion);
-      params.set('to', latestVersion);
-      openExternal(`https://desktop.turbowarp.org/update_available?${params}`);
+      const {owner, repo} = getRepositoryInfo();
+      const encodedTag = encodeURIComponent(`v${latestVersion}`);
+      openExternal(`https://github.com/${owner}/${repo}/releases/tag/${encodedTag}`);
     });
 
     const ignore = (permanently) => {

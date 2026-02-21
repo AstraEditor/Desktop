@@ -4,6 +4,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Unfortunately can't really enforce a CSP due to custom extensions -->
+    <script>
+      // Used by scratch-extension-editor to locate its workers/chunks in builds.
+      window.__SCRATCH_EXTENSION_EDITOR_PUBLIC_PATH__ = 'extension-editor/';
+    </script>
     <style>
       .splash-screen {
         position: absolute;
@@ -12,11 +16,13 @@
         top: 0;
         left: 0;
         display: flex;
+        flex-direction: row;
+        gap: 1rem;
         align-items: center;
         justify-content: center;
-        text-align: center;
+        text-align: right;
         font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-        color: white;
+        overflow: hidden;
       }
       .splash-screen[hidden],
       .tw-loaded .splash-screen {
@@ -26,31 +32,134 @@
         background-color: #333;
         color: white;
       }
-      .splash-spinner:after {
-        content: " ";
-        display: block;
+
+      .splash-screen > * {
+        max-width: 80%;
+      }
+
+      .circle {
         width: 64px;
         height: 64px;
-        border-radius: 50%;
-        border: 6px solid;
-        border-color: currentColor transparent currentColor transparent;
-        animation: splash-spinner 1.2s linear infinite;
+        border-radius: 200%;
+        display: block;
+        border-width: 1px !important;
+        border-style: solid;
       }
-      @keyframes splash-spinner {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
+
+      @keyframes circleA_1 {
+        50%,
+        0% {
+          transform: translate(0px, 22px) scale(0.75, 0.75);
+          opacity: 0;
+        }
+
+        75% {
+          opacity: 1;
+        }
+
+        100% {
+          transform: scale(1.95, 1.95);
+        }
+      }
+
+      @keyframes circleA_2 {
+        20%,
+        0% {
+          transform: translate(0px, -52px) scale(0.5, 0.5);
+          opacity: 0;
+        }
+
+        75% {
+          opacity: 1;
+        }
+
+        100% {
+          transform: translate(-25px, -12px) scale(0.96, 0.96);
+        }
+      }
+
+      @keyframes circleA_3 {
+        30%,
+        0% {
+          transform: translate(0px, -112px) scale(0.26, 0.26);
+          opacity: 0;
+        }
+
+        75% {
+          opacity: 1;
+        }
+
+        100% {
+          transform: translate(40px, -108px) scale(1.46, 1.46);
+        }
+      }
+
+      #circle_1,
+      #circle_2,
+      #circle_3 {
+        animation-duration: 1s;
+        animation-iteration-count: infinite;
+        animation-direction: alternate;
+        transition: background-color 0.5s ease;
+      }
+
+      #circle_1 {
+        animation-name: circleA_1;
+      }
+
+      #circle_2 {
+        animation-name: circleA_2;
+      }
+
+      #circle_3 {
+        animation-name: circleA_3;
+      }
+
+      .splash-error-title {
+        font-weight: bold;
+      }
+
+      .splash-error-title a {
+        color: inherit;
+      }
+
+      .splash-errors {
+        font-family: monospace;
+        max-width: 40%;
+        margin-left: auto;
+        margin-top: 20px;
+        margin-bottom: 20px;
+        background-color: #ffffff44;
+        padding: 5px;
+        border-radius: 10px;
+      }
+
+      .splash-error-list {
+        white-space: pre-wrap;
       }
     </style>
   </head>
   <body>
-    <div class="splash-screen" id="spash-waiting-for-js" hidden>
-      <div class="splash-spinner"></div>
+    <div class="splash-screen spash-waiting-for-js" hidden>
+      <div class="logo">
+        <div class="circle" id="circle_1"></div>
+        <div class="circle" id="circle_2"></div>
+        <div class="circle" id="circle_3"></div>
+      </div>
+      <div>
+        <div class="splash-error-title" hidden><span class="splash-error-title-text">Something went wrong. </span><a class="splash-error-link"
+            href="https://github.com/AstraEditor/desktop/issues" target="_blank" rel="noreferrer">Please report</a>
+          <span class="splash-error-title-text2">with the information below.</span></div>
+        <div class="splash-errors splash-error-list" hidden></div>
+      </div>
     </div>
 
     <script>
       (function() {
+        'use strict';
+
         var theme = '';
-        var accent = '#ff4c4c';
+        var accent = '#0099ff';
 
         try {
           var themeSetting = localStorage.getItem('tw:theme');
@@ -68,6 +177,8 @@
               accent = '#855cd6';
             } else if (parsed.accent === 'blue') {
               accent = '#4c97ff';
+            } else {
+              accent = '#0099ff';
             }
             if (parsed.gui === 'dark' || parsed.gui === 'light') {
               theme = parsed.gui;
@@ -81,12 +192,47 @@
           theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
         }
 
-        var splash = document.getElementById('spash-waiting-for-js');
+        var splash = document.querySelector('.spash-waiting-for-js');
+        var circles = document.getElementsByClassName('circle');
         splash.setAttribute('data-theme', theme);
+
         if (theme !== 'dark') {
+          for (var i = 0; i < circles.length; i++) {
+            circles[i].style.backgroundColor = accent + '50';
+            circles[i].style.borderColor = accent + '10';
+          }
           splash.style.backgroundColor = accent;
+          splash.style.color = 'white';
+        } else {
+          for (var j = 0; j < circles.length; j++) {
+            circles[j].style.backgroundColor = '#ffffff50';
+            circles[j].style.borderColor = '#ffffff10';
+          }
         }
         splash.hidden = false;
+
+        var splashErrorTitle = document.querySelector('.splash-error-title');
+        var splashError = document.querySelector('.splash-errors');
+
+        var totalErrors = 0;
+        window.onerror = function (event, source, line, col, err) {
+          if (++totalErrors > 5) return;
+          splashErrorTitle.hidden = splashError.hidden = false;
+
+          var el = document.createElement('div');
+          el.textContent = 'Error (splash) in ' + source + ' (' + line + ':' + col + '): ' + err;
+          splashError.appendChild(el);
+          splash.style.backgroundColor = '#ff8888';
+          for (var k = 0; k < circles.length; k++) {
+            circles[k].style.backgroundColor = '#ffffff50';
+            circles[k].style.borderColor = '#ffffff10';
+          }
+        };
+
+        window.SplashEnd = function () {
+          splash.hidden = true;
+          window.onerror = null;
+        };
       })();
     </script>
 

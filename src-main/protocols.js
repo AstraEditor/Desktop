@@ -1,4 +1,5 @@
 const path = require('path');
+const fs = require('fs');
 const zlib = require('zlib');
 const nodeURL = require('url');
 const {app, protocol, net} = require('electron');
@@ -38,7 +39,10 @@ const FILE_SCHEMES = {
   },
   'tw-about': {
     root: path.resolve(__dirname, '../src-renderer/about'),
-    csp: "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'"
+    csp: "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src *", //用 self 无效
+    standard: true,
+    secure: true //获取语言用
+
   },
   'tw-packager': {
     root: path.resolve(__dirname, '../src-renderer/packager'),
@@ -62,9 +66,18 @@ const FILE_SCHEMES = {
     defaultExtension: '.html',
     csp: "default-src 'none'; img-src 'self' data:; style-src 'unsafe-inline'; script-src 'self' 'unsafe-inline'"
   },
+  'tw-astra-extensions': {
+    root: path.resolve(__dirname, '../dist-astra-extensions'),
+    supportFetch: true,
+    embeddable: true,
+    stream: true,
+    directoryIndex: 'index.html',
+    defaultExtension: '.html',
+    csp: "default-src 'none'; img-src 'self' data:; style-src 'unsafe-inline'; script-src 'self' 'unsafe-inline'"
+  },
   'tw-update': {
     root: path.resolve(__dirname, '../src-renderer/update'),
-    csp: "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src https://desktop.turbowarp.org"
+    csp: "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src https:"
   },
   'tw-security-prompt': {
     root: path.resolve(__dirname, '../src-renderer/security-prompt'),
@@ -189,9 +202,71 @@ const getBaseProtocolHeaders = metadata => {
   return result;
 };
 
+/**
+ * @param {Metadata} metadata
+ * @param {URL} parsedURL
+ * @returns {{scheme: string; resolved: string; fileExtension: string;}}
+ */
+const resolveRequestPath = (metadata, parsedURL) => {
+  const root = path.join(metadata.root, '/');
+  const scheme = parsedURL.protocol.replace(/:$/, '');
+
+  let pathname = parsedURL.pathname;
+  if (pathname.endsWith('/') && metadata.directoryIndex) {
+    pathname = new URL(metadata.directoryIndex, parsedURL).pathname;
+  }
+
+  if (!path.extname(pathname) && metadata.defaultExtension) {
+    pathname = `${pathname}${metadata.defaultExtension}`;
+  }
+
+  /** @type {string[]} */
+  const candidatePathnames = [pathname];
+
+  // Desktop GUI assets are emitted into editor/gui/* but some runtime URLs request /static/* or /extension-editor/*.
+  if (
+    scheme === 'tw-editor' &&
+    (pathname.startsWith('/static/') || pathname.startsWith('/extension-editor/'))
+  ) {
+    candidatePathnames.push(`/gui${pathname}`);
+  }
+
+  /** @type {string | null} */
+  let resolved = null;
+  for (const candidatePathname of candidatePathnames) {
+    const candidate = path.join(root, candidatePathname);
+    if (!candidate.startsWith(root)) {
+      continue;
+    }
+
+    if (metadata.brotli) {
+      if (fs.existsSync(`${candidate}.br`) || fs.existsSync(candidate)) {
+        resolved = candidate;
+        break;
+      }
+    } else if (fs.existsSync(candidate)) {
+      resolved = candidate;
+      break;
+    }
+  }
+
+  if (!resolved) {
+    resolved = path.join(root, candidatePathnames[0]);
+  }
+  if (!resolved.startsWith(root)) {
+    throw new Error('Path traversal blocked');
+  }
+
+  const fileExtension = path.extname(resolved);
+  return {
+    scheme,
+    resolved,
+    fileExtension
+  };
+};
+
 /** @param {Metadata} metadata */
 const createModernProtocolHandler = (metadata) => {
-  const root = path.join(metadata.root, '/');
   const baseHeaders = getBaseProtocolHeaders(metadata);
 
   /**
@@ -211,21 +286,11 @@ const createModernProtocolHandler = (metadata) => {
     };
 
     try {
-      let parsedURL = new URL(request.url);
-      if (parsedURL.pathname.endsWith('/') && metadata.directoryIndex) {
-        parsedURL = new URL(metadata.directoryIndex, parsedURL);
-      }
-
-      let resolved = path.join(root, parsedURL.pathname);
-      if (!resolved.startsWith(root)) {
-        return createErrorResponse(new Error('Path traversal blocked'));
-      }
-
-      let fileExtension = path.extname(resolved);
-      if (!fileExtension && metadata.defaultExtension) {
-        fileExtension = metadata.defaultExtension;
-        resolved = `${resolved}${fileExtension}`;
-      }
+      const parsedURL = new URL(request.url);
+      const {
+        resolved,
+        fileExtension
+      } = resolveRequestPath(metadata, parsedURL);
 
       const mimeType = MIME_TYPES.get(fileExtension);
       if (!mimeType) {
@@ -240,15 +305,33 @@ const createModernProtocolHandler = (metadata) => {
       if (metadata.brotli) {
         // Reading it all into memory is not ideal, but we've had so many problems with streaming
         // files from the asar that I can settle with this.
-        const brotliResponse = await net.fetch(nodeURL.pathToFileURL(`${resolved}.br`));
-        const brotliData = await brotliResponse.arrayBuffer();
-        const decompressed = await brotliDecompress(brotliData);
-        return new Response(decompressed, {
+        const brotliPath = `${resolved}.br`;
+        if (fs.existsSync(brotliPath)) {
+          const brotliResponse = await net.fetch(nodeURL.pathToFileURL(brotliPath));
+          if (!brotliResponse.ok) {
+            throw new Error(`File not found: ${brotliPath}`);
+          }
+          const brotliData = await brotliResponse.arrayBuffer();
+          const decompressed = await brotliDecompress(brotliData);
+          return new Response(decompressed, {
+            headers
+          });
+        }
+
+        // Fallback for development or custom builds that may store uncompressed files.
+        const rawResponse = await net.fetch(nodeURL.pathToFileURL(resolved));
+        if (!rawResponse.ok) {
+          throw new Error(`File not found: ${resolved}`);
+        }
+        return new Response(rawResponse.body, {
           headers
         });
       }
 
       const response = await net.fetch(nodeURL.pathToFileURL(resolved));
+      if (!response.ok) {
+        throw new Error(`File not found: ${resolved}`);
+      }
       return new Response(response.body, {
         headers
       });
@@ -260,7 +343,6 @@ const createModernProtocolHandler = (metadata) => {
 
 /** @param {Metadata} metadata */
 const createLegacyBrotliProtocolHandler = (metadata) => {
-  const root = path.join(metadata.root, '/');
   const baseHeaders = getBaseProtocolHeaders(metadata);
 
   /**
@@ -283,22 +365,11 @@ const createLegacyBrotliProtocolHandler = (metadata) => {
     };
 
     try {
-      let parsedURL = new URL(request.url);
-      if (parsedURL.pathname.endsWith('/') && metadata.directoryIndex) {
-        parsedURL = new URL(metadata.directoryIndex, parsedURL);
-      }
-
-      let resolved = path.join(root, parsedURL.pathname);
-      if (!resolved.startsWith(root)) {
-        returnErrorPage(new Error('Path traversal blocked'));
-        return;
-      }
-
-      let fileExtension = path.extname(resolved);
-      if (!fileExtension && metadata.defaultExtension) {
-        fileExtension = metadata.defaultExtension;
-        resolved = `${resolved}${fileExtension}`;
-      }
+      const parsedURL = new URL(request.url);
+      const {
+        resolved,
+        fileExtension
+      } = resolveRequestPath(metadata, parsedURL);
 
       const mimeType = MIME_TYPES.get(fileExtension);
       if (!mimeType) {
@@ -308,11 +379,17 @@ const createLegacyBrotliProtocolHandler = (metadata) => {
 
       // Reading it all into memory is not ideal, but we've had so many problems with streaming
       // files from the asar that I can settle with this.
-      const brotliData = await fsPromises.readFile(`${resolved}.br`);
-      const decompressed = await brotliDecompress(brotliData);
+      let data;
+      const brotliPath = `${resolved}.br`;
+      if (fs.existsSync(brotliPath)) {
+        const brotliData = await fsPromises.readFile(brotliPath);
+        data = await brotliDecompress(brotliData);
+      } else {
+        data = await fsPromises.readFile(resolved);
+      }
 
       callback({
-        data: decompressed,
+        data,
         headers: {
           ...baseHeaders,
           'content-type': mimeType
@@ -326,7 +403,6 @@ const createLegacyBrotliProtocolHandler = (metadata) => {
 
 /** @param {Metadata} metadata */
 const createLegacyFileProtocolHandler = (metadata) => {
-  const root = path.join(metadata.root, '/');
   const baseHeaders = getBaseProtocolHeaders(metadata);
 
   /**
@@ -349,22 +425,11 @@ const createLegacyFileProtocolHandler = (metadata) => {
     };
 
     try {
-      let parsedURL = new URL(request.url);
-      if (parsedURL.pathname.endsWith('/') && metadata.directoryIndex) {
-        parsedURL = new URL(metadata.directoryIndex, parsedURL);
-      }
-
-      let resolved = path.join(root, parsedURL.pathname);
-      if (!resolved.startsWith(root)) {
-        returnErrorResponse(new Error('Path traversal blocked'), 'path-traversal');
-        return;
-      }
-
-      let fileExtension = path.extname(resolved);
-      if (!fileExtension && metadata.defaultExtension) {
-        fileExtension = metadata.defaultExtension;
-        resolved = `${resolved}${fileExtension}`;
-      }
+      const parsedURL = new URL(request.url);
+      const {
+        resolved,
+        fileExtension
+      } = resolveRequestPath(metadata, parsedURL);
 
       const mimeType = MIME_TYPES.get(fileExtension);
       if (!mimeType) {

@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=AstraEditor
+# Change the path to match where you install the app.
+Exec=/opt/AstraEditor/astraeditor-desktop %U
+Terminal=false
+Type=Application
+Icon=org.astraeditor.AstraEditor
+StartupWMClass=astraeditor-desktop
+Comment=AstraEditor is a TurboWarp mod used to add more practical features to make your writing lightning fast.
+MimeType=application/x.scratch.sb3;application/x.scratch.sb2;application/x.scratch.sb;
+Categories=Development;
+Keywords=scratch;

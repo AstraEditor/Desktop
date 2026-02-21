@@ -2,11 +2,76 @@ This document is the authoritative source for TurboWarp's changelogs. Everything
 
 Prefix notes with "Windows:", "macOS:", or "Linux:" as needed. Do not use **formatting** or [links](https://desktop.turbowarp.org/).
 
-# 1.15.2 (2026-01-17)
+# 1.1.2 (2026-02-00)
+
+- 修改部分功能的观感
+- 修改CSP让桌面端能正确获取更新
+- 修复画板会错误的拉伸问题
+- 修复隐藏菜单栏插件不能正确更新blockly积木区
+- 优化扩展编辑器
+- 增加“Astras Copilot”插件（测试中）
+- 同步更新扩展
+- 修复积木拖动时的的图层问题
+
+
+# 1.1.1 (2026-02-14)
+
+- aur测试
+
+# 1.1.0 (2026-02-13)
+
+- 将桌面版的来自AstraEditor扩展库的扩展改为离线缓存
+- 修改导出插件设置的文件名
+- 修改扩展编辑器的模板开头
+- 修改Windows安装程序的完成侧边图
+- 修正MacOS应用体验
+- 修复扩展管理器的“+”图标可以被选中的问题
+- 修复搜索栏可能会消失的问题
+- 增加“自制积木+”插件
+- 在扩展管理器增加总加载扩展数
+- 在扩展管理器增加自定义扩展入口
+- 在画板加了一个角度指示器告诉你旋转了多少度
+- 翻转手机布局的界面位置
+- 优化画板的布尔运算
+- 现在加载项目不会保留上一个项目的设置了！（我们不打算移除扩展，因为这可以用于更新扩展）
+- 优化“隐藏菜单栏”插件
+- 优化VSCODE界面的样式
+- 修复一些问题
+
+# 1.0.1 (2026-02-09)
+
+- 修复关于扩展编辑器资源丢失的问题
+- 修复“上传扩展”无法打开的问题
+- 修正部分情况下关于界面的翻译问题
+
+# 1.0.0 (2026-02-08)
+
+- 自定义主题颜色
+- 完整可用的“README”功能
+- 制作“AstraEditor Settings”（管理新功能）
+- 制作“一次性同意自定义扩展请求”
+- 修复“自定义扩展的TextArea编码问题”
+- 优化“积木错误的举措”
+- 修复插件"整理＋"（开发者工具）的翻译缺失
+- “扩展管理器”＆扩展预览
+- 修改默认项目 (随机的Title！)
+- 更多新插件：调试器（含新标签页）、MD注释编辑器、SPA简易作品分析器、隐藏工具栏、显示FPS、拖动调整工具箱分类(来自PMOD)、固定积木(来自PMOD)
+- 隐藏的积木
+- 错误积木
+- 让更多积木值可显示在舞台上
+- 让显示在舞台上的积木值的背景颜色跟随亮暗模式改变
+- 为“在作品中保留设置”的文本加入翻译
+- 可拉伸的 Flyout
+- 造型编辑-布尔运算
+
+
+
+<!--  TW's changelog
+# 1.15.1 (2026-01-01)
 
  - Fixed various bugs in new compiler
  - Improved frame pacing on Windows
- - Optimized variable and list monitors
+ - Optimized list monitors
  - Optimized middle click popup on large projects
  - Fixed local storage extension
  - Fixed camera extension not updating hidden sprites
@@ -357,3 +422,4 @@ Prefix notes with "Windows:", "macOS:", or "Linux:" as needed. Do not use **form
  - Updated integrated packager
  - Various bug fixes
  - Updated translations
+ -->

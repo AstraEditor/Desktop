@@ -1,5 +1,4 @@
 {
-  "latest": "1.15.0",
-  "latest_unstable": "1.15.2",
-  "oldest_safe": "1.8.0"
+  "latest": "1.1.2",
+  "oldest_safe": "1.1.0"
 }

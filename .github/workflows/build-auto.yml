@@ -18,8 +18,89 @@ jobs:
       with:
         node-version: 24
         cache: npm
+    - name: Install Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
+    - name: Verify Python
+      run: python --version
     - name: Install dependencies
-      run: npm ci
+      run: |
+        echo "=== Removing package-lock.json to use latest git commits ==="
+        rm package-lock.json
+        echo "=== Installing dependencies ==="
+        npm install
+    - name: Verify scratch-blocks has build files
+      run: |
+        echo "=== Checking if scratch-blocks has build files ==="
+        if [ -f "node_modules/scratch-blocks/blockly_compressed_vertical.js" ]; then
+          echo "✓ blockly_compressed_vertical.js exists"
+          ls -lh node_modules/scratch-blocks/blockly_compressed_vertical.js
+        else
+          echo "✗ blockly_compressed_vertical.js NOT FOUND"
+          echo "This means the git commit doesn't have build files"
+          exit 1
+        fi
+        echo ""
+        if [ -f "node_modules/scratch-blocks/blocks_compressed_vertical.js" ]; then
+          echo "✓ blocks_compressed_vertical.js exists"
+          ls -lh node_modules/scratch-blocks/blocks_compressed_vertical.js
+        else
+          echo "✗ blocks_compressed_vertical.js NOT FOUND"
+          echo "This means the git commit doesn't have build files"
+          exit 1
+        fi
+    - name: Debug - Check package-lock.json
+      run: |
+        echo "=== Checking scratch-blocks in package-lock.json ==="
+        grep -A 5 '"scratch-blocks"' package-lock.json | grep resolved || true
+        echo ""
+        echo "=== Checking @turbowarp/scratch-l10n in package-lock.json ==="
+        grep -A 5 '"@turbowarp/scratch-l10n"' package-lock.json | grep resolved || true
+    - name: Debug - Check node_modules structure
+      run: |
+        echo "=== Scratch-blocks root directory ==="
+        ls -la node_modules/scratch-blocks/ | grep -E "blockly_compressed|blocks_compressed" || echo "No compressed files found in root"
+        echo ""
+        echo "=== Scratch-blocks shim directory ==="
+        ls -la node_modules/scratch-blocks/shim/ | grep -E "vertical" || echo "No vertical files found in shim"
+        echo ""
+        echo "=== Scratch-blocks media directory ==="
+        ls -la node_modules/scratch-blocks/media/ || echo "No media directory"
+        echo ""
+        echo "=== Scratch-gui directory ==="
+        ls -la node_modules/scratch-gui/ || echo "No scratch-gui directory"
+        echo ""
+        echo "=== Scratch-gui node_modules ==="
+        if [ -d "node_modules/scratch-gui/node_modules" ]; then
+          ls -la node_modules/scratch-gui/node_modules/ || echo "Empty scratch-gui node_modules"
+          echo ""
+          echo "=== Scratch-gui node_modules scratch-blocks ==="
+          if [ -d "node_modules/scratch-gui/node_modules/scratch-blocks" ]; then
+            echo "Directory exists"
+            ls -la node_modules/scratch-gui/node_modules/scratch-blocks/ | head -20
+            echo ""
+            echo "=== Compressed files in scratch-gui node_modules scratch-blocks ==="
+            ls -la node_modules/scratch-gui/node_modules/scratch-blocks/ | grep -E "blockly_compressed|blocks_compressed" || echo "No compressed files found"
+            echo ""
+            echo "=== Media directory in scratch-gui node_modules scratch-blocks ==="
+            ls -la node_modules/scratch-gui/node_modules/scratch-blocks/media/ || echo "No media directory"
+          else
+            echo "No scratch-gui/node_modules/scratch-blocks directory"
+          fi
+        else
+          echo "No scratch-gui/node_modules directory"
+        fi
+        echo ""
+        echo "=== @turbowarp/scratch-l10n ==="
+        ls -la node_modules/@turbowarp/scratch-l10n/ || echo "No @turbowarp/scratch-l10n directory"
+        if [ -d "node_modules/@turbowarp/scratch-l10n" ]; then
+          echo "=== Locales directory ==="
+          ls -la node_modules/@turbowarp/scratch-l10n/locales/ || echo "No locales directory"
+          echo ""
+          echo "=== editor-msgs files ==="
+          find node_modules/@turbowarp/scratch-l10n -name "editor-msgs*" || echo "No editor-msgs files found"
+        fi
     - name: Prepare extensions
       # Don't need to do a full fetch, that would just cause a lot of unnecessary traffic
       run: node scripts/prepare-extensions.mjs

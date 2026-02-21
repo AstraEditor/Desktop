@@ -1,220 +1,264 @@
 {
-  "name": "turbowarp-desktop",
-  "description": "Scratch mod with a compiler, dark mode, a bunch of addons, and more.",
-  "version": "1.15.2",
-  "license": "GPL-3.0",
-  "author": {
-    "email": "contact@turbowarp.org",
-    "name": "Thomas Weber"
-  },
-  "type": "commonjs",
-  "scripts": {
-    "fetch": "node scripts/download-library-files.mjs && node scripts/download-packager.mjs && node scripts/prepare-extensions.mjs",
-    "webpack:compile": "webpack",
-    "webpack:watch": "webpack --watch",
-    "webpack:prod": "cross-env NODE_ENV=production webpack",
-    "electron:start": "electron src-main/entrypoint.js",
-    "electron:package:dir": "electron-builder --dir"
-  },
-  "dependencies": {
-    "semver": "^7.7.3"
-  },
-  "devDependencies": {
-    "@babel/core": "^7.28.4",
-    "@babel/preset-env": "^7.12.16",
-    "@babel/preset-react": "^7.13.13",
-    "@electron/fuses": "^2.0.0",
-    "@turbowarp/extensions": "github:TurboWarp/extensions#master",
-    "adm-zip": "^0.5.16",
-    "autoprefixer": "^9.8.8",
-    "babel-loader": "^8.4.1",
-    "copy-webpack-plugin": "^6.4.1",
-    "cross-env": "^10.1.0",
-    "css-loader": "^1.0.1",
-    "electron": "^40.0.0",
-    "electron-builder": "^26.3.5",
-    "file-loader": "^6.2.0",
-    "postcss": "^8.4.13",
-    "postcss-import": "^14.0.0",
-    "postcss-loader": "^4.2.0",
-    "postcss-simple-vars": "^6.0.3",
-    "scratch-gui": "github:TurboWarp/scratch-gui#develop",
-    "style-loader": "^0.23.0",
-    "url-loader": "^4.1.1",
-    "webpack": "4.47.0",
-    "webpack-cli": "^4.10.0"
-  },
-  "overrides": {
-    "webpack@4.47.0": {
-      "terser-webpack-plugin": "^4.2.3"
-    }
-  },
-  "homepage": "https://desktop.turbowarp.org/",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/TurboWarp/desktop.git"
-  },
-  "bugs": {
-    "url": "https://github.com/TurboWarp/desktop/issues",
-    "email": "contact@turbowarp.org"
-  },
-  "main": "./src-main/entrypoint.js",
-  "build": {
-    "appId": "org.turbowarp.desktop",
-    "productName": "TurboWarp",
-    "files": [
-      "node_modules/**/*",
-      "src-main/**/*",
-      "src-preload/**/*",
-      "src-renderer/**/*",
-      "dist-renderer-webpack/**/*",
-      "dist-library-files/**/*",
-      "dist-extensions/**/*"
-    ],
-    "extraResources": [
-      {
-        "from": "art/icon.png",
-        "to": "icon.png"
-      },
-      {
-        "from": "art/icon.svg",
-        "to": "icon.svg"
-      }
-    ],
-    "win": {
-      "artifactName": "${productName} Portable ${version} ${arch}.${ext}",
-      "icon": "build/icon.ico",
-      "target": [
-        {
-          "target": "nsis",
-          "arch": "x64"
+    "name": "astraeditor-desktop",
+    "description": "TurboWarp mod with move features.",
+    "version": "1.1.2",
+    "license": "GPL-3.0",
+    "author": {
+        "email": "2381068747@qq.com",
+        "name": "KOSHINO"
+    },
+    "type": "commonjs",
+    "scripts": {
+        "fetch": "node scripts/download-library-files.mjs && node scripts/download-packager.mjs && node scripts/prepare-extensions.mjs",
+        "webpack:compile": "webpack",
+        "webpack:watch": "webpack --watch",
+        "webpack:prod": "cross-env NODE_ENV=production webpack",
+        "electron:start": "electron src-main/entrypoint.js",
+        "electron:package:dir": "electron-builder --dir"
+    },
+    "dependencies": {
+        "https-proxy-agent": "^7.0.6",
+        "react": "^16.0.0",
+        "react-dom": "^16.0.0",
+        "react-intl": "2.9.0",
+        "react-redux": "5.0.7",
+        "semver": "^7.7.3"
+    },
+    "devDependencies": {
+        "@babel/core": "^7.28.4",
+        "@babel/preset-env": "^7.12.16",
+        "@babel/preset-react": "^7.13.13",
+        "@electron/fuses": "^2.0.0",
+        "@turbowarp/extensions": "github:TurboWarp/extensions#master",
+        "adm-zip": "^0.5.16",
+        "autoprefixer": "^9.8.8",
+        "babel-loader": "^8.4.1",
+        "copy-webpack-plugin": "^6.4.1",
+        "cross-env": "^10.1.0",
+        "css-loader": "^1.0.1",
+        "electron": "^39.2.6",
+        "electron-builder": "^26.3.5",
+        "file-loader": "^6.2.0",
+        "postcss": "^8.4.13",
+        "postcss-import": "^14.0.0",
+        "postcss-loader": "^4.2.0",
+        "postcss-simple-vars": "^6.0.3",
+        "scratch-gui": "github:AstraEditor/scratch-gui#develop",
+        "scratch-blocks": "github:AstraEditor/scratch-blocks#develop-builds",
+        "scratch-extension-editor": "github:AstraEditor/scratch-extension-editor#main",
+        "spdx-expression-parse": "^4.0.0",
+        "style-loader": "^0.23.0",
+        "terser-webpack-plugin": "^4.2.3",
+        "url-loader": "^4.1.1",
+        "webpack": "4.47.0",
+        "webpack-cli": "^4.10.0"
+    },
+    "resolutions": {
+        "terser-webpack-plugin": "^4.2.3"
+    },
+    "tw_update": true,
+    "homepage": "https://desktop.turbowarp.org/ ",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/AstraEditor/desktop.git "
+    },
+    "bugs": {
+        "url": "https://github.com/AstraEditor/desktop/issues ",
+        "email": "contact@turbowarp.org"
+    },
+    "main": "./src-main/entrypoint.js",
+    "build": {
+        "appId": "org.astraeditor.desktop",
+        "productName": "AstraEditor",
+        "files": [
+            "node_modules/**/*",
+            "src-main/**/*",
+            "src-preload/**/*",
+            "src-renderer/**/*",
+            "dist-renderer-webpack/**/*",
+            "dist-library-files/**/*",
+            "dist-extensions/**/*",
+            "dist-astra-extensions/**/*"
+        ],
+        "extraResources": [
+            {
+                "from": "art/icon.png",
+                "to": "icon.png"
+            },
+            {
+                "from": "art/icon.svg",
+                "to": "icon.svg"
+            }
+        ],
+        "win": {
+            "artifactName": "${productName} Portable ${version} ${arch}.${ext}",
+            "icon": "build/icon.ico",
+            "target": [
+                {
+                    "target": "nsis",
+                    "arch": "x64"
+                },
+                {
+                    "target": "portable",
+                    "arch": "x64"
+                }
+            ]
         },
-        {
-          "target": "portable",
-          "arch": "x64"
-        }
-      ]
-    },
-    "appx": {
-      "artifactName": "${productName}-MS-Store-${version}-${arch}.${ext}",
-      "applicationId": "TurboWarp",
-      "displayName": "TurboWarp",
-      "identityName": "45747ThomasWeber.TurboWarpDesktop",
-      "publisher": "CN=18FA7D4F-01BF-49F2-BF56-782DCEA49C69",
-      "publisherDisplayName": "Thomas Weber",
-      "backgroundColor": "#4c97ff",
-      "showNameOnTiles": true,
-      "languages": [
-        "en-US",
-        "nl",
-        "de",
-        "it",
-        "ko"
-      ]
-    },
-    "nsis": {
-      "artifactName": "${productName}-Setup-${version}-${arch}.${ext}",
-      "oneClick": false,
-      "deleteAppDataOnUninstall": false,
-      "allowToChangeInstallationDirectory": true
-    },
-    "mac": {
-      "artifactName": "${productName}-Setup-${version}.${ext}",
-      "icon": "build/icon.icns",
-      "category": "public.app-category.education",
-      "darkModeSupport": true,
-      "gatekeeperAssess": false,
-      "hardenedRuntime": true,
-      "entitlements": "build/entitlements.mac.plist",
-      "entitlementsInherit": "build/entitlements.mac.plist",
-      "extendInfo": {
-        "ITSAppUsesNonExemptEncryption": false,
-        "LSMultipleInstancesProhibited": true,
-        "NSCameraUsageDescription": "This app requires camera access when using the video sensing or face sensing blocks.",
-        "NSMicrophoneUsageDescription": "This app requires microphone access when recording sounds or detecting loudness."
-      },
-      "target": [
-        {
-          "arch": "universal",
-          "target": "dmg"
-        }
-      ]
-    },
-    "mas": {
-      "hardenedRuntime": false,
-      "entitlements": "build/entitlements.mas.plist",
-      "entitlementsInherit": "build/entitlements.mas.inherit.plist",
-      "provisioningProfile": "build/distribution.provisionprofile"
-    },
-    "masDev": {
-      "type": "development",
-      "provisioningProfile": "build/development.provisionprofile"
-    },
-    "linux": {
-      "executableName": "turbowarp-desktop",
-      "artifactName": "${productName}-${os}-${arch}-${version}.${ext}",
-      "icon": "./build/",
-      "synopsis": "Mod of Scratch with a compiler and more features.",
-      "description": "TurboWarp is a Scratch mod with a compiler to run projects faster, dark mode for your eyes, a bunch of addons to improve the editor, and more.",
-      "category": "Development",
-      "desktop": {
-        "entry": {
-          "StartupWMClass": "turbowarp-desktop",
-          "Keywords": "scratch;"
-        }
-      },
-      "extraFiles": [
-        "linux-files"
-      ],
-      "target": [
-        {
-          "target": "deb"
+        "appx": {
+            "artifactName": "${productName}-MS-Store-${version}-${arch}.${ext}",
+            "applicationId": "AstraEditor",
+            "displayName": "AstraEditor",
+            "identityName": "45747KOSHINO.AstraEditorpDesktop",
+            "publisher": "CN=18FA7D4F-01BF-49F2-BF56-782DCEA49C69",
+            "publisherDisplayName": "KOSHINO",
+            "backgroundColor": "#0099ff",
+            "showNameOnTiles": true,
+            "languages": [
+                "en-US",
+                "nl",
+                "de",
+                "it",
+                "ko"
+            ]
         },
-        {
-          "target": "appimage"
+        "nsis": {
+            "artifactName": "${productName}-Setup-${version}-${arch}.${ext}",
+            "oneClick": false,
+            "deleteAppDataOnUninstall": false,
+            "allowToChangeInstallationDirectory": true
         },
-        {
-          "target": "tar.gz"
-        }
-      ]
+        "mac": {
+            "artifactName": "${productName}-Setup-${version}.${ext}",
+            "icon": "build/icon.icns",
+            "category": "public.app-category.education",
+            "darkModeSupport": true,
+            "gatekeeperAssess": false,
+            "hardenedRuntime": true,
+            "entitlements": "build/entitlements.mac.plist",
+            "entitlementsInherit": "build/entitlements.mac.plist",
+            "extendInfo": {
+                "ITSAppUsesNonExemptEncryption": false,
+                "LSMultipleInstancesProhibited": true,
+                "NSCameraUsageDescription": "This app requires camera access when using the video sensing or face sensing blocks.",
+                "NSMicrophoneUsageDescription": "This app requires microphone access when recording sounds or detecting loudness."
+            },
+            "target": [
+                {
+                    "arch": "universal",
+                    "target": "dmg"
+                }
+            ]
+        },
+        "mas": {
+            "hardenedRuntime": false,
+            "entitlements": "build/entitlements.mas.plist",
+            "entitlementsInherit": "build/entitlements.mas.inherit.plist",
+            "provisioningProfile": "build/distribution.provisionprofile"
+        },
+        "masDev": {
+            "type": "development",
+            "provisioningProfile": "build/development.provisionprofile"
+        },
+        "pacman": {
+            "depends": [
+                "gtk3",
+                "libnotify", 
+                "nss",
+                "libxss",
+                "libxtst",
+                "xdg-utils",
+                "at-spi2-core",
+                "libdrm",
+                "mesa",
+                "libxcb"
+            ],
+            "packageCategory": "devel"
+        },
+        "rpm": {
+            "depends": [
+                "gtk3",
+                "libnotify",
+                "nss",
+                "libXScrnSaver",
+                "xdg-utils",
+                "at-spi2-core",
+                "libdrm",
+                "libxcb"
+            ],
+            "packageCategory": "Development/Tools",
+            "vendor": "KOSHINO"
+        },
+        "linux": {
+            "executableName": "astraeditor-desktop",
+            "artifactName": "${productName}-${os}-${arch}-${version}.${ext}",
+            "icon": "./build/icons/",
+            "synopsis": "Mod of Scratch with a compiler and more features.",
+            "description": "AstraEditor is a TurboWarp mod used to add more practical features to make your writing lightning fast.",
+            "category": "Development",
+            "desktop": {
+                "entry": {
+                    "StartupWMClass": "astraeditor-desktop",
+                    "Keywords": "scratch;"
+                }
+            },
+            "extraFiles": [
+                "linux-files"
+            ],
+            "target": [
+                {
+                    "target": "deb"
+                },
+                {
+                    "target": "appimage"
+                },
+                {
+                    "target": "tar.gz"
+                },
+                {
+                    "target": "pacman"
+                },
+                {
+                    "target": "rpm"
+                }
+            ]
+        },
+        "snap": {
+            "summary": "Scratch mod with a compiler, dark mode, a bunch of addons, and more.",
+            "allowNativeWayland": true,
+            "plugs": [
+                "default",
+                "camera",
+                "audio-record",
+                "joystick",
+                "removable-media"
+            ]
+        },
+        "appImage": {
+            "license": null
+        },
+        "fileAssociations": [
+            {
+                "ext": "sb3",
+                "name": "Scratch 3 Project",
+                "description": "Scratch 3 Project",
+                "role": "Editor",
+                "mimeType": "application/x.scratch.sb3"
+            },
+            {
+                "ext": "sb2",
+                "name": "Scratch 2 Project",
+                "description": "Scratch 2 Project",
+                "role": "Editor",
+                "mimeType": "application/x.scratch.sb2"
+            },
+            {
+                "ext": "sb",
+                "name": "Scratch 1 Project",
+                "description": "Scratch 1 Project",
+                "role": "Editor",
+                "mimeType": "application/x.scratch.sb"
+            }
+        ]
     },
-    "snap": {
-      "summary": "Scratch mod with a compiler, dark mode, a bunch of addons, and more.",
-      "allowNativeWayland": true,
-      "plugs": [
-        "default",
-        "camera",
-        "audio-record",
-        "joystick",
-        "removable-media"
-      ]
-    },
-    "appImage": {
-      "license": null
-    },
-    "fileAssociations": [
-      {
-        "ext": "sb3",
-        "name": "Scratch 3 Project",
-        "description": "Scratch 3 Project",
-        "role": "Editor",
-        "mimeType": "application/x.scratch.sb3"
-      },
-      {
-        "ext": "sb2",
-        "name": "Scratch 2 Project",
-        "description": "Scratch 2 Project",
-        "role": "Editor",
-        "mimeType": "application/x.scratch.sb2"
-      },
-      {
-        "ext": "sb",
-        "name": "Scratch 1 Project",
-        "description": "Scratch 1 Project",
-        "role": "Editor",
-        "mimeType": "application/x.scratch.sb"
-      }
-    ]
-  },
-  "private": true
+    "private": true
 }

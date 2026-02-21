@@ -6,53 +6,133 @@ on:
     - 'v*'
 
 permissions:
-  # required to modify releases
   contents: write
 
 jobs:
+  # ==========================================
+  # Linux 矩阵并行构建 (5格式 × 3架构 = 15个job)
+  # ==========================================
   release-linux:
+    
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        format: [debian, tarball, appimage, pacman, rpm]
+        arch: [x64, armv7l, arm64]
+        include:
+          - format: pacman
+            extra-deps: 'ruby ruby-dev rubygems libarchive-tools'
+          - format: rpm
+            extra-deps: 'rpm ruby ruby-dev rubygems'
+    env:
+      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
     steps:
     - name: Checkout
       uses: actions/checkout@v4
       with:
         submodules: recursive
         persist-credentials: false
-    - name: Install strip-nondeterminism
-      run: sudo apt-get install strip-nondeterminism
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y strip-nondeterminism fakeroot libarchive-tools ${{ matrix.extra-deps }}
+
     - name: Install Node.js
       uses: actions/setup-node@v4
       with:
         node-version: 24
+
+    - name: Install Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
+
+    - name: Install fpm
+      if: matrix.format == 'pacman' || matrix.format == 'rpm'
+      run: sudo gem install --no-document fpm
+
     - name: Install dependencies
-      run: npm ci --loglevel=info
+      run: |
+        rm -f package-lock.json
+        npm install --loglevel=info
+
+    - name: Verify scratch dependencies
+      run: |
+        test -f node_modules/scratch-blocks/blockly_compressed_vertical.js
+        test -f node_modules/scratch-blocks/blocks_compressed_vertical.js
+        node -e "const fs=require('fs'); const paths=['node_modules/@turbowarp/scratch-l10n/locales/editor-msgs.js','node_modules/scratch-gui/node_modules/@turbowarp/scratch-l10n/locales/editor-msgs.js']; if(!paths.some(p=>fs.existsSync(p))){ console.error('Missing editor-msgs.js from @turbowarp/scratch-l10n'); process.exit(1);} "
+
     - name: Fetch
       run: npm run fetch
+
     - name: Compile
       run: npm run webpack:prod
+
     - name: Package
       run: |
-        node release-automation/build.mjs --debian --tarball --appimage --x64 --armv7l --arm64 --production
-    - name: Print file tree
-      run: node scripts/print-file-tree.mjs dist
-    - name: Upload artifacts to GitHub Actions
+        node release-automation/build.mjs --${{ matrix.format }} --${{ matrix.arch }} --production
+
+    - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
-        name: linux
-        path: |
-          dist/*.deb
-          dist/*.tar.gz
-          dist/*.AppImage
-    - name: Upload artifacts to tag
+        name: linux-${{ matrix.format }}-${{ matrix.arch }}
+        path: dist/*.*
+        retention-days: 1
+
+  # ==========================================
+  # Linux 产物合并并发布
+  # ==========================================
+  release-linux-publish:
+    needs: release-linux
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      with:
+        pattern: linux-*
+        path: dist
+        merge-multiple: true
+
+    - name: Verify artifacts
       run: |
-        node scripts/upload-to-github-releases.mjs TurboWarp desktop "dist/*.deb"
-        node scripts/upload-to-github-releases.mjs TurboWarp desktop "dist/*.tar.gz"
-        node scripts/upload-to-github-releases.mjs TurboWarp desktop "dist/*.AppImage"
+        ls -lh dist/*.deb || true
+        ls -lh dist/*.tar.gz || true
+        ls -lh dist/*.AppImage || true
+        ls -lh dist/*.pkg.tar.zst || true
+        ls -lh dist/*.rpm || true
+
+    - name: Print file tree
+      run: node scripts/print-file-tree.mjs dist
+
+    - name: Upload to GitHub Releases
+      run: |
+        node scripts/upload-to-github-releases.mjs "${{ github.repository_owner }}" "${{ github.event.repository.name }}" "dist/*.deb"
+        node scripts/upload-to-github-releases.mjs "${{ github.repository_owner }}" "${{ github.event.repository.name }}" "dist/*.tar.gz"
+        node scripts/upload-to-github-releases.mjs "${{ github.repository_owner }}" "${{ github.event.repository.name }}" "dist/*.AppImage"
+        node scripts/upload-to-github-releases.mjs "${{ github.repository_owner }}" "${{ github.event.repository.name }}" "dist/*.pkg.tar.zst"
+        node scripts/upload-to-github-releases.mjs "${{ github.repository_owner }}" "${{ github.event.repository.name }}" "dist/*.rpm"
       env:
         GH_TOKEN: "${{ github.token }}"
 
+  # ==========================================
+  # Mac 矩阵并行构建 (4个版本)
+  # ==========================================
   release-mac:
     runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: modern
+            args: '--mac --universal'
+          - target: legacy-10.13-10.14
+            args: '--mac-legacy-10.13-10.14 --x64'
+          - target: legacy-10.15
+            args: '--mac-legacy-10.15 --x64'
+          - target: legacy-11
+            args: '--mac-legacy-11 --universal'
     steps:
     - name: Checkout
       uses: actions/checkout@v4
@@ -63,140 +143,279 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: 24
+
+    - name: Install Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
+
     - name: Install dependencies
-      run: npm ci --loglevel=info
+      run: |
+        rm -f package-lock.json
+        npm install --loglevel=info
+
+    - name: Verify scratch dependencies
+      run: |
+        test -f node_modules/scratch-blocks/blockly_compressed_vertical.js
+        test -f node_modules/scratch-blocks/blocks_compressed_vertical.js
+        node -e "const fs=require('fs'); const paths=['node_modules/@turbowarp/scratch-l10n/locales/editor-msgs.js','node_modules/scratch-gui/node_modules/@turbowarp/scratch-l10n/locales/editor-msgs.js']; if(!paths.some(p=>fs.existsSync(p))){ console.error('Missing editor-msgs.js from @turbowarp/scratch-l10n'); process.exit(1);} "
+
     - name: Fetch
       run: npm run fetch
+
     - name: Compile
       run: npm run webpack:prod
-    - name: Package
+
+    - name: Package with signing
       run: |
-        # I don't trust GitHub Actions to not accidentally log shell substitutions somewhere, so we
-        # use Python instead of "echo $SECRET >" to write the private key to a file as needed by notarytool.
-        python3 -c "import os; open(os.getenv('APPLE_API_KEY_NAME'), 'w').write(os.getenv('APPLE_API_KEY_DATA'))" >/dev/null 2>&1
-        # @electron/notaraize documentation says key should be an absolute path
-        export APPLE_API_KEY="$(pwd)/$APPLE_API_KEY_NAME"
-        # Need to run the universal builds as separate commands or it breaks when @electron/universal
-        # diffs the ASARs and finds spurious differences. Not clear why.
-        node release-automation/build.mjs --mac --universal --production
-        node release-automation/build.mjs --mac-legacy-11 --universal --production
-        # These macOS versions never ran on an Apple Silicon device, so only need x64
-        node release-automation/build.mjs --mac-legacy-10.13-10.14 --mac-legacy-10.15 --x64 --production
-        # for safety
-        rm "$APPLE_API_KEY_NAME"
+        cleanup() {
+          if [ -n "${APPLE_API_KEY_NAME:-}" ]; then
+            rm -f "$APPLE_API_KEY_NAME"
+          fi
+        }
+        trap cleanup EXIT
+
+        signing_ok=true
+        if [ -z "${CSC_LINK:-}" ] || [ -z "${CSC_KEY_PASSWORD:-}" ]; then
+          signing_ok=false
+        fi
+
+        if [ "$signing_ok" = true ] && ([[ "${CSC_LINK:-}" == /* ]] || [[ "${CSC_LINK:-}" == ./* ]] || [[ "${CSC_LINK:-}" == ../* ]]); then
+          if [ ! -f "$CSC_LINK" ]; then
+            echo "CSC_LINK looks like a path but is not a file; building unsigned."
+            signing_ok=false
+          fi
+        fi
+
+        if [ "$signing_ok" != true ]; then
+          export CSC_IDENTITY_AUTO_DISCOVERY=false
+          unset CSC_LINK
+          unset CSC_KEY_PASSWORD
+        fi
+
+        if [ -n "${APPLE_API_KEY_NAME:-}" ] && [ -n "${APPLE_API_KEY_DATA:-}" ]; then
+          python3 -c "import os; open(os.getenv('APPLE_API_KEY_NAME'), 'w').write(os.getenv('APPLE_API_KEY_DATA'))" >/dev/null 2>&1 || { echo "Failed to write APPLE_API_KEY file"; exit 1; }
+          export APPLE_API_KEY="$(pwd)/$APPLE_API_KEY_NAME"
+        else
+          echo "APPLE_API_KEY_NAME / APPLE_API_KEY_DATA not set; skipping notarization."
+        fi
+
+        node release-automation/build.mjs ${{ matrix.args }} --production
       env:
         APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
         APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
         APPLE_API_KEY_NAME: ${{ secrets.APPLE_API_KEY_NAME }}
         APPLE_API_KEY_DATA: ${{ secrets.APPLE_API_KEY_DATA }}
-        # base64 -i Certificates.p12
         CSC_LINK: ${{ secrets.APPLE_CSC_LINK }}
-        # electron-builder documentation says password won't be escaped, so don't use any
-        # special characters that the shell will mess with
         CSC_KEY_PASSWORD: ${{ secrets.APPLE_CSC_KEY_PASSWORD }}
-    - name: Print file tree
-      run: node scripts/print-file-tree.mjs dist
-    - name: Upload artifacts to GitHub Actions
+
+    - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
-        name: mac
+        name: mac-${{ matrix.target }}
         path: dist/*.dmg
-    - name: Upload artifacts to tag
+        retention-days: 1
+
+  # ==========================================
+  # Mac 产物合并并发布
+  # ==========================================
+  release-mac-publish:
+    needs: release-mac
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      with:
+        pattern: mac-*
+        path: dist
+        merge-multiple: true
+
+    - name: Verify artifacts
+      run: ls -lh dist/*.dmg
+
+    - name: Print file tree
+      run: node scripts/print-file-tree.mjs dist
+
+    - name: Upload to GitHub Releases
       run: |
-        node scripts/upload-to-github-releases.mjs TurboWarp desktop "dist/*.dmg"
+        node scripts/upload-to-github-releases.mjs "${{ github.repository_owner }}" "${{ github.event.repository.name }}" "dist/*.dmg"
       env:
         GH_TOKEN: "${{ github.token }}"
 
+  # ==========================================
+  # Windows 矩阵并行构建 (9个job)
+  # ==========================================
   release-windows:
-    # GitHub's Windows runners have a C: drive and a D: drive.
-    # C: is for the OS and has good read performance but awful write performance.
-    # D: has much better faster write performance (>20x faster than C:)
-    # We want to use the D: drive whenever we can. Trying to do "npm ci" on the C:
-    # drive has been observed to take over an hour!
     runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # modern: nsis + appx (3架构)
+          - target: modern-nsis-x64
+            args: '--windows --x64'
+            files: '*.exe'
+          - target: modern-nsis-ia32
+            args: '--windows --ia32'
+            files: '*.exe'
+          - target: modern-nsis-arm64
+            args: '--windows --arm64'
+            files: '*.exe'
+          - target: modern-appx-x64
+            args: '--microsoft-store --x64'
+            files: '*.appx'
+          - target: modern-appx-ia32
+            args: '--microsoft-store --ia32'
+            files: '*.appx'
+          - target: modern-appx-arm64
+            args: '--microsoft-store --arm64'
+            files: '*.appx'
+          # portable: 仅x64
+          - target: portable
+            args: '--windows-portable --x64'
+            files: '*.exe'
+          # legacy: x64 + ia32
+          - target: legacy-x64
+            args: '--windows-legacy --x64'
+            files: '*.exe'
+          - target: legacy-ia32
+            args: '--windows-legacy --ia32'
+            files: '*.exe'
+    env:
+      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
     steps:
-    # actions/checkout can only clone to paths in $GITHUB_WORKSPACE which is on the C: drive,
-    # so we have to clone to C: then copy to D: after. This repository itself isn't huge so
-    # this is plenty fast.
     - name: Checkout
       uses: actions/checkout@v4
       with:
         submodules: recursive
         persist-credentials: false
         path: repo
-    - name: "Move repository to D: drive"
+
+    - name: Move to D drive
+      shell: pwsh
       run: |
         Copy-Item -Path repo -Destination D:\repo -Recurse
         Remove-Item -Path repo -Recurse -Force
+
     - name: Install Node.js
       uses: actions/setup-node@v4
       with:
         node-version: 24
-    # The repository being on D: means that node_modules IO will be fast, but npm still downloads
-    # packages to a temporary folder for caching which is on C: by default. We need to make sure
-    # npm uses the D: drive instead otherwise we still get bottlenecked by C:.
-    - name: "Configure npm to use D: drive"
+
+    - name: Install Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
+
+    - name: Configure npm cache
+      shell: pwsh
       run: |
         npm config set cache D:\npm-cache
         npm config set prefix D:\npm-prefix
+
     - name: Install dependencies
       working-directory: D:\repo
-      run: npm ci --loglevel=info
+      run: |
+        Remove-Item -Path package-lock.json -Force -ErrorAction SilentlyContinue
+        npm install --loglevel=info
+
+    - name: Verify scratch dependencies
+      working-directory: D:\repo
+      run: |
+        if (!(Test-Path "node_modules\\scratch-blocks\\blockly_compressed_vertical.js")) { throw "Missing blockly_compressed_vertical.js" }
+        if (!(Test-Path "node_modules\\scratch-blocks\\blocks_compressed_vertical.js")) { throw "Missing blocks_compressed_vertical.js" }
+        if (!(Test-Path "node_modules\\@turbowarp\\scratch-l10n\\locales\\editor-msgs.js") -and !(Test-Path "node_modules\\scratch-gui\\node_modules\\@turbowarp\\scratch-l10n\\locales\\editor-msgs.js")) { throw "Missing editor-msgs.js" }
+
     - name: Fetch
       working-directory: D:\repo
       run: npm run fetch
+
     - name: Compile
       working-directory: D:\repo
       run: npm run webpack:prod
+
     - name: Package
       working-directory: D:\repo
       run: |
-        node release-automation/build.mjs --windows --microsoft-store --x64 --ia32 --arm64 --production
-        node release-automation/build.mjs --windows-portable --x64 --production
-        node release-automation/build.mjs --windows-legacy --ia32 --x64 --production
+        node release-automation/build.mjs ${{ matrix.args }} --production
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: windows-${{ matrix.target }}
+        path: D:\repo\dist\${{ matrix.files }}
+        retention-days: 1
+
+  # ==========================================
+  # Windows 签名和发布
+  # ==========================================
+  release-windows-sign:
+    needs: release-windows
+    runs-on: windows-latest
+    env:
+      SIGNPATH_API_TOKEN: ${{ secrets.SIGNPATH_API_TOKEN }}
+    steps:
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      with:
+        pattern: windows-*
+        path: D:\repo\dist
+        merge-multiple: true
+
+    - name: Verify artifacts
+      run: |
+        Get-ChildItem D:\repo\dist\*.exe | Format-Table Name, Length
+        Get-ChildItem D:\repo\dist\*.appx | Format-Table Name, Length
+
     - name: Print file tree
-      working-directory: D:\repo
-      run: node scripts/print-file-tree.mjs dist
-    - name: Upload unsigned artifacts to GitHub Actions
+      run: node scripts/print-file-tree.mjs D:\repo\dist
+
+    - name: Upload unsigned to GitHub Actions
       uses: actions/upload-artifact@v4
       with:
         name: windows-unsigned
         path: D:\repo\dist\*.exe
-    - name: Upload Microsoft Store artifact to GitHub Actions
+
+    - name: Upload appx to GitHub Actions
       uses: actions/upload-artifact@v4
       with:
         name: appx
         path: D:\repo\dist\*.appx
-    - name: Upload unsigned artifacts for SignPath
+
+    - name: Upload for SignPath
       uses: actions/upload-artifact@v4
       id: signpath-unsigned
       with:
         name: artifact-for-signpath
-        # keep this list in sync with the signed artifiact upload below
         path: |
-          D:\repo\dist\TurboWarp-Setup*x64.exe
-    - name: Sign executables with SignPath
+          D:\repo\dist\AstraEditor-Setup*x64.exe
+          D:\repo\dist\AstraEditor-Legacy-Setup*x64.exe
+
+    - name: Sign with SignPath
+      if: ${{ env.SIGNPATH_API_TOKEN != '' }}
       uses: signpath/github-action-submit-signing-request@4f13d373e8f0cd8d3c0465ff4877feff27aed2ae
       with:
-        api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+        api-token: ${{ env.SIGNPATH_API_TOKEN }}
         organization-id: 04444052-261e-46eb-8168-ed0eee93c57c
         project-slug: desktop_
         signing-policy-slug: release-signing
         github-artifact-id: ${{ steps.signpath-unsigned.outputs.artifact-id }}
         artifact-configuration-slug: sign_installers
         wait-for-completion: true
-        # overwrite the unsigned files
         output-artifact-directory: D:\repo\dist
-    - name: Upload signed artifacts to GitHub Actions
+
+    - name: Upload signed to GitHub Actions
+      if: ${{ env.SIGNPATH_API_TOKEN != '' }}
       uses: actions/upload-artifact@v4
       with:
         name: windows-signed
-        # keep this list in sync with the signpath artifact upload above
         path: |
-          D:\repo\dist\TurboWarp-Setup*x64.exe
-    - name: Upload signed artifacts to tag
-      working-directory: D:\repo
+          D:\repo\dist\AstraEditor-Setup*x64.exe
+          D:\repo\dist\AstraEditor-Legacy-Setup*x64.exe
+
+    - name: Upload to GitHub Releases
       run: |
-        node scripts/upload-to-github-releases.mjs TurboWarp desktop "dist/*.exe"
+        node scripts/upload-to-github-releases.mjs "${{ github.repository_owner }}" "${{ github.event.repository.name }}" "D:\repo\dist\*.exe"
+        node scripts/upload-to-github-releases.mjs "${{ github.repository_owner }}" "${{ github.event.repository.name }}" "D:\repo\dist\*.appx"
       env:
         GH_TOKEN: "${{ github.token }}"

@@ -28,7 +28,7 @@ class AddonsWindow extends AbstractWindow {
 
     this.ipc.handle('export-settings', async (event, settings) => {
       const result = await dialog.showSaveDialog(this.window, {
-        defaultPath: path.join(app.getPath('downloads'), 'turbowarp-addon-settings.json'),
+        defaultPath: path.join(app.getPath('downloads'), 'astraeditor-addon-settings.json'),
         filters: [
           {
             name: 'JSON',

@@ -4,7 +4,53 @@ const packageJSON = require('../package.json');
 const privilegedFetch = require('./fetch');
 
 const currentVersion = packageJSON.version;
-const URL = 'https://desktop.turbowarp.org/version.json';
+
+const getRepositoryInfo = () => {
+  const fallback = {
+    owner: 'AstraEditor',
+    repo: 'desktop'
+  };
+
+  const repositoryURL = packageJSON?.repository?.url;
+  if (typeof repositoryURL !== 'string') {
+    return fallback;
+  }
+
+  const match = /github\.com[/:]([^/]+)\/([^/.]+)(?:\.git)?/i.exec(repositoryURL);
+  if (!match) {
+    return fallback;
+  }
+
+  return {
+    owner: match[1],
+    repo: match[2]
+  };
+};
+
+const {owner: REPO_OWNER, repo: REPO_NAME} = getRepositoryInfo();
+const VERSION_URLS = [
+  `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/master/docs/version.json`,
+  `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/main/docs/version.json`,
+  `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/develop/docs/version.json`
+];
+
+const fetchVersionInfo = async () => {
+  let lastError = null;
+
+  for (const url of VERSION_URLS) {
+    try {
+      return await privilegedFetch.json(url);
+    } catch (error) {
+      lastError = error;
+    }
+  }
+
+  if (lastError) {
+    throw lastError;
+  }
+
+  throw new Error('Could not fetch version information.');
+};
 
 /**
  * Determines whether the update checker is even allowed to be enabled
@@ -25,13 +71,15 @@ const checkForUpdates = async () => {
     return;
   }
 
-  const json = await privilegedFetch.json(URL);
-  const latestStable = json.latest;
-  const latestUnstable = json.latest_unstable;
-  const oldestSafe = json.oldest_safe;
+  const json = await fetchVersionInfo();
 
   // Imported lazily as it takes about 10ms to import
+  const semverValid = require('semver/functions/valid');
   const semverLt = require('semver/functions/lt');
+
+  const latestStable = semverValid(json.latest) || currentVersion;
+  const latestUnstable = semverValid(json.latest_unstable) || latestStable;
+  const oldestSafe = semverValid(json.oldest_safe) || currentVersion;
 
   // Security updates can not be ignored.
   if (semverLt(currentVersion, oldestSafe)) {

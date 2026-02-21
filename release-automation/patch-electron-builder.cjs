@@ -12,9 +12,9 @@ LinuxTargetHelper.prototype.computeMimeTypeFiles = async function (...args) {
     const tempFile = await this.packager.getTempFile('.xml');
     console.log(`${packageJSON.name}: LinuxTargetHelper.prototype.computeMimeTypeFiles has been patched. mime.xml to be saved to ${tempFile}`);
 
-    const xmlPath = pathUtil.join(__dirname, '../linux-files/org.turbowarp.TurboWarp.mime.xml');
+    const xmlPath = pathUtil.join(__dirname, '../linux-files/org.astraeditor.AstraEditor.mime.xml');
     const rawXml = await fsPromises.readFile(xmlPath, 'utf-8');
-    const newXml = rawXml.replace(/org\.turbowarp\.TurboWarp/g, packageJSON.name);
+    const newXml = rawXml.replace(/org\.astraeditor\.AstraEditor/g, packageJSON.name);
 
     // Roughly equivalent to fs-extra's outputFile (creates parent directories as needed)
     await fsPromises.mkdir(pathUtil.dirname(tempFile), {

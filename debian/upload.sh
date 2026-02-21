@@ -7,5 +7,5 @@ cd "$(dirname "$0")"
 # apt is broken.
 # --transfers=1 significantly improves reliability in our experience on both good and
 # bad internet connections.
-rclone copy deb/pool r2:turbowarp-pkgs/deb/pool -P --transfers=1
-rclone copy deb/dists r2:turbowarp-pkgs/deb/dists -P --transfers=1
+rclone copy deb/pool r2:astraeditor-pkgs/deb/pool -P --transfers=1
+rclone copy deb/dists r2:astraeditor-pkgs/deb/dists -P --transfers=1

@@ -1,44 +1,226 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <style>
-      body {
-        margin: 0;
-        padding: 0;
-        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-        color: black;
-        background-color: white;
-      }
-      main {
-        padding: 20px;
-        box-sizing: border-box;
-        width: 100%;
-        min-height: 100vh;
-        border: 20px solid hsla(0, 100%, 65%, 1);
-      }
-      pre {
-        font-size: inherit;
-        overflow-x: hidden;
-      }
-      h1 {
-        margin-top: 0;
-      }
-    </style>
-  </head>
-  <body>
-    <main>
-      <h1>TurboWarp Desktop <span class="version"></span></h1>
-      <p class="more-version"></p>
-      <script>
-        var info = AboutPreload.getInfo();
-        document.querySelector('.version').textContent = info.version;
-        document.querySelector('.more-version').textContent = `(Debug info: Electron ${info.electron}, Platform ${info.platform} ${info.arch}, Distribution ${info.dist})`;
-      </script>
-      <p>TurboWarp is a better offline editor for Scratch 3. Learn more at <a href="https://desktop.turbowarp.org/">https://desktop.turbowarp.org/</a>.</p>
-      <p>TurboWarp Desktop is licensed under the GNU General Public License v3.0. The source code is published <a href="https://github.com/TurboWarp/" target="_blank" rel="noreferrer">on GitHub</a>. You can read the license below:</p>
-      <pre>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: black;
+      background-color: #ceebff;
+    }
+
+    main {
+      box-sizing: border-box;
+      width: 100%;
+      min-height: 100vh;
+      background-color: #ceebff;
+    }
+
+    pre {
+      font-size: inherit;
+      overflow-x: hidden;
+    }
+
+    h1 {
+      margin-top: 0;
+    }
+
+    #main {
+      display: flex;
+      align-items: center;
+      padding: 10px;
+    }
+
+    #split {
+      margin-right: 30px;
+    }
+
+    #logo {
+      width: 300px;
+      height: auto;
+      margin-top: auto;
+      margin-bottom: auto;
+    }
+
+    #gpl {
+      overflow: auto;
+      width: 560px;
+      max-height: calc(100vh - 180px);
+    }
+
+    #ver {
+      color: #0099ff;
+      font-weight: bold;
+      position: relative;
+      top: -25px;
+      left: 86px;
+    }
+
+    .more-version {
+      position: absolute;
+      left: 0;
+      top: calc(100vh - 40px);
+      color: #00000044
+    }
+
+    #thanks {
+
+      margin: 10px 25px;
+
+    }
+
+    .thanks-one,
+    .thanks-you {
+      padding-bottom: 5px;
+      color: #0099ffb8;
+      font-size: small;
+    }
+
+    .thanks-all {
+      padding-bottom: 10px;
+      color: #0099ff;
+      font-size: larger
+    }
+
+    #gpl {
+      background-color: #ffffff;
+      padding: 5px;
+      border-radius: 5px;
+      border: #777777;
+      text-align: left;
+    }
+
+    .intro {
+      white-space: pre-line;
+    }
+  </style>
+</head>
+
+<body>
+  <main>
+    <p class="more-version"></p>
+    <div id="main">
+      <div id="split">
+        <img id="logo" src="./fulllogo.png" alt="AstraEditor"></img><span class="version" id="ver"></span>
+        <div id="thanks">
+          <div class="thanks-all">Credits</div>
+          <div class="thanks-one">KOSHINO</div>
+          <div class="thanks-one">Cyberexplorer</div>
+          <div class="thanks-one">NeuroPulse</div>
+          <div class="thanks-one">A Sean Says</div>
+          <div class="thanks-one">洛天依arm64</div>
+          <div style="font-weight: bold;" class="thanks-you">You</div>
+        </div>
+      </div>
+      <div>
+        <script>
+          var language = "en";
+
+          var translate = {
+            "zh-cn": {
+              "thanks-all": "创作者",
+              "thanks-you": "您",
+              "intro": `AstraEditor 是一款对TurboWarp进行功能扩展和界面优化的编辑器。
+AstraEditor Desktop 是基于 TurboWarp Desktop 构建的离线编辑器。
+此项目遵守 GNU 通用公共许可证 v3.0 (GPLv3.0)，并已在 `,
+              "intro_1":" GitHub ",
+              "intro_2":"上开源。"
+            },
+            "zh-tw": {
+              "thanks-all": "創作者",
+              "thanks-you": "您",
+              "intro": `AstraEditor 是一款對TurboWarp進行功能擴展和界面優化的編輯器。
+AstraEditor Desktop 是基於 TurboWarp Desktop 構建的離線編輯器。
+此項目遵守 GNU 通用公共許可證 v3.0 (GPLv3.0)，並已在 ` ,
+              "intro_1":" GitHub ",
+              "intro_2":"上開源。"
+            },
+            "en": {
+              "thanks-all": "Credits",
+              "thanks-you": "You",
+              "intro": `AstraEditor is an editor that extends the functionality and optimizes the interface of TurboWarp.
+AstraEditor Desktop is an offline editor built upon TurboWarp Desktop.
+This project adheres to the GNU General Public License v3.0 (GPLv3.0) and has been open-sourced `,
+              "intro_1":"on Github",
+              "intro_2":"."
+            },
+            "ja": {
+              "thanks-all": "クレジット",
+              "thanks-you": "あなた",
+              "intro": `AstraEditorはTurboWarpの機能を拡張し、インターフェースを最適化したエディタです。
+AstraEditor DesktopはTurboWarp Desktopをベースに構築されたオフラインエディタです。
+このプロジェクトはGNU General Public License v3.0 (GPLv3.0)に従い、` ,
+              "intro_1":"GitHub",
+              "intro_2":"でオープンソース化されています。"
+            },
+            "ko": {
+              "thanks-all": "크레딧",
+              "thanks-you": "당신",
+              "intro": `AstraEditor는 TurboWarp의 기능을 확장하고 인터페이스를 최적화한 에디터입니다.
+AstraEditor Desktop은 TurboWarp Desktop을 기반으로 구축된 오프라인 에디터입니다.
+이 프로젝트는 GNU General Public License v3.0 (GPLv3.0)을 준수하며 ` ,
+              "intro_1":"GitHub",
+              "intro_2":"에서 오픈 소스로 공개되었습니다."
+            },
+            "fr": {
+              "thanks-all": "Crédits",
+              "thanks-you": "Vous",
+              "intro": `AstraEditor est un éditeur qui étend les fonctionnalités et optimise l'interface de TurboWarp.
+AstraEditor Desktop est un éditeur hors ligne basé sur TurboWarp Desktop.
+Ce projet respecte la GNU General Public License v3.0 (GPLv3.0) et a été open-sourcé `,
+              "intro_1":"sur Github",
+              "intro_2":"."
+            },
+            "de": {
+              "thanks-all": "Danksagungen",
+              "thanks-you": "Sie",
+              "intro": `AstraEditor ist ein Editor, der die Funktionalität von TurboWarp erweitert und die Benutzeroberfläche optimiert.
+AstraEditor Desktop ist ein Offline-Editor, der auf TurboWarp Desktop basiert.
+Dieses Projekt unterliegt der GNU General Public License v3.0 (GPLv3.0) und wurde `,
+              "intro_1":"auf Github",
+              "intro_2":" Open Source veröffentlicht."
+            },
+            "es": {
+              "thanks-all": "Créditos",
+              "thanks-you": "Tú",
+              "intro": `AstraEditor es un editor que extiende la funcionalidad y optimiza la interfaz de TurboWarp.
+AstraEditor Desktop es un editor offline construido sobre TurboWarp Desktop.
+Este proyecto se adhiere a la GNU General Public License v3.0 (GPLv3.0) y ha sido open-sourced `,
+              "intro_1":"en Github",
+              "intro_2":"."
+            }
+          };
+
+          (async () => {
+            language = await AboutPreload.getEditorLocalStorage('tw:language');
+            if(!language){
+              language = navigator.language.toLowerCase();
+            }
+            console.log(`Editor Language: ${language}`);
+            console.log(translate[language])
+            for (let i = 0; i <= Object.keys(translate[language]).length; i++) {
+              document.querySelector(`.${Object.keys(translate[language])[i]}`).textContent = Object.values(translate[language])[i]
+            };
+          })();
+          var info = AboutPreload.getInfo();
+
+          document.querySelector('.version').textContent = info.version;
+          document.querySelector('.more-version').textContent = `Platform info: Electron Version: ${info.electron}, Platform: ${info.platform} ${info.arch}, Distribution: ${info.dist}`;
+
+
+
+
+        </script>
+        <span class="intro">AstraEditor is an editor that extends the functionality and optimizes the interface of TurboWarp.
+        AstraEditor Desktop is an offline editor built upon TurboWarp Desktop.
+        This project adheres to the GNU General Public License v3.0 (GPLv3.0) and has been open-sourced </span><a href="https://github.com/AstraEditor/" target="_blank"
+            rel="noreferrer" class="intro_1">on Github.</a> <span class="intro_2"></span>
+        <div id="gpl">
+          <pre>
                     GNU GENERAL PUBLIC LICENSE
                         Version 3, 29 June 2007
 
@@ -673,7 +855,7 @@ state the exclusion of warranty; and each file should have at least
 the "copyright" line and a pointer to where the full notice is found.
 
     &lt;one line to give the program's name and a brief idea of what it does.&gt;
-    Copyright (C) &lt;year&gt;  &lt;name of author&gt;
+    Copyright (C) &lt;2026&gt;  &lt;KOSHINO&gt;
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -693,7 +875,7 @@ Also add information on how to contact you by electronic and paper mail.
   If the program does terminal interaction, make it output a short
 notice like this when it starts in an interactive mode:
 
-    &lt;program&gt;  Copyright (C) &lt;year&gt;  &lt;name of author&gt;
+    &lt;AstraEditor&gt;  Copyright (C) &lt;2026&gt;  &lt;KOSHINO&gt;
     This program comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
     This is free software, and you are welcome to redistribute it
     under certain conditions; type `show c' for details.
@@ -713,6 +895,10 @@ may consider it more useful to permit linking proprietary applications with
 the library.  If this is what you want to do, use the GNU Lesser General
 Public License instead of this License.  But first, please read
 &lt;https://www.gnu.org/licenses/why-not-lgpl.html&gt;.</pre>
-    </main>
-  </body>
+        </div>
+      </div>
+    </div>
+  </main>
+</body>
+
 </html>

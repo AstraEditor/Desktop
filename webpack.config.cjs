@@ -70,6 +70,12 @@ module.exports = [
             }),
             new CopyWebpackPlugin({
                 patterns: [
+                    // scratch-extension-editor is bundled into scratch-gui, but it still loads additional
+                    // chunks/workers at runtime. Those files must be available at runtime.
+                    {
+                        from: path.resolve(__dirname, 'node_modules/scratch-extension-editor/dist'),
+                        to: 'extension-editor'
+                    },
                     {
                         from: 'node_modules/scratch-blocks/media',
                         to: 'static/blocks-media/default'
@@ -85,15 +91,34 @@ module.exports = [
                     },
                     {
                         context: 'src-renderer-webpack/editor/gui/',
+                        from: 'submit',
+                        to: 'submit'
+                    },
+                    {
+                        context: 'src-renderer-webpack/editor/gui/',
                         from: '*.html'
                     }
                 ]
             })
         ],
         resolve: {
+            modules: [
+                path.resolve(__dirname, 'node_modules'),
+                path.resolve(__dirname, 'node_modules/scratch-gui/node_modules'),
+                'node_modules'
+            ],
             alias: {
+                // Force single React copy to avoid "Invalid hook call" errors
+                'react': path.resolve(__dirname, 'node_modules/react'),
+                'react-dom': path.resolve(__dirname, 'node_modules/react-dom'),
+                // Add scratch-extension-editor alias - updated path
+                'scratch-extension-editor': path.resolve(__dirname, 'node_modules/scratch-extension-editor'),
                 'scratch-gui$': path.resolve(__dirname, 'node_modules/scratch-gui/src/index.js'),
+                'scratch-gui/': path.resolve(__dirname, 'node_modules/scratch-gui/src/'),
                 'scratch-render-fonts$': path.resolve(__dirname, 'node_modules/scratch-gui/src/lib/tw-scratch-render-fonts'),
+                // Aliases for dynamic requires in AppStateHOC
+                '../reducers/gui': path.resolve(__dirname, 'node_modules/scratch-gui/src/reducers/gui.js'),
+                './tw-scratch-paint': path.resolve(__dirname, 'node_modules/scratch-gui/src/lib/tw-scratch-paint.js'),
             }
         }
     },
