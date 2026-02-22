@@ -100,14 +100,14 @@ jobs:
 # ==========================================
 # Flatpak (独立构建)
 # ==========================================
-  package-flatpak:
+  flatpak:
     needs: build
     runs-on: ubuntu-latest
     strategy:
-      fail-fast: false
       matrix:
         include:
-          - arch: x64
+          - target: x64
+            arch: x64
     steps:
     - uses: actions/checkout@v4
 
@@ -116,6 +116,12 @@ jobs:
       with:
         node-version: 24
 
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Build Linux app
+      run: npm run build:linux
+
     - name: Install Flatpak & Runtime
       run: |
         sudo apt-get update
@@ -123,18 +129,6 @@ jobs:
         flatpak --user remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
         flatpak --user install -y --noninteractive flathub org.freedesktop.Platform//23.08
         flatpak --user install -y --noninteractive flathub org.freedesktop.Sdk//23.08
-  
-    - name: Install dependencies
-      run: npm ci
-
-    - name: Download build artifacts
-      uses: actions/download-artifact@v4
-      with:
-        name: linux-build
-        path: dist-linux
-
-    - name: Build Linux app
-      run: npm run build:linux
 
     - name: Prepare Flatpak sources
       run: |
