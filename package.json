@@ -15,7 +15,7 @@
         "webpack:prod": "cross-env NODE_ENV=production webpack",
         "electron:start": "electron src-main/entrypoint.js",
         "electron:package:dir": "electron-builder --dir",
-        "build:linux": "node build.mjs --flatpak"
+        "build:linux": "node release-automation/build.mjs --flatpak"
     },
     "dependencies": {
         "https-proxy-agent": "^7.0.6",
