@@ -127,6 +127,11 @@ jobs:
     - name: Build Linux app
       run: npm run build:linux
 
+    - name: Prepare Flatpak sources
+      run: |
+        mkdir -p dist-linux
+        cp dist-linux/linux-unpacked/astraeditor-desktop dist-linux/
+  
     - name: Build Flatpak
       run: |
         flatpak-builder --user build-dir flatpak/org.astraeditor.AstraEditor.yml --force-clean
