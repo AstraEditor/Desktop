@@ -117,7 +117,7 @@ jobs:
 
       - name: Add Flathub
         run: |
-          sudo flatpak --user remote-add --if-not-exists flathub \
+          flatpak --user remote-add --if-not-exists flathub \
             https://flathub.org/repo/flathub.flatpakrepo
 
       - name: Download build artifacts
@@ -128,7 +128,7 @@ jobs:
           
       - name: Install Runtime
         run: |
-          sudo flatpak --user install -y --noninteractive flathub \
+          flatpak --user install -y --noninteractive flathub \
             org.freedesktop.Platform//23.08 \
             org.freedesktop.Sdk//23.08
 
@@ -143,8 +143,8 @@ jobs:
 
       - name: Build Flatpak
         run: |
-          flatpak-builder build-dir flatpak/org.astraeditor.AstraEditor.yml --force-clean
-          flatpak build-bundle build-dir AstraEditor.flatpak org.astraeditor.AstraEditor
+          flatpak-builder --user build-dir flatpak/org.astraeditor.AstraEditor.yml --force-clean
+          flatpak --user build-bundle build-dir AstraEditor.flatpak org.astraeditor.AstraEditor
           mkdir -p dist
           mv AstraEditor.flatpak dist/
 
