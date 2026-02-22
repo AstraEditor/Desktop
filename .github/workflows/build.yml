@@ -124,9 +124,6 @@ jobs:
     - name: Install dependencies
       run: npm ci
 
-    - name: Build Linux app
-      run: npm run build:linux
-
     - name: Install Flatpak & Runtime
       run: |
         sudo apt-get update
@@ -134,6 +131,9 @@ jobs:
         flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
         flatpak install -y --noninteractive flathub org.freedesktop.Platform//23.08
         flatpak install -y --noninteractive flathub org.freedesktop.Sdk//23.08
+
+    - name: Build Linux app
+      run: npm run build:linux
 
     - name: Prepare Flatpak sources
       run: |
