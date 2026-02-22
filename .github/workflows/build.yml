@@ -137,7 +137,7 @@ jobs:
         
     - name: Build Flatpak
       run: |
-        flatpak-builder --user build-dir flatpak/org.astraeditor.AstraEditor.yml --force-clean
+        flatpak-builder build-dir flatpak/org.astraeditor.AstraEditor.yml --force-clean
 
     - name: Create Bundle
       run: |

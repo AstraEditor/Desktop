@@ -143,7 +143,7 @@ jobs:
 
     - name: Build Flatpak
       run: |
-        flatpak-builder --user build-dir flatpak/org.astraeditor.AstraEditor.yml --force-clean
+        flatpak-builder build-dir flatpak/org.astraeditor.AstraEditor.yml --force-clean
         flatpak --user build-bundle build-dir AstraEditor.flatpak org.astraeditor.AstraEditor
         mkdir -p dist
         mv AstraEditor.flatpak dist/
