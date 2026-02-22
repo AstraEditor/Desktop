@@ -115,6 +115,12 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y flatpak flatpak-builder
 
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: linux-build
+          path: dist-linux
+          
       - name: Add Flathub
         run: |
           sudo flatpak --user remote-add --if-not-exists flathub \
