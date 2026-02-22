@@ -3,627 +3,294 @@ name: Release
 on:
   push:
     tags:
-    - 'v*'
+      - 'v*'
 
 permissions:
   contents: write
 
+env:
+  PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+
 jobs:
-  # ==========================================
-  # Linux AMD64 构建 (ubuntu-latest)
-  # ==========================================
-  release-linux-amd64:
+
+# ==========================================
+# 统一构建阶段 (webpack:prod)
+# ==========================================
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: |
+          rm -f package-lock.json
+          npm install --loglevel=info
+
+      - name: Fetch
+        run: npm run fetch
+
+      - name: Compile
+        run: npm run webpack:prod
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: |
+            dist-astra-extensions/
+            dist-extensions/
+            dist-library-files/
+            dist-renderer-webpack/
+
+# ==========================================
+# Linux 多格式打包
+# ==========================================
+  package-linux:
+    needs: build
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - format: debian
-            arch: x64
-          - format: tarball
-            arch: x64
-          - format: appimage
-            arch: x64
-          - format: pacman
-            arch: x64
-            extra-deps: 'ruby ruby-dev rubygems libarchive-tools'
-          - format: rpm
-            arch: x64
-            extra-deps: 'rpm ruby ruby-dev rubygems'
-          - format: flatpak
-            arch: x64
-            extra-deps: 'flatpak flatpak-builder'
-          - format: snap
-            arch: x64
-            extra-deps: 'snapd'
-    env:
-      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+        format: [debian, tarball, appimage, pacman, rpm]
+        arch: [x64, armv7l, arm64]
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        submodules: recursive
-        persist-credentials: false
+      - uses: actions/checkout@v4
 
-    - name: Install system dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y strip-nondeterminism fakeroot libarchive-tools ${{ matrix.extra-deps }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
 
-    - name: Setup Flatpak
-      if: matrix.format == 'flatpak'
-      run: |
-        sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-        sudo flatpak install -y --noninteractive flathub org.freedesktop.Platform/x86_64/23.08
-        sudo flatpak install -y --noninteractive flathub org.freedesktop.Sdk/x86_64/23.08
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
 
-    - name: Setup Snapcraft
-      if: matrix.format == 'snap'
-      run: |
-        sudo snap install snapcraft --classic
-        sudo snap install lxd
-        sudo lxd init --auto
-        sudo usermod -aG lxd $USER
-        newgrp lxd
+      - name: Install system deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y strip-nondeterminism fakeroot ruby ruby-dev rubygems libarchive-tools rpm
 
-    - name: Install Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: 24
+      - name: Install fpm
+        run: sudo gem install --no-document fpm
 
-    - name: Install Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.x'
+      - name: Install dependencies (skip postinstall)
+        run: |
+          rm -f package-lock.json
+          npm install --ignore-scripts
 
-    - name: Install fpm
-      if: matrix.format == 'pacman' || matrix.format == 'rpm'
-      run: sudo gem install --no-document fpm
+      - name: Package
+        run: |
+          node release-automation/build.mjs \
+            --${{ matrix.format }} \
+            --${{ matrix.arch }} \
+            --production
 
-    - name: Install dependencies
-      run: |
-        rm -f package-lock.json
-        npm install --loglevel=info
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux-${{ matrix.format }}-${{ matrix.arch }}
+          path: dist/*
 
-    - name: Verify scratch dependencies
-      run: |
-        test -f node_modules/scratch-blocks/blockly_compressed_vertical.js
-        test -f node_modules/scratch-blocks/blocks_compressed_vertical.js
-        node -e "const fs=require('fs'); const paths=['node_modules/@turbowarp/scratch-l10n/locales/editor-msgs.js','node_modules/scratch-gui/node_modules/@turbowarp/scratch-l10n/locales/editor-msgs.js']; if(!paths.some(p=>fs.existsSync(p))){ console.error('Missing editor-msgs.js from @turbowarp/scratch-l10n'); process.exit(1);} "
-
-    - name: Fetch
-      run: npm run fetch
-
-    - name: Compile
-      run: npm run webpack:prod
-
-    - name: Package
-      run: |
-        node release-automation/build.mjs --${{ matrix.format }} --${{ matrix.arch }} --production
-
-    - name: Upload artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: linux-${{ matrix.format }}-${{ matrix.arch }}
-        path: dist/*.*
-        retention-days: 1
-
-  # ==========================================
-  # Linux ARM64 构建 (ubuntu-24.04-arm)
-  # ==========================================
-  release-linux-arm64:
-    runs-on: ubuntu-24.04-arm
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - format: debian
-            arch: arm64
-          - format: tarball
-            arch: arm64
-          - format: appimage
-            arch: arm64
-          - format: pacman
-            arch: arm64
-            extra-deps: 'ruby ruby-dev rubygems libarchive-tools'
-          - format: rpm
-            arch: arm64
-            extra-deps: 'rpm ruby ruby-dev rubygems'
-          - format: flatpak
-            arch: arm64
-            extra-deps: 'flatpak flatpak-builder'
-          - format: snap
-            arch: arm64
-            extra-deps: 'snapd'
-    env:
-      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        submodules: recursive
-        persist-credentials: false
-
-    - name: Install system dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y strip-nondeterminism fakeroot libarchive-tools ${{ matrix.extra-deps }}
-
-    - name: Setup Flatpak
-      if: matrix.format == 'flatpak'
-      run: |
-        sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-        sudo flatpak install -y --noninteractive flathub org.freedesktop.Platform/aarch64/23.08
-        sudo flatpak install -y --noninteractive flathub org.freedesktop.Sdk/aarch64/23.08
-
-    - name: Setup Snapcraft
-      if: matrix.format == 'snap'
-      run: |
-        sudo snap install snapcraft --classic
-        sudo snap install lxd
-        sudo lxd init --auto
-        sudo usermod -aG lxd $USER
-        newgrp lxd
-
-    - name: Install Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: 24
-
-    - name: Install Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.x'
-
-    - name: Install fpm
-      if: matrix.format == 'pacman' || matrix.format == 'rpm'
-      run: sudo gem install --no-document fpm
-
-    - name: Install dependencies
-      run: |
-        rm -f package-lock.json
-        npm install --loglevel=info
-
-    - name: Verify scratch dependencies
-      run: |
-        test -f node_modules/scratch-blocks/blockly_compressed_vertical.js
-        test -f node_modules/scratch-blocks/blocks_compressed_vertical.js
-        node -e "const fs=require('fs'); const paths=['node_modules/@turbowarp/scratch-l10n/locales/editor-msgs.js','node_modules/scratch-gui/node_modules/@turbowarp/scratch-l10n/locales/editor-msgs.js']; if(!paths.some(p=>fs.existsSync(p))){ console.error('Missing editor-msgs.js from @turbowarp/scratch-l10n'); process.exit(1);} "
-
-    - name: Fetch
-      run: npm run fetch
-
-    - name: Compile
-      run: npm run webpack:prod
-
-    - name: Package
-      run: |
-        node release-automation/build.mjs --${{ matrix.format }} --${{ matrix.arch }} --production
-
-    - name: Upload artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: linux-${{ matrix.format }}-${{ matrix.arch }}
-        path: dist/*.*
-        retention-days: 1
-
-  # ==========================================
-  # Linux ARMv7l 构建 (ubuntu-24.04-arm)
-  # ==========================================
-  release-linux-armv7l:
-    runs-on: ubuntu-24.04-arm
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - format: debian
-            arch: armv7l
-          - format: tarball
-            arch: armv7l
-          - format: appimage
-            arch: armv7l
-          - format: pacman
-            arch: armv7l
-            extra-deps: 'ruby ruby-dev rubygems libarchive-tools'
-          - format: rpm
-            arch: armv7l
-            extra-deps: 'rpm ruby ruby-dev rubygems'
-          # flatpak 和 snap 跳过 armv7l
-    env:
-      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        submodules: recursive
-        persist-credentials: false
-
-    - name: Install system dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y strip-nondeterminism fakeroot libarchive-tools ${{ matrix.extra-deps }}
-
-    - name: Install Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: 24
-
-    - name: Install Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.x'
-
-    - name: Install fpm
-      if: matrix.format == 'pacman' || matrix.format == 'rpm'
-      run: sudo gem install --no-document fpm
-
-    - name: Install dependencies
-      run: |
-        rm -f package-lock.json
-        npm install --loglevel=info
-
-    - name: Verify scratch dependencies
-      run: |
-        test -f node_modules/scratch-blocks/blockly_compressed_vertical.js
-        test -f node_modules/scratch-blocks/blocks_compressed_vertical.js
-        node -e "const fs=require('fs'); const paths=['node_modules/@turbowarp/scratch-l10n/locales/editor-msgs.js','node_modules/scratch-gui/node_modules/@turbowarp/scratch-l10n/locales/editor-msgs.js']; if(!paths.some(p=>fs.existsSync(p))){ console.error('Missing editor-msgs.js from @turbowarp/scratch-l10n'); process.exit(1);} "
-
-    - name: Fetch
-      run: npm run fetch
-
-    - name: Compile
-      run: npm run webpack:prod
-
-    - name: Package
-      run: |
-        node release-automation/build.mjs --${{ matrix.format }} --${{ matrix.arch }} --production
-
-    - name: Upload artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: linux-${{ matrix.format }}-${{ matrix.arch }}
-        path: dist/*.*
-        retention-days: 1
-
-  # ==========================================
-  # Linux 产物合并并发布
-  # ==========================================
-  release-linux-publish:
-    needs: [release-linux-amd64, release-linux-arm64, release-linux-armv7l]
+# ==========================================
+# Flatpak (独立构建)
+# ==========================================
+  package-flatpak:
+    needs: build
     runs-on: ubuntu-latest
     steps:
-    - name: Download all artifacts
-      uses: actions/download-artifact@v4
-      with:
-        pattern: linux-*
-        path: dist
-        merge-multiple: true
+      - uses: actions/checkout@v4
 
-    - name: Verify artifacts
-      run: |
-        ls -lh dist/*.deb || true
-        ls -lh dist/*.tar.gz || true
-        ls -lh dist/*.AppImage || true
-        ls -lh dist/*.pkg.tar.zst || true
-        ls -lh dist/*.rpm || true
-        ls -lh dist/*.flatpak || true
-        ls -lh dist/*.snap || true
+      - uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
 
-    - name: Print file tree
-      run: node scripts/print-file-tree.mjs dist
+      - name: Install Flatpak
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y flatpak flatpak-builder
 
-    - name: Upload to GitHub Releases
-      run: |
-        node scripts/upload-to-github-releases.mjs "${{ github.repository_owner }}" "${{ github.event.repository.name }}" "dist/*.deb"
-        node scripts/upload-to-github-releases.mjs "${{ github.repository_owner }}" "${{ github.event.repository.name }}" "dist/*.tar.gz"
-        node scripts/upload-to-github-releases.mjs "${{ github.repository_owner }}" "${{ github.event.repository.name }}" "dist/*.AppImage"
-        node scripts/upload-to-github-releases.mjs "${{ github.repository_owner }}" "${{ github.event.repository.name }}" "dist/*.pkg.tar.zst"
-        node scripts/upload-to-github-releases.mjs "${{ github.repository_owner }}" "${{ github.event.repository.name }}" "dist/*.rpm"
-        node scripts/upload-to-github-releases.mjs "${{ github.repository_owner }}" "${{ github.event.repository.name }}" "dist/*.flatpak" || true
-        node scripts/upload-to-github-releases.mjs "${{ github.repository_owner }}" "${{ github.event.repository.name }}" "dist/*.snap" || true
-      env:
-        GH_TOKEN: "${{ github.token }}"
+      - name: Add Flathub
+        run: |
+          sudo flatpak remote-add --if-not-exists flathub \
+            https://flathub.org/repo/flathub.flatpakrepo
 
-  # ==========================================
-  # Mac 矩阵并行构建 (4个版本)
-  # ==========================================
-  release-mac:
+      - name: Install Runtime
+        run: |
+          sudo flatpak install -y --noninteractive flathub \
+            org.freedesktop.Platform//23.08 \
+            org.freedesktop.Sdk//23.08
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install dependencies
+        run: |
+          rm -f package-lock.json
+          npm install --ignore-scripts
+
+      - name: Build Flatpak
+        run: |
+          flatpak-builder build-dir flatpak/org.astraeditor.AstraEditor.yml --force-clean
+          flatpak build-bundle build-dir AstraEditor.flatpak org.astraeditor.AstraEditor
+          mkdir -p dist
+          mv AstraEditor.flatpak dist/
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux-flatpak-x64
+          path: dist/*.flatpak
+
+# ==========================================
+# Snap
+# ==========================================
+  package-snap:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+
+      - name: Install snapcraft
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y snapd
+          sudo snap install snapcraft --classic
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install dependencies
+        run: |
+          rm -f package-lock.json
+          npm install --ignore-scripts
+
+      - name: Package
+        run: |
+          node release-automation/build.mjs --snap --x64 --production
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux-snap-x64
+          path: dist/*.snap
+
+# ==========================================
+# Mac
+# ==========================================
+  package-mac:
+    needs: build
     runs-on: macos-latest
     strategy:
-      fail-fast: false
       matrix:
         include:
-          - target: modern
-            args: '--mac --universal'
-          - target: legacy-10.13-10.14
-            args: '--mac-legacy-10.13-10.14 --x64'
-          - target: legacy-10.15
-            args: '--mac-legacy-10.15 --x64'
-          - target: legacy-11
-            args: '--mac-legacy-11 --universal'
+          - args: '--mac --universal'
+            name: modern
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        submodules: recursive
-        persist-credentials: false
-    - name: Install Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: 24
+      - uses: actions/checkout@v4
 
-    - name: Install Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.x'
+      - uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
 
-    - name: Install dependencies
-      run: |
-        rm -f package-lock.json
-        npm install --loglevel=info
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
 
-    - name: Verify scratch dependencies
-      run: |
-        test -f node_modules/scratch-blocks/blockly_compressed_vertical.js
-        test -f node_modules/scratch-blocks/blocks_compressed_vertical.js
-        node -e "const fs=require('fs'); const paths=['node_modules/@turbowarp/scratch-l10n/locales/editor-msgs.js','node_modules/scratch-gui/node_modules/@turbowarp/scratch-l10n/locales/editor-msgs.js']; if(!paths.some(p=>fs.existsSync(p))){ console.error('Missing editor-msgs.js from @turbowarp/scratch-l10n'); process.exit(1);} "
+      - name: Install dependencies
+        run: |
+          rm -f package-lock.json
+          npm install --ignore-scripts
 
-    - name: Fetch
-      run: npm run fetch
+      - name: Package
+        run: |
+          node release-automation/build.mjs \
+            ${{ matrix.args }} \
+            --production
 
-    - name: Compile
-      run: npm run webpack:prod
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mac-${{ matrix.name }}
+          path: dist/*.dmg
 
-    - name: Package with signing
-      run: |
-        cleanup() {
-          if [ -n "${APPLE_API_KEY_NAME:-}" ]; then
-            rm -f "$APPLE_API_KEY_NAME"
-          fi
-        }
-        trap cleanup EXIT
-
-        signing_ok=true
-        if [ -z "${CSC_LINK:-}" ] || [ -z "${CSC_KEY_PASSWORD:-}" ]; then
-          signing_ok=false
-        fi
-
-        if [ "$signing_ok" = true ] && ([[ "${CSC_LINK:-}" == /* ]] || [[ "${CSC_LINK:-}" == ./* ]] || [[ "${CSC_LINK:-}" == ../* ]]); then
-          if [ ! -f "$CSC_LINK" ]; then
-            echo "CSC_LINK looks like a path but is not a file; building unsigned."
-            signing_ok=false
-          fi
-        fi
-
-        if [ "$signing_ok" != true ]; then
-          export CSC_IDENTITY_AUTO_DISCOVERY=false
-          unset CSC_LINK
-          unset CSC_KEY_PASSWORD
-        fi
-
-        if [ -n "${APPLE_API_KEY_NAME:-}" ] && [ -n "${APPLE_API_KEY_DATA:-}" ]; then
-          python3 -c "import os; open(os.getenv('APPLE_API_KEY_NAME'), 'w').write(os.getenv('APPLE_API_KEY_DATA'))" >/dev/null 2>&1 || { echo "Failed to write APPLE_API_KEY file"; exit 1; }
-          export APPLE_API_KEY="$(pwd)/$APPLE_API_KEY_NAME"
-        else
-          echo "APPLE_API_KEY_NAME / APPLE_API_KEY_DATA not set; skipping notarization."
-        fi
-
-        node release-automation/build.mjs ${{ matrix.args }} --production
-      env:
-        APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
-        APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
-        APPLE_API_KEY_NAME: ${{ secrets.APPLE_API_KEY_NAME }}
-        APPLE_API_KEY_DATA: ${{ secrets.APPLE_API_KEY_DATA }}
-        CSC_LINK: ${{ secrets.APPLE_CSC_LINK }}
-        CSC_KEY_PASSWORD: ${{ secrets.APPLE_CSC_KEY_PASSWORD }}
-
-    - name: Upload artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: mac-${{ matrix.target }}
-        path: dist/*.dmg
-        retention-days: 1
-
-  # ==========================================
-  # Mac 产物合并并发布
-  # ==========================================
-  release-mac-publish:
-    needs: release-mac
-    runs-on: ubuntu-latest
-    steps:
-    - name: Download all artifacts
-      uses: actions/download-artifact@v4
-      with:
-        pattern: mac-*
-        path: dist
-        merge-multiple: true
-
-    - name: Verify artifacts
-      run: ls -lh dist/*.dmg
-
-    - name: Print file tree
-      run: node scripts/print-file-tree.mjs dist
-
-    - name: Upload to GitHub Releases
-      run: |
-        node scripts/upload-to-github-releases.mjs "${{ github.repository_owner }}" "${{ github.event.repository.name }}" "dist/*.dmg"
-      env:
-        GH_TOKEN: "${{ github.token }}"
-
-  # ==========================================
-  # Windows 矩阵并行构建 (9个job)
-  # ==========================================
-  release-windows:
+# ==========================================
+# Windows
+# ==========================================
+  package-windows:
+    needs: build
     runs-on: windows-latest
     strategy:
-      fail-fast: false
       matrix:
         include:
-          # modern: nsis + appx (3架构)
-          - target: modern-nsis-x64
-            args: '--windows --x64'
-            files: '*.exe'
-          - target: modern-nsis-ia32
-            args: '--windows --ia32'
-            files: '*.exe'
-          - target: modern-nsis-arm64
-            args: '--windows --arm64'
-            files: '*.exe'
-          - target: modern-appx-x64
-            args: '--microsoft-store --x64'
-            files: '*.appx'
-          - target: modern-appx-ia32
-            args: '--microsoft-store --ia32'
-            files: '*.appx'
-          - target: modern-appx-arm64
-            args: '--microsoft-store --arm64'
-            files: '*.appx'
-          # portable: 仅x64
-          - target: portable
-            args: '--windows-portable --x64'
-            files: '*.exe'
-          # legacy: x64 + ia32
-          - target: legacy-x64
-            args: '--windows-legacy --x64'
-            files: '*.exe'
-          - target: legacy-ia32
-            args: '--windows-legacy --ia32'
-            files: '*.exe'
-    env:
-      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+          - args: '--windows --x64'
+            name: nsis-x64
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        submodules: recursive
-        persist-credentials: false
-        path: repo
+      - uses: actions/checkout@v4
+        with:
+          path: repo
 
-    - name: Move to D drive
-      shell: pwsh
-      run: |
-        Copy-Item -Path repo -Destination D:\repo -Recurse
-        Remove-Item -Path repo -Recurse -Force
+      - uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+          path: repo/
 
-    - name: Install Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: 24
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
 
-    - name: Install Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.x'
+      - name: Install dependencies
+        working-directory: repo
+        run: |
+          Remove-Item package-lock.json -Force -ErrorAction SilentlyContinue
+          npm install --ignore-scripts
 
-    - name: Configure npm cache
-      shell: pwsh
-      run: |
-        npm config set cache D:\npm-cache
-        npm config set prefix D:\npm-prefix
+      - name: Package
+        working-directory: repo
+        run: |
+          node release-automation/build.mjs \
+            ${{ matrix.args }} \
+            --production
 
-    - name: Install dependencies
-      working-directory: D:\repo
-      run: |
-        Remove-Item -Path package-lock.json -Force -ErrorAction SilentlyContinue
-        npm install --loglevel=info
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-${{ matrix.name }}
+          path: repo/dist/*.exe
 
-    - name: Verify scratch dependencies
-      working-directory: D:\repo
-      run: |
-        if (!(Test-Path "node_modules\\scratch-blocks\\blockly_compressed_vertical.js")) { throw "Missing blockly_compressed_vertical.js" }
-        if (!(Test-Path "node_modules\\scratch-blocks\\blocks_compressed_vertical.js")) { throw "Missing blocks_compressed_vertical.js" }
-        if (!(Test-Path "node_modules\\@turbowarp\\scratch-l10n\\locales\\editor-msgs.js") -and !(Test-Path "node_modules\\scratch-gui\\node_modules\\@turbowarp\\scratch-l10n\\locales\\editor-msgs.js")) { throw "Missing editor-msgs.js" }
-
-    - name: Fetch
-      working-directory: D:\repo
-      run: npm run fetch
-
-    - name: Compile
-      working-directory: D:\repo
-      run: npm run webpack:prod
-
-    - name: Package
-      working-directory: D:\repo
-      run: |
-        node release-automation/build.mjs ${{ matrix.args }} --production
-
-    - name: Upload artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: windows-${{ matrix.target }}
-        path: D:\repo\dist\${{ matrix.files }}
-        retention-days: 1
-
-  # ==========================================
-  # Windows 签名和发布
-  # ==========================================
-  release-windows-sign:
-    needs: release-windows
-    runs-on: windows-latest
-    env:
-      SIGNPATH_API_TOKEN: ${{ secrets.SIGNPATH_API_TOKEN }}
+# ==========================================
+# 发布到 GitHub Releases
+# ==========================================
+  publish:
+    needs:
+      - package-linux
+      - package-flatpak
+      - package-snap
+      - package-mac
+      - package-windows
+    runs-on: ubuntu-latest
     steps:
-    - name: Download all artifacts
-      uses: actions/download-artifact@v4
-      with:
-        pattern: windows-*
-        path: D:\repo\dist
-        merge-multiple: true
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: '*'
+          path: dist
+          merge-multiple: true
 
-    - name: Verify artifacts
-      run: |
-        Get-ChildItem D:\repo\dist\*.exe | Format-Table Name, Length
-        Get-ChildItem D:\repo\dist\*.appx | Format-Table Name, Length
+      - name: List artifacts
+        run: ls -lh dist/
 
-    - name: Print file tree
-      run: node scripts/print-file-tree.mjs D:\repo\dist
-
-    - name: Upload unsigned to GitHub Actions
-      uses: actions/upload-artifact@v4
-      with:
-        name: windows-unsigned
-        path: D:\repo\dist\*.exe
-
-    - name: Upload appx to GitHub Actions
-      uses: actions/upload-artifact@v4
-      with:
-        name: appx
-        path: D:\repo\dist\*.appx
-
-    - name: Upload for SignPath
-      uses: actions/upload-artifact@v4
-      id: signpath-unsigned
-      with:
-        name: artifact-for-signpath
-        path: |
-          D:\repo\dist\AstraEditor-Setup*x64.exe
-          D:\repo\dist\AstraEditor-Legacy-Setup*x64.exe
-
-    - name: Sign with SignPath
-      if: ${{ env.SIGNPATH_API_TOKEN != '' }}
-      uses: signpath/github-action-submit-signing-request@4f13d373e8f0cd8d3c0465ff4877feff27aed2ae
-      with:
-        api-token: ${{ env.SIGNPATH_API_TOKEN }}
-        organization-id: 04444052-261e-46eb-8168-ed0eee93c57c
-        project-slug: desktop_
-        signing-policy-slug: release-signing
-        github-artifact-id: ${{ steps.signpath-unsigned.outputs.artifact-id }}
-        artifact-configuration-slug: sign_installers
-        wait-for-completion: true
-        output-artifact-directory: D:\repo\dist
-
-    - name: Upload signed to GitHub Actions
-      if: ${{ env.SIGNPATH_API_TOKEN != '' }}
-      uses: actions/upload-artifact@v4
-      with:
-        name: windows-signed
-        path: |
-          D:\repo\dist\AstraEditor-Setup*x64.exe
-          D:\repo\dist\AstraEditor-Legacy-Setup*x64.exe
-
-    - name: Upload to GitHub Releases
-      run: |
-        node scripts/upload-to-github-releases.mjs "${{ github.repository_owner }}" "${{ github.event.repository.name }}" "D:\repo\dist\*.exe"
-        node scripts/upload-to-github-releases.mjs "${{ github.repository_owner }}" "${{ github.event.repository.name }}" "D:\repo\dist\*.appx"
-      env:
-        GH_TOKEN: "${{ github.token }}"
+      - name: Upload to GitHub Releases
+        run: |
+          node scripts/upload-to-github-releases.mjs \
+            "${{ github.repository_owner }}" \
+            "${{ github.event.repository.name }}" \
+            "dist/*"
+        env:
+          GH_TOKEN: "${{ github.token }}"

@@ -1,0 +1,65 @@
+app-id: org.astraeditor.AstraEditor
+runtime: org.freedesktop.Platform
+runtime-version: "23.08"
+sdk: org.freedesktop.Sdk
+command: astraeditor-desktop
+
+finish-args:
+  # Electron 必需
+  - --share=ipc
+  - --socket=x11
+  - --socket=wayland
+
+  # 网络
+  - --share=network
+
+  # 音频
+  - --socket=pulseaudio
+
+  # GPU 加速
+  - --device=dri
+
+  # 允许访问 home（如不需要可删除）
+  - --filesystem=home
+
+  # 主题支持
+  - --filesystem=xdg-data/themes:ro
+
+modules:
+  - name: astraeditor
+    buildsystem: simple
+    build-commands:
+      # 安装主程序
+      - install -Dm755 astraeditor-desktop /app/bin/astraeditor-desktop
+
+      # desktop
+      - install -Dm644 org.astraeditor.AstraEditor.desktop \
+          /app/share/applications/org.astraeditor.AstraEditor.desktop
+
+      # metainfo
+      - install -Dm644 org.astraeditor.AstraEditor.metainfo.xml \
+          /app/share/metainfo/org.astraeditor.AstraEditor.metainfo.xml
+
+      # mime
+      - install -Dm644 org.astraeditor.AstraEditor.mime.xml \
+          /app/share/mime/packages/org.astraeditor.AstraEditor.mime.xml
+
+      # icon (必须与 app-id 同名)
+      - install -Dm644 icon.png \
+          /app/share/icons/hicolor/256x256/apps/org.astraeditor.AstraEditor.png
+
+    sources:
+      - type: file
+        path: ../dist-linux/astraeditor-desktop
+
+      - type: file
+        path: files/org.astraeditor.AstraEditor.desktop
+
+      - type: file
+        path: files/org.astraeditor.AstraEditor.metainfo.xml
+
+      - type: file
+        path: files/org.astraeditor.AstraEditor.mime.xml
+
+      - type: file
+        path: assets/icon.png
