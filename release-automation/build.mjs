@@ -396,6 +396,9 @@ const buildFlatpak = () => build({
   platformType: 'flatpak',
   manageUpdates: true,
   extraConfig: {
+    directories: {
+      output: "dist-linux"
+    },
     flatpak: {
       runtime: 'org.freedesktop.Platform',
       runtimeVersion: '23.08',
@@ -414,7 +417,6 @@ const buildFlatpak = () => build({
     }
   }
 });
-
 const buildSnap = () => build({
   platformName: 'LINUX',
   platformType: 'snap',
