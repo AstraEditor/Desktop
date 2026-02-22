@@ -54,6 +54,7 @@ jobs:
 # Linux 多格式打包
 # ==========================================
   package-linux:
+    needs: build
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -128,9 +129,6 @@ jobs:
       with:
         name: linux-build
         path: dist-linux
-
-    - name: Install dependencies
-      run: npm ci
 
     - name: Build Linux app
       run: npm run build:linux
