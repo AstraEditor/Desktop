@@ -54,7 +54,6 @@ jobs:
 # Linux 多格式打包
 # ==========================================
   package-linux:
-    needs: build
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
