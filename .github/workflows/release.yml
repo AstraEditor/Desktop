@@ -123,6 +123,9 @@ jobs:
         flatpak --user remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
         flatpak --user install -y --noninteractive flathub org.freedesktop.Platform//23.08
         flatpak --user install -y --noninteractive flathub org.freedesktop.Sdk//23.08
+  
+    - name: Install dependencies
+      run: npm ci
 
     - name: Download build artifacts
       uses: actions/download-artifact@v4

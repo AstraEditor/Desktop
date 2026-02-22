@@ -123,6 +123,9 @@ jobs:
         flatpak --user remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
         flatpak --user install -y flathub org.freedesktop.Platform/x86_64/23.08
         flatpak --user install -y flathub org.freedesktop.Sdk/x86_64/23.08
+      
+    - name: Install dependencies
+      run: npm ci
 
     - name: Build Linux app
       run: npm run build:linux
@@ -131,7 +134,7 @@ jobs:
       run: |
         mkdir -p dist-linux
         cp dist-linux/linux-unpacked/astraeditor-desktop dist-linux/
-  
+        
     - name: Build Flatpak
       run: |
         flatpak-builder --user build-dir flatpak/org.astraeditor.AstraEditor.yml --force-clean
