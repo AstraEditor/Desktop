@@ -45,7 +45,7 @@ jobs:
         retention-days: 1
 
   # ==========================================
-  # Linux AMD64 打包 (仅 x64)
+  # Linux 标准格式打包 (5格式 × 3架构)
   # ==========================================
   package-linux:
     needs: build
@@ -53,17 +53,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        format: [debian, tarball, appimage, pacman, rpm, flatpak, snap]
-        arch: [x64]
+        format: [debian, tarball, appimage, pacman, rpm]
+        arch: [x64, armv7l, arm64]
         include:
           - format: pacman
             extra-deps: 'ruby ruby-dev rubygems libarchive-tools'
           - format: rpm
             extra-deps: 'rpm ruby ruby-dev rubygems'
-          - format: flatpak
-            extra-deps: 'flatpak flatpak-builder'
-          - format: snap
-            extra-deps: 'snapd'
     env:
       PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
     steps:
@@ -82,22 +78,6 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y strip-nondeterminism fakeroot ${{ matrix.extra-deps }}
-
-    - name: Setup Flatpak
-      if: matrix.format == 'flatpak'
-      run: |
-        sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-        sudo flatpak install -y --noninteractive flathub org.freedesktop.Platform/x86_64/23.08
-        sudo flatpak install -y --noninteractive flathub org.freedesktop.Sdk/x86_64/23.08
-
-    - name: Setup Snapcraft
-      if: matrix.format == 'snap'
-      run: |
-        sudo snap install snapcraft --classic
-        sudo snap install lxd
-        sudo lxd init --auto
-        sudo usermod -aG lxd $USER
-        newgrp lxd
 
     - name: Install Node.js
       uses: actions/setup-node@v4
@@ -122,6 +102,114 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: linux-${{ matrix.format }}-${{ matrix.arch }}
+        path: dist/*.*
+        retention-days: 1
+
+  # ==========================================
+  # Linux Flatpak 打包 (仅 x64)
+  # ==========================================
+  package-linux-flatpak:
+    needs: build
+    runs-on: ubuntu-latest
+    env:
+      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        persist-credentials: false
+
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: build-artifacts
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y strip-nondeterminism fakeroot flatpak flatpak-builder
+
+    - name: Setup Flatpak
+      run: |
+        sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+        sudo flatpak install -y --noninteractive flathub org.freedesktop.Platform/x86_64/23.08
+        sudo flatpak install -y --noninteractive flathub org.freedesktop.Sdk/x86_64/23.08
+
+    - name: Install Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 24
+        cache: 'npm'
+
+    - name: Install dependencies (skip postinstall)
+      run: |
+        rm -f package-lock.json
+        npm install --loglevel=info --ignore-scripts
+
+    - name: Package
+      run: |
+        node release-automation/build.mjs --flatpak --x64 --production
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: linux-flatpak-x64
+        path: dist/*.*
+        retention-days: 1
+
+  # ==========================================
+  # Linux Snap 打包 (仅 x64)
+  # ==========================================
+  package-linux-snap:
+    needs: build
+    runs-on: ubuntu-latest
+    env:
+      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        persist-credentials: false
+
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: build-artifacts
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y strip-nondeterminism fakeroot snapd
+
+    - name: Setup Snapcraft
+      run: |
+        sudo snap install snapcraft --classic
+        sudo snap install lxd
+        sudo lxd init --auto
+        sudo usermod -aG lxd $USER
+        newgrp lxd
+
+    - name: Install Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 24
+        cache: 'npm'
+
+    - name: Install dependencies (skip postinstall)
+      run: |
+        rm -f package-lock.json
+        npm install --loglevel=info --ignore-scripts
+
+    - name: Package
+      run: |
+        node release-automation/build.mjs --snap --x64 --production
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: linux-snap-x64
         path: dist/*.*
         retention-days: 1
 
