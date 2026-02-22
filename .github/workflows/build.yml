@@ -5,32 +5,64 @@ on:
 
 jobs:
   # ==========================================
-  # Linux AMD64 构建 (ubuntu-latest)
+  # 统一构建步骤 (webpack:prod)
   # ==========================================
-  
-  build-linux-amd64:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        persist-credentials: false
+
+    - name: Install Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 24
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: |
+        rm -f package-lock.json
+        npm install --loglevel=info
+
+    - name: Fetch
+      run: npm run fetch
+
+    - name: Compile (webpack:prod)
+      run: npm run webpack:prod
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-artifacts
+        path: |
+          dist-astra-extensions/
+          dist-extensions/
+          dist-library-files/
+          dist-renderer-webpack/
+        retention-days: 1
+
+  # ==========================================
+  # Linux AMD64 打包 (仅 x64)
+  # ==========================================
+  package-linux:
+    needs: build
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
+        format: [debian, tarball, appimage, pacman, rpm, flatpak, snap]
+        arch: [x64]
         include:
-          - format: debian
-            arch: x64
-          - format: tarball
-            arch: x64
-          - format: appimage
-            arch: x64
           - format: pacman
-            arch: x64
             extra-deps: 'ruby ruby-dev rubygems libarchive-tools'
           - format: rpm
-            arch: x64
             extra-deps: 'rpm ruby ruby-dev rubygems'
           - format: flatpak
-            arch: x64
             extra-deps: 'flatpak flatpak-builder'
           - format: snap
-            arch: x64
             extra-deps: 'snapd'
     env:
       PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
@@ -40,6 +72,11 @@ jobs:
       with:
         submodules: recursive
         persist-credentials: false
+
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: build-artifacts
 
     - name: Install system dependencies
       run: |
@@ -72,16 +109,10 @@ jobs:
       if: matrix.format == 'pacman' || matrix.format == 'rpm'
       run: sudo gem install --no-document fpm
 
-    - name: Install dependencies
+    - name: Install dependencies (skip postinstall)
       run: |
         rm -f package-lock.json
-        npm install --loglevel=info
-
-    - name: Fetch
-      run: npm run fetch
-
-    - name: Compile
-      run: npm run webpack:prod
+        npm install --loglevel=info --ignore-scripts
 
     - name: Package
       run: |
@@ -95,174 +126,10 @@ jobs:
         retention-days: 1
 
   # ==========================================
-  # Linux ARM64 构建 (ubuntu-24.04-arm)
+  # Mac 打包
   # ==========================================
-  
-  build-linux-arm64:
-    runs-on: ubuntu-24.04-arm
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - format: debian
-            arch: arm64
-          - format: tarball
-            arch: arm64
-          - format: appimage
-            arch: arm64
-          - format: pacman
-            arch: arm64
-            extra-deps: 'ruby ruby-dev rubygems libarchive-tools'
-          - format: rpm
-            arch: arm64
-            extra-deps: 'rpm ruby ruby-dev rubygems'
-          - format: flatpak
-            arch: arm64
-            extra-deps: 'flatpak flatpak-builder'
-          - format: snap
-            arch: arm64
-            extra-deps: 'snapd'
-    env:
-      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        submodules: recursive
-        persist-credentials: false
-
-    - name: Install system dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y strip-nondeterminism fakeroot ${{ matrix.extra-deps }}
-
-    - name: Setup Flatpak
-      if: matrix.format == 'flatpak'
-      run: |
-        sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-        sudo flatpak install -y --noninteractive flathub org.freedesktop.Platform/aarch64/23.08
-        sudo flatpak install -y --noninteractive flathub org.freedesktop.Sdk/aarch64/23.08
-
-    - name: Setup Snapcraft
-      if: matrix.format == 'snap'
-      run: |
-        sudo snap install snapcraft --classic
-        sudo snap install lxd
-        sudo lxd init --auto
-        sudo usermod -aG lxd $USER
-        newgrp lxd
-
-    - name: Install Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: 24
-        cache: 'npm'
-
-    - name: Install fpm
-      if: matrix.format == 'pacman' || matrix.format == 'rpm'
-      run: sudo gem install --no-document fpm
-
-    - name: Install dependencies
-      run: |
-        rm -f package-lock.json
-        npm install --loglevel=info
-
-    - name: Fetch
-      run: npm run fetch
-
-    - name: Compile
-      run: npm run webpack:prod
-
-    - name: Package
-      run: |
-        node release-automation/build.mjs --${{ matrix.format }} --${{ matrix.arch }} --production
-
-    - name: Upload artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: linux-${{ matrix.format }}-${{ matrix.arch }}
-        path: dist/*.*
-        retention-days: 1
-
-  # ==========================================
-  # Linux ARMv7l 构建 (ubuntu-24.04-arm + 模拟)
-  # ==========================================
-  
-  build-linux-armv7l:
-    runs-on: ubuntu-24.04-arm
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - format: debian
-            arch: armv7l
-          - format: tarball
-            arch: armv7l
-          - format: appimage
-            arch: armv7l
-          - format: pacman
-            arch: armv7l
-            extra-deps: 'ruby ruby-dev rubygems libarchive-tools'
-          - format: rpm
-            arch: armv7l
-            extra-deps: 'rpm ruby ruby-dev rubygems'
-          # flatpak 和 snap 跳过 armv7l（支持差/没必要）
-    env:
-      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        submodules: recursive
-        persist-credentials: false
-
-    - name: Install system dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y strip-nondeterminism fakeroot ${{ matrix.extra-deps }}
-
-    - name: Install Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: 24
-        cache: 'npm'
-
-    - name: Install fpm
-      if: matrix.format == 'pacman' || matrix.format == 'rpm'
-      run: sudo gem install --no-document fpm
-
-    - name: Configure git to use HTTPS instead of SSH
-      run: |
-        git config --global url."https://${{ secrets.GITHUB_TOKEN }}:x-oauth-basic@github.com/".insteadOf "ssh://git@github.com/"
-        git config --global url."https://${{ secrets.GITHUB_TOKEN }}:x-oauth-basic@github.com/".insteadOf "git@github.com:"
-
-    - name: Install dependencies
-      run: |
-        rm -f package-lock.json
-        npm install --loglevel=info --ver
-
-    - name: Fetch
-      run: npm run fetch
-
-    - name: Compile
-      run: npm run webpack:prod
-
-    - name: Package
-      run: |
-        node release-automation/build.mjs --${{ matrix.format }} --${{ matrix.arch }} --production
-
-    - name: Upload artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: linux-${{ matrix.format }}-${{ matrix.arch }}
-        path: dist/*.*
-        retention-days: 1
-
-  # ==========================================
-  # Mac 构建 (modern universal + legacy x64)
-  # ==========================================
-
-  build-mac:
+  package-mac:
+    needs: build
     runs-on: macos-latest
     strategy:
       fail-fast: false
@@ -283,28 +150,21 @@ jobs:
         submodules: recursive
         persist-credentials: false
 
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: build-artifacts
+
     - name: Install Node.js
       uses: actions/setup-node@v4
       with:
         node-version: 24
         cache: 'npm'
 
-    - name: Configure git to use HTTPS instead of SSH
-      run: |
-        git config --global url."https://${{ secrets.GITHUB_TOKEN }}:x-oauth-basic@github.com/".insteadOf "ssh://git@github.com/"
-        git config --global url."https://${{ secrets.GITHUB_TOKEN }}:x-oauth-basic@github.com/".insteadOf "git@github.com:"
-
-
-    - name: Install dependencies
+    - name: Install dependencies (skip postinstall)
       run: |
         rm -f package-lock.json
-        npm install --loglevel=info
-
-    - name: Fetch
-      run: npm run fetch
-
-    - name: Compile
-      run: npm run webpack:prod
+        npm install --loglevel=info --ignore-scripts
 
     - name: Package
       run: |
@@ -317,18 +177,16 @@ jobs:
         path: dist/*.dmg
         retention-days: 1
 
-
   # ==========================================
-  # Windows 矩阵并行构建
+  # Windows 打包
   # ==========================================
-
-  build-windows:
+  package-windows:
+    needs: build
     runs-on: windows-latest
     strategy:
       fail-fast: false
       matrix:
         include:
-          # modern: nsis + appx (3架构)
           - target: modern-nsis-x64
             args: '--windows --x64'
             files: '*.exe'
@@ -347,17 +205,17 @@ jobs:
           - target: modern-appx-arm64
             args: '--microsoft-store --arm64'
             files: '*.appx'
-          # portable: 仅x64
           - target: portable
             args: '--windows-portable --x64'
             files: '*.exe'
-          # legacy: x64 + ia32
           - target: legacy-x64
             args: '--windows-legacy --x64'
             files: '*.exe'
           - target: legacy-ia32
             args: '--windows-legacy --ia32'
             files: '*.exe'
+    env:
+      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
     steps:
     - name: Checkout
       uses: actions/checkout@v4
@@ -372,6 +230,12 @@ jobs:
         Copy-Item -Path repo -Destination D:\repo -Recurse
         Remove-Item -Path repo -Recurse -Force
 
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: build-artifacts
+        path: D:\repo\
+
     - name: Install Node.js
       uses: actions/setup-node@v4
       with:
@@ -383,24 +247,11 @@ jobs:
         npm config set cache D:\npm-cache
         npm config set prefix D:\npm-prefix
 
-    - name: Configure git to use HTTPS instead of SSH
-      run: |
-        git config --global url."https://${{ secrets.GITHUB_TOKEN }}:x-oauth-basic@github.com/".insteadOf "ssh://git@github.com/"
-        git config --global url."https://${{ secrets.GITHUB_TOKEN }}:x-oauth-basic@github.com/".insteadOf "git@github.com:"
-
-    - name: Install dependencies
+    - name: Install dependencies (skip postinstall)
       working-directory: D:\repo
       run: |
         Remove-Item -Path package-lock.json -Force -ErrorAction SilentlyContinue
-        npm install --loglevel=info
-
-    - name: Fetch
-      working-directory: D:\repo
-      run: npm run fetch
-
-    - name: Compile
-      working-directory: D:\repo
-      run: npm run webpack:prod
+        npm install --loglevel=info --ignore-scripts
 
     - name: Package
       working-directory: D:\repo
