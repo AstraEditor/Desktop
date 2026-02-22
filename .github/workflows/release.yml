@@ -103,70 +103,50 @@ jobs:
   package-flatpak:
     needs: build
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x64
     steps:
-      - uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 24
+    - name: Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: 24
 
-      - name: Install dependencies
-        run: npm ci
+    - name: Install Flatpak & Runtime
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y flatpak flatpak-builder
+        flatpak --user remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+        flatpak --user install -y --noninteractive flathub org.freedesktop.Platform//23.08
+        flatpak --user install -y --noninteractive flathub org.freedesktop.Sdk//23.08
 
-      - name: Build Linux app
-        run: npm run build:linux  
-        
-      - uses: actions/download-artifact@v4
-        with:
-          name: build-artifacts
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: linux-build
+        path: dist-linux
 
-      - name: Install Flatpak
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y flatpak flatpak-builder
-          flatpak --user remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-          flatpak --user install -y flathub org.freedesktop.Platform/x86_64/23.08
-          flatpak --user install -y flathub org.freedesktop.Sdk/x86_64/23.08
+    - name: Install dependencies
+      run: npm ci
 
-      - name: Add Flathub
-        run: |
-          flatpak --user remote-add --if-not-exists flathub \
-            https://flathub.org/repo/flathub.flatpakrepo
+    - name: Build Linux app
+      run: npm run build:linux
 
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: linux-build
-          path: dist-linux
-          
-      - name: Install Runtime
-        run: |
-          flatpak --user install -y --noninteractive flathub \
-            org.freedesktop.Platform//23.08 \
-            org.freedesktop.Sdk//23.08
+    - name: Build Flatpak
+      run: |
+        flatpak-builder --user build-dir flatpak/org.astraeditor.AstraEditor.yml --force-clean
+        flatpak --user build-bundle build-dir AstraEditor.flatpak org.astraeditor.AstraEditor
+        mkdir -p dist
+        mv AstraEditor.flatpak dist/
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 24
-
-      - name: Install dependencies
-        run: |
-          rm -f package-lock.json
-          npm install --ignore-scripts
-
-      - name: Build Flatpak
-        run: |
-          flatpak-builder --user build-dir flatpak/org.astraeditor.AstraEditor.yml --force-clean
-          flatpak --user build-bundle build-dir AstraEditor.flatpak org.astraeditor.AstraEditor
-          mkdir -p dist
-          mv AstraEditor.flatpak dist/
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: linux-flatpak-x64
-          path: dist/*.flatpak
-
+    - uses: actions/upload-artifact@v4
+      with:
+        name: linux-flatpak-x64
+        path: dist/*.flatpak
 # ==========================================
 # Snap
 # ==========================================
