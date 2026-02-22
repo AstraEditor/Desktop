@@ -415,6 +415,39 @@ const buildFlatpak = () => build({
   }
 });
 
+const buildSnap = () => build({
+  platformName: 'LINUX',
+  platformType: 'snap',
+  manageUpdates: true,
+  extraConfig: {
+    snap: {
+      confinement: 'strict',
+      grade: 'stable',
+      assumes: ['command-chain'],
+      plugs: [
+        'default',
+        'home',
+        'network',
+        'network-bind',
+        'audio-playback',
+        'audio-record',
+        'desktop',
+        'desktop-legacy',
+        'wayland',
+        'x11',
+        'opengl',
+        'browser-support',
+        'pulseaudio',
+        'camera',
+        'removable-media'
+      ],
+      base: 'core22',
+      buildPackages: [],
+      stagePackages: ['default']
+    }
+  }
+});
+
 const run = async () => {
   const options = {
     '--windows': buildWindows,
@@ -433,7 +466,8 @@ const run = async () => {
     '--linux-dir': buildLinuxDir,
     '--pacman': buildPacman,
     '--rpm': buildRpm,
-    '--flatpak': buildFlatpak
+    '--flatpak': buildFlatpak,
+    '--snap': buildSnap
   };
 
   let built = 0;

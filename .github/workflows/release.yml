@@ -10,21 +10,225 @@ permissions:
 
 jobs:
   # ==========================================
-  # Linux 矩阵并行构建 (5格式 × 3架构 = 15个job)
+  # Linux AMD64 构建 (ubuntu-latest)
   # ==========================================
-  release-linux:
-    
+  release-linux-amd64:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        format: [debian, tarball, appimage, pacman, rpm, flatpak]
-        arch: [x64, armv7l, arm64]
         include:
+          - format: debian
+            arch: x64
+          - format: tarball
+            arch: x64
+          - format: appimage
+            arch: x64
           - format: pacman
+            arch: x64
             extra-deps: 'ruby ruby-dev rubygems libarchive-tools'
           - format: rpm
+            arch: x64
             extra-deps: 'rpm ruby ruby-dev rubygems'
+          - format: flatpak
+            arch: x64
+            extra-deps: 'flatpak flatpak-builder'
+          - format: snap
+            arch: x64
+            extra-deps: 'snapd'
+    env:
+      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        persist-credentials: false
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y strip-nondeterminism fakeroot libarchive-tools ${{ matrix.extra-deps }}
+
+    - name: Setup Flatpak
+      if: matrix.format == 'flatpak'
+      run: |
+        sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+        sudo flatpak install -y --noninteractive flathub org.freedesktop.Platform/x86_64/23.08
+        sudo flatpak install -y --noninteractive flathub org.freedesktop.Sdk/x86_64/23.08
+
+    - name: Setup Snapcraft
+      if: matrix.format == 'snap'
+      run: |
+        sudo snap install snapcraft --classic
+        sudo snap install lxd
+        sudo lxd init --auto
+        sudo usermod -aG lxd $USER
+        newgrp lxd
+
+    - name: Install Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 24
+
+    - name: Install Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
+
+    - name: Install fpm
+      if: matrix.format == 'pacman' || matrix.format == 'rpm'
+      run: sudo gem install --no-document fpm
+
+    - name: Install dependencies
+      run: |
+        rm -f package-lock.json
+        npm install --loglevel=info
+
+    - name: Verify scratch dependencies
+      run: |
+        test -f node_modules/scratch-blocks/blockly_compressed_vertical.js
+        test -f node_modules/scratch-blocks/blocks_compressed_vertical.js
+        node -e "const fs=require('fs'); const paths=['node_modules/@turbowarp/scratch-l10n/locales/editor-msgs.js','node_modules/scratch-gui/node_modules/@turbowarp/scratch-l10n/locales/editor-msgs.js']; if(!paths.some(p=>fs.existsSync(p))){ console.error('Missing editor-msgs.js from @turbowarp/scratch-l10n'); process.exit(1);} "
+
+    - name: Fetch
+      run: npm run fetch
+
+    - name: Compile
+      run: npm run webpack:prod
+
+    - name: Package
+      run: |
+        node release-automation/build.mjs --${{ matrix.format }} --${{ matrix.arch }} --production
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: linux-${{ matrix.format }}-${{ matrix.arch }}
+        path: dist/*.*
+        retention-days: 1
+
+  # ==========================================
+  # Linux ARM64 构建 (ubuntu-24.04-arm)
+  # ==========================================
+  release-linux-arm64:
+    runs-on: ubuntu-24.04-arm
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - format: debian
+            arch: arm64
+          - format: tarball
+            arch: arm64
+          - format: appimage
+            arch: arm64
+          - format: pacman
+            arch: arm64
+            extra-deps: 'ruby ruby-dev rubygems libarchive-tools'
+          - format: rpm
+            arch: arm64
+            extra-deps: 'rpm ruby ruby-dev rubygems'
+          - format: flatpak
+            arch: arm64
+            extra-deps: 'flatpak flatpak-builder'
+          - format: snap
+            arch: arm64
+            extra-deps: 'snapd'
+    env:
+      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        persist-credentials: false
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y strip-nondeterminism fakeroot libarchive-tools ${{ matrix.extra-deps }}
+
+    - name: Setup Flatpak
+      if: matrix.format == 'flatpak'
+      run: |
+        sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+        sudo flatpak install -y --noninteractive flathub org.freedesktop.Platform/aarch64/23.08
+        sudo flatpak install -y --noninteractive flathub org.freedesktop.Sdk/aarch64/23.08
+
+    - name: Setup Snapcraft
+      if: matrix.format == 'snap'
+      run: |
+        sudo snap install snapcraft --classic
+        sudo snap install lxd
+        sudo lxd init --auto
+        sudo usermod -aG lxd $USER
+        newgrp lxd
+
+    - name: Install Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 24
+
+    - name: Install Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
+
+    - name: Install fpm
+      if: matrix.format == 'pacman' || matrix.format == 'rpm'
+      run: sudo gem install --no-document fpm
+
+    - name: Install dependencies
+      run: |
+        rm -f package-lock.json
+        npm install --loglevel=info
+
+    - name: Verify scratch dependencies
+      run: |
+        test -f node_modules/scratch-blocks/blockly_compressed_vertical.js
+        test -f node_modules/scratch-blocks/blocks_compressed_vertical.js
+        node -e "const fs=require('fs'); const paths=['node_modules/@turbowarp/scratch-l10n/locales/editor-msgs.js','node_modules/scratch-gui/node_modules/@turbowarp/scratch-l10n/locales/editor-msgs.js']; if(!paths.some(p=>fs.existsSync(p))){ console.error('Missing editor-msgs.js from @turbowarp/scratch-l10n'); process.exit(1);} "
+
+    - name: Fetch
+      run: npm run fetch
+
+    - name: Compile
+      run: npm run webpack:prod
+
+    - name: Package
+      run: |
+        node release-automation/build.mjs --${{ matrix.format }} --${{ matrix.arch }} --production
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: linux-${{ matrix.format }}-${{ matrix.arch }}
+        path: dist/*.*
+        retention-days: 1
+
+  # ==========================================
+  # Linux ARMv7l 构建 (ubuntu-24.04-arm)
+  # ==========================================
+  release-linux-armv7l:
+    runs-on: ubuntu-24.04-arm
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - format: debian
+            arch: armv7l
+          - format: tarball
+            arch: armv7l
+          - format: appimage
+            arch: armv7l
+          - format: pacman
+            arch: armv7l
+            extra-deps: 'ruby ruby-dev rubygems libarchive-tools'
+          - format: rpm
+            arch: armv7l
+            extra-deps: 'rpm ruby ruby-dev rubygems'
+          # flatpak 和 snap 跳过 armv7l
     env:
       PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
     steps:
@@ -85,7 +289,7 @@ jobs:
   # Linux 产物合并并发布
   # ==========================================
   release-linux-publish:
-    needs: release-linux
+    needs: [release-linux-amd64, release-linux-arm64, release-linux-armv7l]
     runs-on: ubuntu-latest
     steps:
     - name: Download all artifacts
@@ -102,6 +306,8 @@ jobs:
         ls -lh dist/*.AppImage || true
         ls -lh dist/*.pkg.tar.zst || true
         ls -lh dist/*.rpm || true
+        ls -lh dist/*.flatpak || true
+        ls -lh dist/*.snap || true
 
     - name: Print file tree
       run: node scripts/print-file-tree.mjs dist
@@ -113,6 +319,8 @@ jobs:
         node scripts/upload-to-github-releases.mjs "${{ github.repository_owner }}" "${{ github.event.repository.name }}" "dist/*.AppImage"
         node scripts/upload-to-github-releases.mjs "${{ github.repository_owner }}" "${{ github.event.repository.name }}" "dist/*.pkg.tar.zst"
         node scripts/upload-to-github-releases.mjs "${{ github.repository_owner }}" "${{ github.event.repository.name }}" "dist/*.rpm"
+        node scripts/upload-to-github-releases.mjs "${{ github.repository_owner }}" "${{ github.event.repository.name }}" "dist/*.flatpak" || true
+        node scripts/upload-to-github-releases.mjs "${{ github.repository_owner }}" "${{ github.event.repository.name }}" "dist/*.snap" || true
       env:
         GH_TOKEN: "${{ github.token }}"
 
