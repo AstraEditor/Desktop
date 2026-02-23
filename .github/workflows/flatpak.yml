@@ -5,18 +5,16 @@ on:
   pull_request:
 
 jobs:
-  # ================================
-  # Node 构建
-  # ================================
-  build-node:
+  build-linux-flatpak:
     runs-on: ubuntu-latest
-    outputs:
-      dist-path: ${{ steps.set-dist-path.outputs.dist-path }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # -----------------------------
+      # 安装 Node
+      # -----------------------------
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -30,39 +28,10 @@ jobs:
       - name: Fetch assets
         run: npm run fetch
 
-      - name: Build Linux app
-        run: npm run build:linux
-
-      - name: Prepare Flatpak sources
-        id: set-dist-path
-        run: |
-          cp -r dist-linux/linux-unpacked/astraeditor-desktop dist-linux/
-          echo "dist-path=dist-linux" >> $GITHUB_OUTPUT
-
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: linux-build
-          path: dist-linux/
-
-  # ================================
-  # Flatpak 构建
-  # ================================
-  build-flatpak:
-    runs-on: ubuntu-latest
-    needs: build-node
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Download build artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: linux-build
-          path: dist-linux
-
-      - name: Install Flatpak
+      # -----------------------------
+      # 安装 Flatpak & Runtime
+      # -----------------------------
+      - name: Install Flatpak & Runtimes
         run: |
           sudo apt-get update
           sudo apt-get install -y flatpak flatpak-builder
@@ -78,26 +47,19 @@ jobs:
           echo "========== INSTALLED SYSTEM RUNTIMES =========="
           sudo flatpak list --system
 
-      - name: Build Flatpak
+      # -----------------------------
+      # 构建 Linux + Flatpak
+      # -----------------------------
+      - name: Build Linux + Flatpak
         run: |
-          sudo flatpak-builder \
-            --repo=repo \
-            --force-clean \
-            --system \
-            build-dir \
-            flatpak/org.astraeditor.AstraEditor.yml
+          npm run build:linux
 
-          flatpak build-bundle \
-            repo \
-            AstraEditor.flatpak \
-            org.astraeditor.AstraEditor
-
-          mkdir -p dist
-          mv AstraEditor.flatpak dist/
-
+      # -----------------------------
+      # 上传 Flatpak 构建产物
+      # -----------------------------
       - name: Upload Flatpak artifact
         uses: actions/upload-artifact@v4
         with:
           name: linux-flatpak-x64
-          path: dist/*.flatpak
+          path: dist-linux/*.flatpak
           retention-days: 1
