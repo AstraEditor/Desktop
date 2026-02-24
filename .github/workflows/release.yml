@@ -276,21 +276,18 @@ jobs:
 # 发布到 GitHub Releases
 # ==========================================
   publish:
-    needs:
-      - package-linux
-      - package-snap
-      - package-mac
-      - package-windows
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v4
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
         with:
           pattern: '*'
           path: dist
           merge-multiple: true
-
-      - name: List artifacts
-        run: ls -lh dist/
 
       - name: Upload to GitHub Releases
         run: |
