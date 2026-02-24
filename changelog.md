@@ -17,6 +17,7 @@ Prefix notes with "Windows:", "macOS:", or "Linux:" as needed. Do not use **form
 - 增加“AstraEditor”扩展库按钮
 - 删除“扩展编辑器”功能，我们计划重新制作它
 - 优化扩展删除&加载
+- 来自AE扩展库的部分扩展可以显示扩展图了
 
 # 1.1.2 (2026-02-14)
 
