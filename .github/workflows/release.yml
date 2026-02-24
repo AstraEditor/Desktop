@@ -276,6 +276,13 @@ jobs:
 # 发布到 GitHub Releases
 # ==========================================
   publish:
+    needs:
+      - package-linux
+      - package-snap
+      - package-mac
+      - package-windows
+    runs-on: ubuntu-latest
+    steps:
     runs-on: ubuntu-latest
     steps:
 
