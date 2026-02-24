@@ -8,7 +8,7 @@ Prefix notes with "Windows:", "macOS:", or "Linux:" as needed. Do not use **form
 - 修改“调试器”中收藏功能的图标
 - 增加“AstraEditor特性”和“基础设置”
 - 修复部分情况下的主题色错误
-- 修复AstraEditor的默认设置为“undefined”的错误
+- 修复 AstraEditor 的默认设置为“undefined”的错误
 - 修复对于过老版本的更新链接还是TurboWarp的问题
 - 修复“循环计时器”默认关闭的问题
 - 为README功能增加显示HTML支持，这需要启用“启用HTML支持”设置
