@@ -1,9 +1,7 @@
 name: flatpak
 
 on:
-  push:
-  pull_request:
-
+  workflow_dispatch:
 jobs:
   build-linux-flatpak:
     runs-on: ubuntu-latest
