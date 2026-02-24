@@ -16,6 +16,7 @@ Prefix notes with "Windows:", "macOS:", or "Linux:" as needed. Do not use **form
 - 让扩展库加载失败的时候也能显示其它的扩展库
 - 增加“AstraEditor”扩展库按钮
 - 删除“扩展编辑器”功能，我们计划重新制作它
+- 优化扩展删除&加载
 
 # 1.1.2 (2026-02-14)
 
