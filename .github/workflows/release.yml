@@ -296,7 +296,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           pattern: '*'
-          path: dist
+          path: "dist/*.{exe,dmg,deb,zip,tar.gz,AppImage,snap,rpm,zst,appx}"
           merge-multiple: true
 
       - name: Upload to GitHub Releases
