@@ -28,14 +28,14 @@ pkgver=REPLACE_ME_VERSION
 pkgrel=1
 pkgdesc='AstraEditor is a TurboWarp mod used to add more practical features to make your writing lightning fast.'
 arch=('x86_64' 'aarch64' 'armv7h')
-url='https://github.com/AstraEditor/Desktop'
+url='https://github.com/AstraEditor/'
 license=('GPL3')
 makedepends=('nodejs' 'npm' 'git' 'python')
 depends=('alsa-lib' 'gtk3' 'nss' 'libxss' 'libxtst' 'xdg-utils' 'hicolor-icon-theme' 'at-spi2-core' 'libdrm' 'mesa' 'libxcb' 'libnotify')
 provides=('astraeditor')
 conflicts=('astraeditor')
 options=(!strip !debug)
-source=("${pkgname}::git+${url}.git")
+source=("${pkgname}::git+Desktop${url}.git")
 sha256sums=('SKIP')
 
 build() {
@@ -49,8 +49,7 @@ build() {
   [[ "$CARCH" == "aarch64" ]] && _target_arch="arm64"
   [[ "$CARCH" == "armv7h" ]] && _target_arch="armv7l"
 
-  npx electron-builder --linux --dir --$_target_arch -c.projectDir=.
-}
+  npx electron-builder --linux --dir --$_target_arch
 
 package() {
   cd "$pkgname"
@@ -95,7 +94,7 @@ pkgbase = astraeditor-git
 	pkgdesc = AstraEditor is a TurboWarp mod used to add more practical features to make your writing lightning fast.
 	pkgver = ${VERSION}
 	pkgrel = 1
-	url = https://github.com/AstraEditor/Desktop
+	url = https://github.com/AstraEditor/
 	arch = x86_64
 	arch = aarch64
 	arch = armv7h
