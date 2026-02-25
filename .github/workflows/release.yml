@@ -12,9 +12,8 @@ env:
   PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
 
 jobs:
-
 # ==========================================
-# 统一构建阶段 (webpack:prod)
+# 统一构建阶段
 # ==========================================
   build:
     runs-on: ubuntu-latest
@@ -34,11 +33,10 @@ jobs:
           rm -f package-lock.json
           npm install --loglevel=info
 
-      - name: Fetch
-        run: npm run fetch
-
-      - name: Compile
-        run: npm run webpack:prod
+      - name: Fetch & Compile
+        run: |
+          npm run fetch
+          npm run webpack:prod
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
@@ -51,39 +49,42 @@ jobs:
             dist-renderer-webpack/
 
 # ==========================================
-# Linux 多格式打包
+# Linux 打包 (增加了并发限制和文件同步)
 # ==========================================
   package-linux:
     needs: build
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
+      max-parallel: 6 # 限制并发，防止 IO 竞争导致 ASAR 损坏
       matrix:
         format: [debian, tarball, appimage, pacman, rpm]
         arch: [x64, armv7l, arm64]
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/download-artifact@v4
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
         with:
           name: build-artifacts
+          path: . # 明确解压到当前目录
 
       - uses: actions/setup-node@v4
         with:
           node-version: 24
+          cache: npm
 
       - name: Install system deps
         run: |
           sudo apt-get update
           sudo apt-get install -y strip-nondeterminism fakeroot ruby ruby-dev rubygems libarchive-tools rpm
+          sudo gem install --no-document fpm
 
-      - name: Install fpm
-        run: sudo gem install --no-document fpm
-
-      - name: Install dependencies (skip postinstall)
+      - name: Install dependencies
         run: |
           rm -f package-lock.json
           npm install --ignore-scripts
+          sync # 强制同步文件系统，确保 entrypoint.js 对 builder 可见
 
       - name: Package
         run: |
@@ -105,30 +106,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/download-artifact@v4
         with:
           name: build-artifacts
-
+          path: .
       - name: Install snapcraft
         run: |
           sudo apt-get update
-          sudo apt-get install -y snapd
           sudo snap install snapcraft --classic
-
       - uses: actions/setup-node@v4
         with:
           node-version: 24
-
       - name: Install dependencies
-        run: |
-          rm -f package-lock.json
-          npm install --ignore-scripts
-
+        run: npm install --ignore-scripts && sync
       - name: Package
-        run: |
-          node release-automation/build.mjs --snap --x64 --production
-
+        run: node release-automation/build.mjs --snap --x64 --production
       - uses: actions/upload-artifact@v4
         with:
           name: linux-snap-x64
@@ -153,37 +145,24 @@ jobs:
           - target: legacy-11
             args: '--mac-legacy-11 --universal'
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        submodules: recursive
-        persist-credentials: false
-
-    - name: Download build artifacts
-      uses: actions/download-artifact@v4
-      with:
-        name: build-artifacts
-
-    - name: Install Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: 24
-        cache: 'npm'
-
-    - name: Install dependencies (skip postinstall)
-      run: |
-        rm -f package-lock.json
-        npm install --loglevel=info --ignore-scripts
-
-    - name: Package
-      run: |
-        node release-automation/build.mjs ${{ matrix.args }} --production
-
-    - name: Upload artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: mac-${{ matrix.target }}
-        path: dist/*.dmg
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+          path: .
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Install dependencies
+        run: npm install --ignore-scripts && sync
+      - name: Package
+        run: node release-automation/build.mjs ${{ matrix.args }} --production
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mac-${{ matrix.target }}
+          path: dist/*.dmg
 
 # ==========================================
 # Windows
@@ -197,93 +176,58 @@ jobs:
         include:
           - target: modern-nsis-x64
             args: '--windows --x64'
-            files: '*.exe'
           - target: modern-nsis-ia32
             args: '--windows --ia32'
-            files: '*.exe'
           - target: modern-nsis-arm64
             args: '--windows --arm64'
-            files: '*.exe'
           - target: modern-appx-x64
             args: '--microsoft-store --x64'
-            files: '*.appx'
           - target: modern-appx-ia32
             args: '--microsoft-store --ia32'
-            files: '*.appx'
           - target: modern-appx-arm64
             args: '--microsoft-store --arm64'
-            files: '*.appx'
           - target: portable
             args: '--windows-portable --x64'
-            files: '*.exe'
           - target: legacy-x64
             args: '--windows-legacy --x64'
-            files: '*.exe'
           - target: legacy-ia32
             args: '--windows-legacy --ia32'
-            files: '*.exe'
-    env:
-      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        submodules: recursive
-        persist-credentials: false
-        path: repo
-
-    - name: Move to D drive
-      shell: pwsh
-      run: |
-        Copy-Item -Path repo -Destination D:\repo -Recurse
-        Remove-Item -Path repo -Recurse -Force
-
-    - name: Download build artifacts
-      uses: actions/download-artifact@v4
-      with:
-        name: build-artifacts
-        path: D:\repo\
-
-    - name: Install Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: 24
-
-    - name: Configure npm cache
-      shell: pwsh
-      run: |
-        npm config set cache D:\npm-cache
-        npm config set prefix D:\npm-prefix
-
-    - name: Install dependencies (skip postinstall)
-      working-directory: D:\repo
-      run: |
-        Remove-Item -Path package-lock.json -Force -ErrorAction SilentlyContinue
-        npm install --loglevel=info --ignore-scripts
-
-    - name: Package
-      working-directory: D:\repo
-      run: |
-        node release-automation/build.mjs ${{ matrix.args }} --production
-
-    - name: Upload artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: windows-${{ matrix.target }}
-        path: D:\repo\dist\${{ matrix.files }}
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          path: repo
+      - name: Move and Prepare
+        shell: pwsh
+        run: |
+          Copy-Item -Path repo -Destination D:\repo -Recurse
+          Remove-Item -Path repo -Recurse -Force
+      - uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+          path: D:\repo\
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Install dependencies
+        working-directory: D:\repo
+        run: npm install --ignore-scripts
+      - name: Package
+        working-directory: D:\repo
+        run: node release-automation/build.mjs ${{ matrix.args }} --production
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-${{ matrix.target }}
+          path: D:\repo\dist\*
 
 # ==========================================
-# 发布到 GitHub Releases
+# 发布阶段 (修正了通配符和下载逻辑)
 # ==========================================
   publish:
-    needs:
-      - package-linux
-      - package-snap
-      - package-mac
-      - package-windows
+    needs: [package-linux, package-snap, package-mac, package-windows]
     runs-on: ubuntu-latest
     steps:
-
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -292,23 +236,24 @@ jobs:
         with:
           node-version: 24
 
-      - name: Download artifacts
+      - name: Download all packages
         uses: actions/download-artifact@v4
         with:
-          pattern: '*'
-          path: "dist/"
+          # 下载所有产物到 dist 目录
+          # merge-multiple 会把子 artifact 里的内容直接平铺在 dist 文件夹
+          path: dist
           merge-multiple: true
 
       - name: Upload to GitHub Releases
-        shell: bash  # 明确指定使用 bash 以支持花括号扩展
+        shell: bash
         run: |
           shopt -s nullglob
-
+          # 精准匹配后缀，避开 dist-astra-extensions 等文件夹和 .yml
           FILES=$(ls dist/*.{exe,dmg,deb,zip,tar.gz,AppImage,snap,rpm,zst,appx} 2>/dev/null || true)
           
           if [ -z "$FILES" ]; then
-            echo "No matching files found to upload."
-            exit 0
+            echo "No packages found!"
+            exit 1
           fi
 
           node scripts/upload-to-github-releases.mjs \
