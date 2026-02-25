@@ -296,15 +296,24 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           pattern: '*'
-          path: "dist/*.{exe,dmg,deb,zip,tar.gz,AppImage,snap,rpm,zst,appx}"
+          path: "dist/"
           merge-multiple: true
 
       - name: Upload to GitHub Releases
+        shell: bash  # 明确指定使用 bash 以支持花括号扩展
         run: |
+          shopt -s nullglob
+
+          FILES=$(ls dist/*.{exe,dmg,deb,zip,tar.gz,AppImage,snap,rpm,zst,appx} 2>/dev/null || true)
+          
+          if [ -z "$FILES" ]; then
+            echo "No matching files found to upload."
+            exit 0
+          fi
+
           node scripts/upload-to-github-releases.mjs \
             "${{ github.repository_owner }}" \
             "${{ github.event.repository.name }}" \
-            "dist/*.{exe,dmg,deb,zip,tar.gz,AppImage,snap,rpm,zst,appx}"
-
+            $FILES
         env:
           GH_TOKEN: "${{ github.token }}"
