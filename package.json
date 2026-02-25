@@ -72,7 +72,6 @@
         "appId": "org.astraeditor.desktop",
         "productName": "AstraEditor",
         "asar": true,
-        "disableSanityCheckAsar": true,
         "files": [
             "./node_modules/**/*",
             "./src-main/**/*",
