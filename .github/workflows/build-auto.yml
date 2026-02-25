@@ -107,7 +107,7 @@ jobs:
     - name: Compile
       run: npm run webpack:compile
     - name: Package
-      run: 
+      run: |
         ls /home/runner/work/Desktop/Desktop/*
         ls /home/runner/work/Desktop/*
         npm run electron:package:dir
