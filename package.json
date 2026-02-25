@@ -71,7 +71,7 @@
     "build": {
         "appId": "org.astraeditor.desktop",
         "productName": "AstraEditor",
-        "asar": true,
+        "asar": false,
         "files": [
             "src-main/**/*",
             "src-preload/**/*",
