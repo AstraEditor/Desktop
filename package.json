@@ -73,14 +73,15 @@
         "productName": "AstraEditor",
         "asar": true,
         "files": [
-            "./node_modules/**/*",
-            "./src-main/**/*",
-            "./src-preload/**/*",
-            "./src-renderer/**/*",
-            "./dist-renderer-webpack/**/*",
-            "./dist-library-files/**/*",
-            "./dist-extensions/**/*",
-            "./dist-astra-extensions/**/*",
+            "node_modules/**/*",
+            "src-main/**/*",
+            "src-preload/**/*",
+            "src-renderer/**/*",
+            "dist-renderer-webpack/**/*",
+            "dist-library-files/**/*",
+            "dist-extensions/**/*",
+            "dist-astra-extensions/**/*",
+            "package.json",
             "!**/node_modules/*/{CHANGELOG.md,README.md,test,obj,bin}"
         ],
         "extraResources": [
