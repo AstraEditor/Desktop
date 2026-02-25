@@ -73,7 +73,6 @@
         "productName": "AstraEditor",
         "asar": true,
         "files": [
-            "node_modules/**/*",
             "src-main/**/*",
             "src-preload/**/*",
             "src-renderer/**/*",

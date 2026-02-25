@@ -109,4 +109,9 @@ jobs:
     - name: Package
       run: |
         npm run electron:package:dir -- --config.disableSanityCheckAsar=true
-        npx --yes asar list dist/linux-unpacked/resources/app.asar | grep -q "src-main/entrypoint.js"
+        if ! npx --yes asar list dist/linux-unpacked/resources/app.asar | grep -q "src-main/entrypoint.js"; then
+          echo "::error::Entry point src-main/entrypoint.js not found in app.asar"
+          echo "=== app.asar src-main preview ==="
+          npx --yes asar list dist/linux-unpacked/resources/app.asar | grep -E "^/src-main/" | head -50 || true
+          exit 1
+        fi
