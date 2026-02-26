@@ -275,19 +275,9 @@ jobs:
       - name: Upload to GitHub Releases
         shell: bash
         run: |
-          cd artifacts
-          shopt -s nullglob
-          FILES=$(echo *.{exe,dmg,deb,zip,tar.gz,AppImage,snap,rpm,zst,appx})   
-          if [ -z "$FILES" ] || [ "$FILES" = "*."* ]; then
-            echo "错误：未找到任何待上传的二进制文件！"
-            ls -R # 打印当前目录结构方便排查
-            exit 1
-          fi
-          echo "正在上传以下文件: $FILES"
-          cd ..
           node scripts/upload-to-github-releases.mjs \
             "${{ github.repository_owner }}" \
             "${{ github.event.repository.name }}" \
-            "artifacts/$FILES"
+            "artifacts/*.{exe,dmg,deb,zip,tar.gz,AppImage,snap,rpm,zst,appx}"
         env:
           GH_TOKEN: "${{ github.token }}"
