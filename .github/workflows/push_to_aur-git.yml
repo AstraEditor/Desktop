@@ -50,7 +50,7 @@ jobs:
             [[ "$CARCH" == "armv7h" ]] && _target_arch="armv7l"
 
             npx electron-builder --linux --dir --$_target_arch
-
+          }
           package() {
             cd "$pkgname"
             local _unpacked_dir="dist/linux-unpacked"
@@ -85,7 +85,7 @@ jobs:
                 install -Dm644 "$_icon_path" "$pkgdir/usr/share/icons/hicolor/${_res}x${_res}/apps/astraeditor.png"
               fi
             done
-          }
+            }
           EOF
           sed -i "s/REPLACE_ME_VERSION/${VERSION}/" PKGBUILD
 
