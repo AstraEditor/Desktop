@@ -20,14 +20,11 @@ modules:
       - type: file
         path: ../run.sh  
     build-commands:
-      # 创建 /app/bin 目录
       - mkdir -p /app/bin
-      # 拷贝 Electron 启动脚本
       - install -Dm755 run.sh /app/bin/run.sh
-      # 拷贝 app.asar
       - install -Dm644 resources/app.asar /app/app.asar
-      # 拷贝 desktop 文件和图标
       - install -Dm644 linux-files/org.astraeditor.AstraEditor.desktop /app/share/applications/org.astraeditor.AstraEditor.desktop
       - install -Dm644 linux-files/org.astraeditor.AstraEditor.metainfo.xml /app/share/metainfo/org.astraeditor.AstraEditor.metainfo.xml
       - install -Dm644 linux-files/org.astraeditor.AstraEditor.mime.xml /app/share/mime/packages/org.astraeditor.AstraEditor.mime.xml
       - install -Dm644 icon.png /app/share/icons/hicolor/256x256/apps/org.astraeditor.AstraEditor.png
+      - mkdir -p /app/share/astraeditor
