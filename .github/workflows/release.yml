@@ -286,6 +286,6 @@ jobs:
           node scripts/upload-to-github-releases.mjs \
             "${{ github.repository_owner }}" \
             "${{ github.event.repository.name }}" \
-            $FILES
+            "$FILES"
         env:
           GH_TOKEN: "${{ github.token }}"
