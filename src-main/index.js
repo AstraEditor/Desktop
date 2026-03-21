@@ -1,4 +1,9 @@
-const {app} = require('electron');
+const {app, nativeTheme} = require('electron');
+
+// Force dark theme on Windows for acrylic effect (doesn't follow system)
+if (process.platform === 'win32') {
+  nativeTheme.themeSource = 'dark';
+}
 
 // requestSingleInstanceLock() crashes the app in signed MAS builds
 // https://github.com/electron/electron/issues/15958

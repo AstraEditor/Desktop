@@ -66,6 +66,18 @@ const handleClickCheckForUpdates = () => {
   EditorPreload.checkForUpdates();
 }
 
+const handleClickMinimize = () => {
+  EditorPreload.minimizeWindow();
+};
+
+const handleClickMaximize = () => {
+  EditorPreload.maximizeWindow();
+};
+
+const handleClickClose = () => {
+  EditorPreload.closeWindow();
+};
+
 const securityManager = {
   // Everything not specified here falls back to the scratch-gui security manager
 
@@ -229,12 +241,15 @@ const DesktopHOC = function (WrappedComponent) {
               title: this.messages['in-app-about.source-code'],
               onClick: handleClickSourceCode
             },
-            // {
-            //   title: this.messages['in-app-about.check-for-updates'],
-            //   onClick: handleClickCheckForUpdates
-            // },
+            {
+              title: this.messages['in-app-about.check-for-updates'],
+              onClick: handleClickCheckForUpdates
+            },
           ]}
           onClickDesktopSettings={handleClickDesktopSettings}
+          onClickMinimize={handleClickMinimize}
+          onClickMaximize={handleClickMaximize}
+          onClickClose={handleClickClose}
           securityManager={securityManager}
           {...props}
         />

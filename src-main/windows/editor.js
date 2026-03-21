@@ -618,6 +618,22 @@ class EditorWindow extends ProjectRunningWindow {
       }
     });
 
+    this.ipc.handle('minimize-window', () => {
+      this.window.minimize();
+    });
+
+    this.ipc.handle('maximize-window', () => {
+      if (this.window.isMaximized()) {
+        this.window.unmaximize();
+      } else {
+        this.window.maximize();
+      }
+    });
+
+    this.ipc.handle('close-window', () => {
+      this.window.close();
+    });
+
     this.ipc.on('get-local-storage', (event, key) => {
       const result = this.window.webContents.executeJavaScript(`localStorage.getItem('${key}')`);
       event.returnValue = result;
@@ -654,6 +670,11 @@ class EditorWindow extends ProjectRunningWindow {
 
     this.loadURL('tw-editor://./gui/gui.html');
     this.show();
+
+    // Windows acrylic blur effect (theme controlled by nativeTheme.themeSource in index.js)
+    if (process.platform === 'win32') {
+      this.window.setBackgroundMaterial('acrylic');
+    }
   }
 
   getPreload () {
@@ -668,7 +689,35 @@ class EditorWindow extends ProjectRunningWindow {
   }
 
   getBackgroundColor () {
-    return '#333333';
+    // Windows acrylic handles background, return solid color for animations
+    if (process.platform === 'win32') {
+      return '#333333';
+    }
+    return '#33333300';
+  }
+
+  getWindowOptions () {
+    const options = super.getWindowOptions();
+    options.frame = false;
+    options.minWidth = 1024;
+    options.minHeight = 640;
+
+    // macOS vibrancy blur effect
+    if (process.platform === 'darwin') {
+      options.vibrancy = 'under-window';
+      options.transparent = true;
+      // 或 'sidebar', 'titlebar', 'selection', 'menu', 'popover', 'fullscreen-ui', 'tooltip', 'content', 'under-page', 'window'
+    }
+
+    // Windows uses setBackgroundMaterial instead of transparent
+    if (process.platform === 'win32') {
+      options.transparent = false;
+      options.backgroundColor = '#333333';
+    } else {
+      options.transparent = true;
+    }
+
+    return options;
   }
 
   applySettings () {

@@ -1,0 +1,6 @@
+onlyBuiltDependencies:
+  - "electron"
+  - "scratch-blocks"
+  - "scratch-gui"
+  - "scratch-extension-editor"
+  - "@turbowarp/extensions"
