@@ -177,6 +177,13 @@ class Settings {
   set richPresence (richPresence) {
     this.data.richPresence = richPresence;
   }
+
+  get useBlurBackground() {
+    return this.data.useBlurBackground !== false;
+  }
+  set useBlurBackground(useBlurBackground) {
+    this.data.useBlurBackground = useBlurBackground;
+  }
 }
 
 module.exports = new Settings();

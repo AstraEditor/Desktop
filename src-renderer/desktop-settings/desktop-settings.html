@@ -302,6 +302,19 @@
       </script>
 
       <label>
+        <input type="checkbox" class="useBlurBackground-checkbox" autocomplete="off">
+        <span class="useBlurBackground-label"></span>
+      </label>
+        <script>
+        const useBlurBackground = document.querySelector('.useBlurBackground-checkbox');
+        useBlurBackground.onchange = () => {
+          DesktopSettingsPreload.setBlurBackground(useBlurBackground.checked);
+        };
+        useBlurBackground.checked = settings.useBlurBackground;
+        document.querySelector('.useBlurBackground-label').textContent = strings['desktop-settings.useBlurBackground'];
+      </script>
+
+      <label>
         <input type="checkbox" class="rich-presence-checkbox" autocomplete="off">
         <span class="rich-presence-label"></span>
         <a class="rich-presence-more-information" href="https://docs.turbowarp.org/desktop/rich-presence" target="_blank" rel="noreferrer"></a>

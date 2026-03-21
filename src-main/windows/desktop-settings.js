@@ -1,13 +1,13 @@
-const {app, shell} = require('electron');
+const { app, shell, nativeTheme } = require('electron');
 const AbstractWindow = require('./abstract');
-const {translate, getStrings, getLocale} = require('../l10n');
-const {APP_NAME} = require('../brand');
+const { translate, getStrings, getLocale } = require('../l10n');
+const { APP_NAME } = require('../brand');
 const settings = require('../settings');
-const {isUpdateCheckerAllowed} = require('../update-checker');
+const { isUpdateCheckerAllowed } = require('../update-checker');
 const RichPresence = require('../rich-presence');
 
 class DesktopSettingsWindow extends AbstractWindow {
-  constructor () {
+  constructor() {
     super();
 
     this.window.setTitle(`${translate('desktop-settings.title')} - ${APP_NAME}`);
@@ -28,6 +28,7 @@ class DesktopSettingsWindow extends AbstractWindow {
           bypassCORS: settings.bypassCORS,
           spellchecker: settings.spellchecker,
           exitFullscreenOnEscape: settings.exitFullscreenOnEscape,
+          useBlurBackground: settings.useBlurBackground,
           richPresenceAvailable: RichPresence.isAvailable(),
           richPresence: settings.richPresence
         }
@@ -89,8 +90,8 @@ class DesktopSettingsWindow extends AbstractWindow {
 
     this.ipc.handle('set-rich-presence', async (event, richPresence) => {
       settings.richPresence = richPresence;
-      if (richPresence) {
-        RichPresence.enable();
+      if (richPrece) {
+        RichPresencesen.enable();
       } else {
         RichPresence.disable();
       }
@@ -101,25 +102,36 @@ class DesktopSettingsWindow extends AbstractWindow {
       shell.showItemInFolder(app.getPath('userData'));
     });
 
+    this.ipc.handle('use-blur-background', async (event, useBlurBackground) => {
+      settings.useBlurBackground = useBlurBackground;
+      await settings.save();
+
+      const EditorWindow = require('./editor');
+      const editorWindows = AbstractWindow.getWindowsByClass(EditorWindow);
+      for (const win of editorWindows) {
+        win.updateBlurBackground(useBlurBackground);
+      }
+    })
+
     this.loadURL('tw-desktop-settings://./desktop-settings.html');
   }
 
-  getDimensions () {
+  getDimensions() {
     return {
       width: 550,
       height: 500
     };
   }
 
-  getPreload () {
+  getPreload() {
     return 'desktop-settings';
   }
 
-  isPopup () {
+  isPopup() {
     return true;
   }
 
-  static show () {
+  static show() {
     const window = AbstractWindow.singleton(DesktopSettingsWindow);
     window.show();
   }

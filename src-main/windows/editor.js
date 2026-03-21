@@ -3,16 +3,16 @@ const path = require('path');
 const nodeURL = require('url');
 const zlib = require('zlib');
 const nodeCrypto = require('crypto');
-const {app, dialog} = require('electron');
+const { app, dialog, nativeTheme } = require('electron');
 const ProjectRunningWindow = require('./project-running-window');
 const AddonsWindow = require('./addons');
 const DesktopSettingsWindow = require('./desktop-settings');
 const PrivacyWindow = require('./privacy');
 const AboutWindow = require('./about');
 const PackagerWindow = require('./packager');
-const {createAtomicWriteStream} = require('../atomic-write-stream');
-const {translate, updateLocale, getStrings} = require('../l10n');
-const {APP_NAME} = require('../brand');
+const { createAtomicWriteStream } = require('../atomic-write-stream');
+const { translate, updateLocale, getStrings } = require('../l10n');
+const { APP_NAME } = require('../brand');
 const prompts = require('../prompts');
 const settings = require('../settings');
 const privilegedFetch = require('../fetch');
@@ -68,7 +68,7 @@ const getCachedExtensionsRedirect = (input) => {
 };
 
 class OpenedFile {
-  constructor (type, path) {
+  constructor(type, path) {
     /** @type {TYPE_FILE|TYPE_URL|TYPE_SCRATCH|TYPE_SAMPLE|TYPE_SAMPLE_ASTRA} */
     this.type = type;
 
@@ -79,7 +79,7 @@ class OpenedFile {
     this.path = path;
   }
 
-  async read () {
+  async read() {
     if (this.type === TYPE_FILE) {
       return {
         name: path.basename(this.path),
@@ -273,7 +273,7 @@ class EditorWindow extends ProjectRunningWindow {
    * @param {OpenedFile|null} initialFile
    * @param {boolean} isInitiallyFullscreen
    */
-  constructor (initialFile, isInitiallyFullscreen) {
+  constructor(initialFile, isInitiallyFullscreen) {
     super();
 
     /**
@@ -369,7 +369,7 @@ class EditorWindow extends ProjectRunningWindow {
 
     this.ipc.handle('get-file', async (event, id) => {
       const file = getFileById(id);
-      const {name, data} = await file.read();
+      const { name, data } = await file.read();
       return {
         name,
         type: file.type,
@@ -468,7 +468,7 @@ class EditorWindow extends ProjectRunningWindow {
             .replace('{APP_NAME}', unsafePath.app)
             .replace('{file}', filePath),
           noLink: true
-        });  
+        });
         return null;
       }
 
@@ -668,35 +668,44 @@ class EditorWindow extends ProjectRunningWindow {
       this.isInEditorFullScreen = !!isFullScreen;
     });
 
+    this.ipc.handle('set-window-theme', (event, theme) => {
+      if (process.platform === 'win32') {
+        if (theme === 'light' || theme === 'dark') {
+          nativeTheme.themeSource = theme;
+        } else {
+          nativeTheme.themeSource = 'dark'; // default
+        }
+      }
+    });
+
     this.loadURL('tw-editor://./gui/gui.html');
     this.show();
 
     // Windows acrylic blur effect (theme controlled by nativeTheme.themeSource in index.js)
-    if (process.platform === 'win32') {
+    if (process.platform === 'win32' && settings.useBlurBackground) {
       this.window.setBackgroundMaterial('acrylic');
     }
   }
 
-  getPreload () {
+  getPreload() {
     return 'editor';
   }
 
-  getDimensions () {
+  getDimensions() {
     return {
       width: 1280,
       height: 800
     };
   }
 
-  getBackgroundColor () {
-    // Windows acrylic handles background, return solid color for animations
+  getBackgroundColor() {
     if (process.platform === 'win32') {
       return '#333333';
     }
     return '#33333300';
   }
 
-  getWindowOptions () {
+  getWindowOptions() {
     const options = super.getWindowOptions();
     options.frame = false;
     options.minWidth = 1024;
@@ -712,7 +721,6 @@ class EditorWindow extends ProjectRunningWindow {
     // Windows uses setBackgroundMaterial instead of transparent
     if (process.platform === 'win32') {
       options.transparent = false;
-      options.backgroundColor = '#333333';
     } else {
       options.transparent = true;
     }
@@ -720,11 +728,21 @@ class EditorWindow extends ProjectRunningWindow {
     return options;
   }
 
-  applySettings () {
+  applySettings() {
     this.window.webContents.setBackgroundThrottling(settings.backgroundThrottling);
   }
 
-  enumerateMediaDevices () {
+  updateBlurBackground(useBlurBackground) {
+    if (process.platform !== 'win32') return;
+    
+    if (useBlurBackground) {
+      this.window.setBackgroundMaterial('acrylic');
+    } else {
+      this.window.setBackgroundMaterial('none');
+    }
+  }
+
+  enumerateMediaDevices() {
     // Used by desktop settings
     return new Promise((resolve, reject) => {
       this.ipc.once('enumerated-media-devices', (event, result) => {
@@ -738,7 +756,7 @@ class EditorWindow extends ProjectRunningWindow {
     });
   }
 
-  handleWindowOpen (details) {
+  handleWindowOpen(details) {
     const url = new URL(details.url);
     const params = new URLSearchParams(url.search);
 
@@ -786,11 +804,11 @@ class EditorWindow extends ProjectRunningWindow {
     return super.handleWindowOpen(details);
   }
 
-  canExitFullscreenByPressingEscape () {
+  canExitFullscreenByPressingEscape() {
     return !this.isInEditorFullScreen;
   }
 
-  updateRichPresence () {
+  updateRichPresence() {
     RichPresence.setActivity(this.projectTitle, this.openedProjectAt);
   }
 
@@ -799,7 +817,7 @@ class EditorWindow extends ProjectRunningWindow {
    * @param {boolean} fullscreen
    * @param {string|null} workingDirectory
    */
-  static openFiles (files, fullscreen, workingDirectory) {
+  static openFiles(files, fullscreen, workingDirectory) {
     if (files.length === 0) {
       EditorWindow.newWindow(fullscreen);
     } else {
@@ -813,7 +831,7 @@ class EditorWindow extends ProjectRunningWindow {
    * Open a new window with the default project.
    * @param {boolean} fullscreen
    */
-  static newWindow (fullscreen) {
+  static newWindow(fullscreen) {
     new EditorWindow(null, fullscreen);
   }
 }

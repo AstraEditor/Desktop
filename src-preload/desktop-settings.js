@@ -12,5 +12,6 @@ contextBridge.exposeInMainWorld('DesktopSettingsPreload', {
   setSpellchecker: (spellchecker) => ipcRenderer.invoke('set-spellchecker', spellchecker),
   setExitFullscreenOnEscape: (exitFullscreenOnEscape) => ipcRenderer.invoke('set-exit-fullscreen-on-escape', exitFullscreenOnEscape),
   setRichPresence: (richPresence) => ipcRenderer.invoke('set-rich-presence', richPresence),
+  setBlurBackground: (useBlurBackground) => ipcRenderer.invoke('use-blur-background', useBlurBackground),
   openUserData: () => ipcRenderer.invoke('open-user-data')
 });

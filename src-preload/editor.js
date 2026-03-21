@@ -26,7 +26,7 @@ contextBridge.exposeInMainWorld('EditorPreload', {
     exportForPackager = callback;
   },
   setIsFullScreen: (isFullScreen) => ipcRenderer.invoke('set-is-full-screen', isFullScreen),
-  getLocalStorage: (key) => localStorage.getItem(key)
+  getLocalStorage: (key) => localStorage.getItem(key),
 });
 
 let exportForPackager = () => Promise.reject(new Error('exportForPackager missing'));
@@ -51,6 +51,13 @@ window.addEventListener('message', (e) => {
     }
   }
 });
+
+window.addEventListener('storage', () => {
+  const theme = localStorage.getItem('tw:theme');
+  if (process.platform === 'win32') {
+    ipcRenderer.invoke('set-window-theme', theme);
+  }
+})
 
 ipcRenderer.on('enumerate-media-devices', (e) => {
   navigator.mediaDevices.enumerateDevices()
