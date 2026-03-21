@@ -184,6 +184,13 @@ class Settings {
   set useBlurBackground(useBlurBackground) {
     this.data.useBlurBackground = useBlurBackground;
   }
+
+  get blurAlphaGain() {
+    return this.data.blurAlphaGain ?? 1;
+  }
+  set blurAlphaGain(blurAlphaGain) {
+    this.data.blurAlphaGain = blurAlphaGain;
+  }
 }
 
 module.exports = new Settings();

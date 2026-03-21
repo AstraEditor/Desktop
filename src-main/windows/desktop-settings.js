@@ -29,6 +29,7 @@ class DesktopSettingsWindow extends AbstractWindow {
           spellchecker: settings.spellchecker,
           exitFullscreenOnEscape: settings.exitFullscreenOnEscape,
           useBlurBackground: settings.useBlurBackground,
+          blurAlphaGain: settings.blurAlphaGain,
           richPresenceAvailable: RichPresence.isAvailable(),
           richPresence: settings.richPresence
         }
@@ -111,7 +112,18 @@ class DesktopSettingsWindow extends AbstractWindow {
       for (const win of editorWindows) {
         win.updateBlurBackground(useBlurBackground);
       }
-    })
+    });
+
+    this.ipc.handle('set-blur-alpha-gain', async (event, blurAlphaGain) => {
+      settings.blurAlphaGain = blurAlphaGain;
+      await settings.save();
+
+      const EditorWindow = require('./editor');
+      const editorWindows = AbstractWindow.getWindowsByClass(EditorWindow);
+      for (const win of editorWindows) {
+        await win.updateBlurAlphaGain();
+      }
+    });
 
     this.loadURL('tw-desktop-settings://./desktop-settings.html');
   }

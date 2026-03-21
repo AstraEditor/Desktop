@@ -315,6 +315,24 @@
       </script>
 
       <label>
+        <div class="label blur-alpha-gain-label"></div>
+        <input type="range" class="blur-alpha-gain-slider" min="0.5" max="2" step="0.1" autocomplete="off">
+        <span class="blur-alpha-gain-value"></span>
+      </label>
+      <script>
+        const blurAlphaGainSlider = document.querySelector('.blur-alpha-gain-slider');
+        const blurAlphaGainValue = document.querySelector('.blur-alpha-gain-value');
+        blurAlphaGainSlider.oninput = () => {
+          const value = parseFloat(blurAlphaGainSlider.value);
+          blurAlphaGainValue.textContent = value.toFixed(1).toString() + 'x';
+          DesktopSettingsPreload.setBlurAlphaGain(value);
+        };
+        blurAlphaGainSlider.value = settings.blurAlphaGain;
+        blurAlphaGainValue.textContent = settings.blurAlphaGain.toFixed(1).toString() + 'x';
+        document.querySelector('.blur-alpha-gain-label').textContent = strings['desktop-settings.blur-alpha-gain'];
+      </script>
+
+      <label>
         <input type="checkbox" class="rich-presence-checkbox" autocomplete="off">
         <span class="rich-presence-label"></span>
         <a class="rich-presence-more-information" href="https://docs.turbowarp.org/desktop/rich-presence" target="_blank" rel="noreferrer"></a>

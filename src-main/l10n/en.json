@@ -264,8 +264,12 @@
     "developer_comment": "Refering to when an entire window is in fullscreen by pressing F11 or the maximize button on macOS, not the fullscreen mode you get by pressing the fullscreen button in the editor."
   },
   "desktop-settings.useBlurBackground": {
-    "string": "Enable window background blur (Windows only)",
+    "string": "Enable window background blur (Windows 11 22H2+ and MacOS(Testing) only)",
     "developer_comment": "Show beautiful effect on the Window background."
+  },
+  "desktop-settings.blur-alpha-gain": {
+    "string": "Blur intensity",
+    "developer_comment": "Slider to adjust the blur background alpha gain (0.5-2)"
   },
   "desktop-settings.rich-presence": {
     "string": "Enable Rich Presence",

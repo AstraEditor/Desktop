@@ -2,6 +2,7 @@ const { BrowserWindow, screen, session } = require('electron');
 const path = require('path');
 const openExternal = require('../open-external');
 const settings = require('../settings');
+const blurCSS = require('./blur')
 
 /** @type {Map<unknown, AbstractWindow[]>} */
 const windowsByClass = new Map();
@@ -14,12 +15,13 @@ const windowsByClass = new Map();
 
 class AbstractWindow {
   /** @param {AbstractWindowOptions} options */
-  constructor (options = {}) {
+  constructor(options = {}) {
     this.parentWindow = options.parentWindow || null;
 
     /** @type {Electron.BrowserWindow} */
     this.window = options.existingWindow || new BrowserWindow(this.getWindowOptions());
     this.window.webContents.on('before-input-event', this.handleInput.bind(this));
+    this.window.webContents.on('dom-ready', () => blurCSS(this.window.webContents))
     this.applySettings();
 
     if (!options.existingWindow) {
@@ -61,7 +63,7 @@ class AbstractWindow {
     });
   }
 
-  static getAllWindows () {
+  static getAllWindows() {
     const allWindows = [];
     for (const windows of windowsByClass.values()) {
       for (const window of windows) {
@@ -71,7 +73,7 @@ class AbstractWindow {
     return allWindows;
   }
 
-  static settingsChanged () {
+  static settingsChanged() {
     session.defaultSession.setSpellCheckerEnabled(settings.spellchecker);
 
     for (const window of AbstractWindow.getAllWindows()) {
@@ -79,7 +81,7 @@ class AbstractWindow {
     }
   }
 
-  static getWindowByBrowserWindow (browserWindow) {
+  static getWindowByBrowserWindow(browserWindow) {
     for (const windows of windowsByClass.values()) {
       for (const window of windows) {
         if (window.window === browserWindow) {
@@ -90,7 +92,7 @@ class AbstractWindow {
     return null;
   }
 
-  static getWindowByWebContents (webContents) {
+  static getWindowByWebContents(webContents) {
     for (const windows of windowsByClass.values()) {
       for (const window of windows) {
         if (window.window.webContents === webContents) {
@@ -106,7 +108,7 @@ class AbstractWindow {
    * @param {{new(): T}} cls 
    * @returns {T[]}
    */
-  static getWindowsByClass (cls) {
+  static getWindowsByClass(cls) {
     return windowsByClass.get(cls) || [];
   }
 
@@ -115,7 +117,7 @@ class AbstractWindow {
    * @param {{new(): T}} cls
    * @returns {T}
    */
-  static singleton (cls) {
+  static singleton(cls) {
     const windows = AbstractWindow.getWindowsByClass(cls);
     if (windows.length) {
       return windows[0];
@@ -128,7 +130,7 @@ class AbstractWindow {
    * @param {{width: number; height: number;}} preferredDimensions
    * @returns {Electron.Rectangle}
    */
-  static calculateWindowBounds (area, preferredDimensions) {
+  static calculateWindowBounds(area, preferredDimensions) {
     const width = Math.min(area.width, preferredDimensions.width);
     const height = Math.min(area.height, preferredDimensions.height);
     const x = area.x + ((area.width - width) / 2);
@@ -141,11 +143,11 @@ class AbstractWindow {
     };
   }
 
-  getPreload () {
+  getPreload() {
     // to be overridden
   }
 
-  getDimensions () {
+  getDimensions() {
     // to be overridden
     return {
       width: 200,
@@ -153,17 +155,17 @@ class AbstractWindow {
     };
   }
 
-  isPopup () {
+  isPopup() {
     // to be overridden
     return false;
   }
 
-  getBackgroundColor () {
+  getBackgroundColor() {
     // to be overridden
     return '#ffffff';
   }
 
-  getWindowOptions () {
+  getWindowOptions() {
     /** @type {Electron.BrowserWindowConstructorOptions} */
     const options = {};
 
@@ -197,13 +199,13 @@ class AbstractWindow {
     return options;
   }
 
-  loadURL (url) {
+  loadURL(url) {
     this.initialURL = url;
     this.protocol = new URL(url).protocol;
     return this.window.loadURL(url);
   }
 
-  show () {
+  show() {
     this.window.show();
     this.window.focus();
   }
@@ -212,7 +214,7 @@ class AbstractWindow {
    * @see {Electron.WebContents.setWindowOpenHandler}
    * @param {Electron.HandlerDetails} details
    */
-  handleWindowOpen (details) {
+  handleWindowOpen(details) {
     openExternal(details.url);
     return {
       action: 'deny'
@@ -223,7 +225,7 @@ class AbstractWindow {
    * @param {Electron.Event} event
    * @param {Electron.Input} input
    */
-  handleInput (event, input) {
+  handleInput(event, input) {
     if (input.isAutoRepeat || input.isComposing || input.type !== 'keyDown' || input.meta) {
       return;
     }
@@ -235,10 +237,10 @@ class AbstractWindow {
         this.window.setFullScreen(false);
       } else if (this.isPopup()) {
         event.preventDefault();
-        this.window.close();  
+        this.window.close();
       }
     }
-    
+
     // On macOS, these shortcuts are handled by the menu bar
     if (process.platform !== 'darwin') {
       const webContents = this.window.webContents;
@@ -299,7 +301,7 @@ class AbstractWindow {
    * @param {Electron.WillNavigateEvent} event 
    * @param {string} url
    */
-  handleWillNavigate (event, url) {
+  handleWillNavigate(event, url) {
     // Only allow windows to refresh, not navigate anywhere.
     if (url !== this.initialURL) {
       event.preventDefault();
@@ -307,7 +309,7 @@ class AbstractWindow {
     }
   }
 
-  reload () {
+  reload() {
     // Don't use webContents.reload() because it allows the page to navigate by using
     // history.pushState() then location.reload()
     if (this.initialURL !== null) {
@@ -321,7 +323,7 @@ class AbstractWindow {
    * @param {Electron.PermissionCheckHandlerHandlerDetails} details
    * @returns {boolean}
    */
-  handlePermissionCheck (permisson, details) {
+  handlePermissionCheck(permisson, details) {
     // to be overridden
     return permisson === 'accessibility-events';
   }
@@ -332,7 +334,7 @@ class AbstractWindow {
    * @param {Electron.PermissionRequestHandlerHandlerDetails} details
    * @returns {Promise<boolean>}
    */
-  async handlePermissionRequest (permisson, details) {
+  async handlePermissionRequest(permisson, details) {
     // to be overridden
     return false;
   }
@@ -341,7 +343,7 @@ class AbstractWindow {
    * @param {Electron.OnBeforeRequestListenerDetails} details
    * @param {(response: Electron.CallbackResponse) => void} callback
    */
-  onBeforeRequest (details, callback) {
+  onBeforeRequest(details, callback) {
     // to be overridden
     callback({});
   }
@@ -350,7 +352,7 @@ class AbstractWindow {
    * @param {Electron.OnBeforeSendHeadersListenerDetails} details
    * @param {(response: Electron.BeforeSendResponse) => void} callback 
    */
-  onBeforeSendHeaders (details, callback) {
+  onBeforeSendHeaders(details, callback) {
     // to be overridden
     callback({});
   }
@@ -359,7 +361,7 @@ class AbstractWindow {
    * @param {Electron.OnHeadersReceivedListenerDetails} details
    * @param {(response: Electron.HeadersReceivedResponse) => void} callback
    */
-  onHeadersReceived (details, callback) {
+  onHeadersReceived(details, callback) {
     // to be overridden
     callback({});
   }
@@ -368,12 +370,12 @@ class AbstractWindow {
    * @param {Electron.RenderProcessGoneDetails} details
    * @returns {boolean} Return true to cancel default warning message.
    */
-  handleRendererProcessGone (details) {
+  handleRendererProcessGone(details) {
     // to be overridden
     return false;
   }
 
-  applySettings () {
+  applySettings() {
     // to be overrridden
   }
 
@@ -382,7 +384,7 @@ class AbstractWindow {
    * You do not need to check `settings` here. The caller will do that for you.
    * @returns {boolean}
    */
-  canExitFullscreenByPressingEscape () {
+  canExitFullscreenByPressingEscape() {
     return true;
   }
 }

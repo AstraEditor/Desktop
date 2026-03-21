@@ -13,5 +13,6 @@ contextBridge.exposeInMainWorld('DesktopSettingsPreload', {
   setExitFullscreenOnEscape: (exitFullscreenOnEscape) => ipcRenderer.invoke('set-exit-fullscreen-on-escape', exitFullscreenOnEscape),
   setRichPresence: (richPresence) => ipcRenderer.invoke('set-rich-presence', richPresence),
   setBlurBackground: (useBlurBackground) => ipcRenderer.invoke('use-blur-background', useBlurBackground),
+  setBlurAlphaGain: (blurAlphaGain) => ipcRenderer.invoke('set-blur-alpha-gain', blurAlphaGain),
   openUserData: () => ipcRenderer.invoke('open-user-data')
 });

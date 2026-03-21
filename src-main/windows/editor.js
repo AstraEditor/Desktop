@@ -715,10 +715,9 @@ class EditorWindow extends ProjectRunningWindow {
     if (process.platform === 'darwin') {
       options.vibrancy = 'under-window';
       options.transparent = true;
-      // 或 'sidebar', 'titlebar', 'selection', 'menu', 'popover', 'fullscreen-ui', 'tooltip', 'content', 'under-page', 'window'
     }
 
-    // Windows uses setBackgroundMaterial instead of transparent
+    // Windows use setBackgroundMaterial instead of transparent
     if (process.platform === 'win32') {
       options.transparent = false;
     } else {
@@ -740,6 +739,11 @@ class EditorWindow extends ProjectRunningWindow {
     } else {
       this.window.setBackgroundMaterial('none');
     }
+  }
+
+  async updateBlurAlphaGain() {
+    const updateBlurCSS = require('./blur').updateBlurCSS;
+    await updateBlurCSS(this.window.webContents);
   }
 
   enumerateMediaDevices() {
