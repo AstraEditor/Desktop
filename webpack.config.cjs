@@ -2,6 +2,13 @@ const path = require('path');
 const { DefinePlugin } = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
+const refractorPath = request => path.resolve(
+    __dirname,
+    request === 'core' || request === 'all' ?
+        '../scratch-gui/node_modules/refractor/lib/' + request + '.js' :
+        '../scratch-gui/node_modules/refractor/lang/' + request + '.js'
+);
+
 const base = {
     mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
     devtool: process.env.NODE_ENV === 'production' ? false : 'cheap-source-map',
@@ -67,6 +74,9 @@ module.exports = [
         plugins: [
             new DefinePlugin({
                 'process.env.ROOT': '""'
+            }),
+            new (require('webpack')).NormalModuleReplacementPlugin(/^refractor\/(.+)$/, resource => {
+                resource.request = refractorPath(resource.request.slice('refractor/'.length));
             }),
             new CopyWebpackPlugin({
                 patterns: [

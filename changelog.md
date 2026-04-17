@@ -2,6 +2,11 @@ This document is the authoritative source for TurboWarp's changelogs. Everything
 
 Prefix notes with "Windows:", "macOS:", or "Linux:" as needed. Do not use **formatting** or [links](https://desktop.turbowarp.org/).
 
+# 1.2.0 (2026-04-xx)
+
+- 增加扩展编辑器
+- 修改桌面端控制栏，和菜单栏融为一体
+
 # 1.1.4 (2026-03-18)
 
 - 修复打包器无法使用的问题
