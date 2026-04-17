@@ -14,6 +14,7 @@ contextBridge.exposeInMainWorld('EditorPreload', {
   openAddonSettings: (search) => ipcRenderer.invoke('open-addon-settings', search),
   openPackager: () => ipcRenderer.invoke('open-packager'),
   openDesktopSettings: () => ipcRenderer.invoke('open-desktop-settings'),
+  openExtensionEditor: () => ipcRenderer.invoke('open-extension-editor'),
   openPrivacy: () => ipcRenderer.invoke('open-privacy'),
   openAbout: () => ipcRenderer.invoke('open-about'),
   checkForUpdates: () => ipcRenderer.invoke('check-for-updates'),
@@ -25,11 +26,15 @@ contextBridge.exposeInMainWorld('EditorPreload', {
   setExportForPackager: (callback) => {
     exportForPackager = callback;
   },
+  setExtensionEditorHotReloadHandler: (callback) => {
+    extensionEditorHotReloadHandler = callback;
+  },
   setIsFullScreen: (isFullScreen) => ipcRenderer.invoke('set-is-full-screen', isFullScreen),
   getLocalStorage: (key) => localStorage.getItem(key),
 });
 
 let exportForPackager = () => Promise.reject(new Error('exportForPackager missing'));
+let extensionEditorHotReloadHandler = null;
 
 ipcRenderer.on('export-project-to-port', (e) => {
   const port = e.ports[0];
@@ -40,6 +45,17 @@ ipcRenderer.on('export-project-to-port', (e) => {
     .catch((error) => {
       console.error(error);
       port.postMessage({ error: true });
+    });
+});
+
+ipcRenderer.on('extension-editor-hot-reload', (event, data) => {
+  if (!extensionEditorHotReloadHandler) {
+    return;
+  }
+
+  Promise.resolve(extensionEditorHotReloadHandler(data))
+    .catch((error) => {
+      console.error('Extension editor hot reload handler failed:', error);
     });
 });
 

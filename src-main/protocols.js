@@ -50,6 +50,12 @@ const FILE_SCHEMES = {
     secure: true,
     embeddable: true, // migration helper
   },
+  'tw-extension-editor': {
+    root: path.resolve(__dirname, '../dist-extension-editor'),
+    standard: true,
+    secure: true,
+    supportFetch: true
+  },
   'tw-library': {
     root: path.resolve(__dirname, '../dist-library-files'),
     supportFetch: true,
@@ -91,6 +97,7 @@ const FILE_SCHEMES = {
 
 const MIME_TYPES = new Map();
 MIME_TYPES.set('.html', 'text/html');
+MIME_TYPES.set('.css', 'text/css');
 MIME_TYPES.set('.js', 'text/javascript');
 MIME_TYPES.set('.map', 'application/json');
 MIME_TYPES.set('.txt', 'text/plain');

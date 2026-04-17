@@ -19,6 +19,7 @@ const privilegedFetch = require('../fetch');
 const RichPresence = require('../rich-presence.js');
 const FileAccessWindow = require('./file-access-window.js');
 const ExtensionDocumentationWindow = require('./extension-documentation.js');
+const ExtensionEditorWindow = require('./extension-editor.js');
 
 const TYPE_FILE = 'file';
 const TYPE_URL = 'url';
@@ -586,6 +587,10 @@ class EditorWindow extends ProjectRunningWindow {
 
     this.ipc.handle('open-desktop-settings', () => {
       DesktopSettingsWindow.show();
+    });
+
+    this.ipc.handle('open-extension-editor', () => {
+      ExtensionEditorWindow.forEditor(this);
     });
 
     this.ipc.handle('open-privacy', () => {

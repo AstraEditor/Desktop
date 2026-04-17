@@ -23,7 +23,7 @@ const base = {
                 }
             },
             {
-                test: /\.(svg|png|wav|gif|jpg|mp3|woff2|hex)$/,
+                test: /\.(svg|png|wav|gif|jpg|mp3|woff2|hex|css)$/,
                 loader: 'file-loader',
                 options: {
                     outputPath: 'static/assets/',
@@ -80,12 +80,6 @@ module.exports = [
             }),
             new CopyWebpackPlugin({
                 patterns: [
-                    // scratch-extension-editor is bundled into scratch-gui, but it still loads additional
-                    // chunks/workers at runtime. Those files must be available at runtime.
-                    {
-                        from: path.resolve(__dirname, 'node_modules/scratch-extension-editor/dist'),
-                        to: 'extension-editor'
-                    },
                     {
                         from: 'node_modules/scratch-blocks/media',
                         to: 'static/blocks-media/default'
@@ -121,8 +115,6 @@ module.exports = [
                 // Force single React copy to avoid "Invalid hook call" errors
                 'react': path.resolve(__dirname, 'node_modules/react'),
                 'react-dom': path.resolve(__dirname, 'node_modules/react-dom'),
-                // Add scratch-extension-editor alias - updated path
-                'scratch-extension-editor': path.resolve(__dirname, 'node_modules/scratch-extension-editor'),
                 'scratch-gui$': path.resolve(__dirname, 'node_modules/scratch-gui/src/index.js'),
                 'scratch-gui/': path.resolve(__dirname, 'node_modules/scratch-gui/src/'),
                 'scratch-render-fonts$': path.resolve(__dirname, 'node_modules/scratch-gui/src/lib/tw-scratch-render-fonts'),

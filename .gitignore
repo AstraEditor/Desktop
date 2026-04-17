@@ -11,6 +11,7 @@ dist-renderer-webpack
 dist-library-files
 dist-extensions
 dist-astra-extensions
+dist-extension-editor
 src-renderer/packager/standalone.html
 repo
 node_modoles
