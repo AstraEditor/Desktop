@@ -2,12 +2,23 @@ const path = require('path');
 const { DefinePlugin } = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
-const refractorPath = request => path.resolve(
-    __dirname,
-    request === 'core' || request === 'all' ?
-        '../scratch-gui/node_modules/refractor/lib/' + request + '.js' :
-        '../scratch-gui/node_modules/refractor/lang/' + request + '.js'
-);
+const refractorPath = request => {
+    const path = require('path');
+    const refractorDir = path.resolve(__dirname, '../scratch-gui/node_modules/refractor');
+    
+    // 检查refractor目录是否存在，如果不存在则使用scratch-gui/node_modules/refractor
+    if (require('fs').existsSync(refractorDir)) {
+        return path.resolve(
+            refractorDir,
+            request === 'core' || request === 'all' ?
+                'lib/' + request + '.js' :
+                'lang/' + request + '.js'
+        );
+    } else {
+        // 如果refractor不存在，返回一个空模块以避免构建失败
+        return path.resolve(__dirname, 'empty-module.js');
+    }
+};
 
 const base = {
     mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
@@ -75,9 +86,12 @@ module.exports = [
             new DefinePlugin({
                 'process.env.ROOT': '""'
             }),
-            new (require('webpack')).NormalModuleReplacementPlugin(/^refractor\/(.+)$/, resource => {
-                resource.request = refractorPath(resource.request.slice('refractor/'.length));
-            }),
+new (require('webpack')).NormalModuleReplacementPlugin(/^refractor\/(.+)$/, resource => {
+    resource.request = refractorPath(resource.request.slice('refractor/'.length));
+}),
+new (require('webpack')).NormalModuleReplacementPlugin(/^refractor$/, () => {
+    return 'empty-module';
+}),
             new CopyWebpackPlugin({
                 patterns: [
                     {
