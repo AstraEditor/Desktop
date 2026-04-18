@@ -23,7 +23,7 @@ const base = {
                 }
             },
             {
-                test: /\.(svg|png|wav|gif|jpg|mp3|woff2|hex|css)$/,
+                test: /\.(svg|png|wav|gif|jpg|mp3|woff2|hex)$/,
                 loader: 'file-loader',
                 options: {
                     outputPath: 'static/assets/',
