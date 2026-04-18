@@ -80,5 +80,15 @@ const updateBlurCSS = async (webContents) => {
     }
 };
 
+const removeBlurCSS = async (webContents) => {
+    const id = webContents.id;
+    const key = cssKeys.get(id);
+    if (key) {
+        await webContents.removeInsertedCSS(key);
+        cssKeys.delete(id);
+    }
+};
+
 module.exports = blurCSS;
 module.exports.updateBlurCSS = updateBlurCSS;
+module.exports.removeBlurCSS = removeBlurCSS;

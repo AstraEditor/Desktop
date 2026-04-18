@@ -104,13 +104,14 @@ class DesktopSettingsWindow extends AbstractWindow {
     });
 
     this.ipc.handle('use-blur-background', async (event, useBlurBackground) => {
+      if (process.platform !== 'win32' && process.platform !== 'darwin') return;
       settings.useBlurBackground = useBlurBackground;
       await settings.save();
 
       const EditorWindow = require('./editor');
       const editorWindows = AbstractWindow.getWindowsByClass(EditorWindow);
       for (const win of editorWindows) {
-        win.updateBlurBackground(useBlurBackground);
+        await win.updateBlurBackground(useBlurBackground);
       }
     });
 

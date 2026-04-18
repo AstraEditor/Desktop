@@ -20,6 +20,7 @@ const RichPresence = require('../rich-presence.js');
 const FileAccessWindow = require('./file-access-window.js');
 const ExtensionDocumentationWindow = require('./extension-documentation.js');
 const ExtensionEditorWindow = require('./extension-editor.js');
+const blur = require('./blur');
 
 const TYPE_FILE = 'file';
 const TYPE_URL = 'url';
@@ -687,7 +688,7 @@ class EditorWindow extends ProjectRunningWindow {
     this.show();
 
     // Windows acrylic blur effect (theme controlled by nativeTheme.themeSource in index.js)
-    if (process.platform === 'win32' && settings.useBlurBackground) {
+    if (process.platform === 'win32' && process.platform === 'darwin' && settings.useBlurBackground) {
       this.window.setBackgroundMaterial('acrylic');
     }
   }
@@ -736,19 +737,24 @@ class EditorWindow extends ProjectRunningWindow {
     this.window.webContents.setBackgroundThrottling(settings.backgroundThrottling);
   }
 
-  updateBlurBackground(useBlurBackground) {
-    if (process.platform !== 'win32') return;
-    
+  async updateBlurBackground(useBlurBackground) {
     if (useBlurBackground) {
       this.window.setBackgroundMaterial('acrylic');
+      await this.updateBlurAlphaGain()
     } else {
       this.window.setBackgroundMaterial('none');
+      await this.clearBlurAlphaGain()
     }
   }
 
   async updateBlurAlphaGain() {
-    const updateBlurCSS = require('./blur').updateBlurCSS;
+    const updateBlurCSS = blur.updateBlurCSS;
     await updateBlurCSS(this.window.webContents);
+  }
+
+  async clearBlurAlphaGain() {
+    const removeBlurCSS = blur.removeBlurCSS;
+    await removeBlurCSS(this.window.webContents);
   }
 
   enumerateMediaDevices() {
