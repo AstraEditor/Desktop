@@ -6,7 +6,7 @@ on:
     #types: [completed]
 jobs:
   push_to_aur:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     steps:
     - name: generate PKGBUILD and .SRCINFO
       run: |
@@ -81,7 +81,7 @@ jobs:
           pkgname = astraeditor-bin
         EOF
     - name: Push to AUR
-      uses: KSXGitHub/github-actions-deploy-aur@v4.1.1 
+      uses: KSXGitHub/github-actions-deploy-aur@v4.1.3 
       with:
         pkgname: astraeditor-bin
         pkgbuild: ./PKGBUILD
