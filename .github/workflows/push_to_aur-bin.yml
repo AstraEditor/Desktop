@@ -4,6 +4,7 @@ on:
   workflow_run:
     workflows: ["Release"]
     types: [completed]
+  workflow_dispatch:
 jobs:
   push_to_aur:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
@@ -20,8 +21,8 @@ jobs:
         pkgname=astraeditor-bin
         provides=('astraeditor')
         conflicts=('astraeditor')
-        pkgver=${VERSION}
-        pkgrel=1
+        pkgver=v1.1.4
+        pkgrel=2
         pkgdesc='AstraEditor is a TurboWarp mod used to add more practical features to make your writing lightning fast.'
         arch=('x86_64' 'aarch64' 'armv7h')
         url='https://github.com/AstraEditor/'
@@ -59,8 +60,8 @@ jobs:
         cat > .SRCINFO << EOF
         pkgbase = astraeditor-bin
           pkgdesc = AstraEditor is a TurboWarp mod used to add more practical features to make your writing lightning fast.
-          pkgver = ${VERSION}
-          pkgrel = 1
+          pkgver = v1.1.4
+          pkgrel = 2
           url = https://github.com/AstraEditor/
           arch = x86_64
           arch = armv7h
