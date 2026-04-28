@@ -1,11 +1,11 @@
 const path = require('path');
-const { DefinePlugin } = require('webpack');
+const { DefinePlugin, ProvidePlugin } = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const refractorPath = request => {
     const path = require('path');
     const refractorDir = path.resolve(__dirname, '../scratch-gui/node_modules/refractor');
-    
+
     // 检查refractor目录是否存在，如果不存在则使用scratch-gui/node_modules/refractor
     if (require('fs').existsSync(refractorDir)) {
         return path.resolve(
@@ -28,6 +28,9 @@ const base = {
         rules: [
             {
                 test: /\.jsx?$/,
+                // Override package.json "type": "commonjs" so webpack 5 auto-detects
+                // ESM/CJS for each file instead of treating all .js files as CommonJS.
+                type: 'javascript/auto',
                 loader: 'babel-loader',
                 options: {
                     presets: ['@babel/preset-env', '@babel/preset-react']
@@ -42,6 +45,13 @@ const base = {
                 }
             },
             {
+                test: /\.(vert|frag|glsl)$/,
+                loader: 'raw-loader',
+                options: {
+                    esModule: false
+                }
+            },
+            {
                 test: /\.css$/,
                 use: [
                     {
@@ -50,10 +60,11 @@ const base = {
                     {
                         loader: 'css-loader',
                         options: {
-                            modules: true,
                             importLoaders: 1,
-                            localIdentName: '[name]_[local]_[hash:base64:5]',
-                            camelCase: true
+                            modules: {
+                                localIdentName: '[name]_[local]_[hash:base64:5]',
+                                exportLocalsConvention: 'camelCase'
+                            }
                         }
                     },
                     {
@@ -71,20 +82,37 @@ const base = {
                 ]
             }
         ]
+    },
+    resolve: {
+        fallback: {
+            "path": require.resolve("path-browserify")
+        },
+        // webpack 5 respects the "exports" field in package.json, which breaks
+        // older packages like htmlparser2@3.10.0 that import un-exported paths.
+        // Disable to restore webpack 4 behavior for these legacy dependencies.
+        exportsFields: []
     }
 }
 
 module.exports = [
     {
+        name: 'gui',
         ...base,
         output: {
             path: path.resolve(__dirname, 'dist-renderer-webpack/editor/gui'),
-            filename: 'index.js'
+            filename: '[name].js'
         },
-        entry: './src-renderer-webpack/editor/gui/index.jsx',
+        entry: {
+            index: './src-renderer-webpack/editor/gui/index.jsx'
+        },
         plugins: [
             new DefinePlugin({
                 'process.env.ROOT': '""'
+            }),
+            new ProvidePlugin({
+                // webpack 5 no longer auto-polyfills process; provide it for
+                // dependencies that reference process.env.* or process directly.
+                process: 'process/browser'
             }),
 new (require('webpack')).NormalModuleReplacementPlugin(/^refractor\/(.+)$/, resource => {
     resource.request = refractorPath(resource.request.slice('refractor/'.length));
@@ -120,6 +148,7 @@ new (require('webpack')).NormalModuleReplacementPlugin(/^refractor$/, () => {
             })
         ],
         resolve: {
+            ...base.resolve,
             modules: [
                 path.resolve(__dirname, 'node_modules'),
                 path.resolve(__dirname, 'node_modules/scratch-gui/node_modules'),
@@ -140,12 +169,15 @@ new (require('webpack')).NormalModuleReplacementPlugin(/^refractor$/, () => {
     },
 
     {
+        name: 'addons',
         ...base,
         output: {
             path: path.resolve(__dirname, 'dist-renderer-webpack/editor/addons'),
-            filename: 'index.js'
+            filename: '[name].js'
         },
-        entry: './src-renderer-webpack/editor/addons/index.jsx',
+        entry: {
+            addons: './src-renderer-webpack/editor/addons/index.jsx'
+        },
         plugins: [
             new CopyWebpackPlugin({
                 patterns: [
