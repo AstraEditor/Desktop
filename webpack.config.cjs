@@ -2,12 +2,6 @@ const path = require('path');
 const { DefinePlugin, ProvidePlugin } = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
-const refractorPath = request => path.resolve(
-    __dirname,
-    request === 'core' || request === 'all' ?
-        '../scratch-gui/node_modules/refractor/lib/' + request + '.js' :
-        '../scratch-gui/node_modules/refractor/lang/' + request + '.js'
-);
 const base = {
     mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
     devtool: process.env.NODE_ENV === 'production' ? false : 'cheap-source-map',
@@ -73,12 +67,12 @@ const base = {
     },
     resolve: {
         fallback: {
-            "path": require.resolve("path-browserify")
+            "path": require.resolve("path-browserify"),
+            "url": require.resolve("url")
         },
-        // webpack 5 respects the "exports" field in package.json, which breaks
-        // older packages like htmlparser2@3.10.0 that import un-exported paths.
-        // Disable to restore webpack 4 behavior for these legacy dependencies.
-        exportsFields: []
+        // NOTE: exportsField is kept enabled because refractor@5.0.0 relies on it
+        // to map sub-path imports like "refractor/all" → "./lib/all.js".
+        // If htmlparser2@3.10.0 deps get wrong versions, add targeted aliases instead.
     }
 }
 
@@ -102,12 +96,6 @@ module.exports = [
                 // dependencies that reference process.env.* or process directly.
                 process: 'process/browser'
             }),
-new (require('webpack')).NormalModuleReplacementPlugin(/^refractor\/(.+)$/, resource => {
-    resource.request = refractorPath(resource.request.slice('refractor/'.length));
-}),
-new (require('webpack')).NormalModuleReplacementPlugin(/^refractor$/, () => {
-    return 'empty-module';
-}),
             new CopyWebpackPlugin({
                 patterns: [
                     {
@@ -137,9 +125,12 @@ new (require('webpack')).NormalModuleReplacementPlugin(/^refractor$/, () => {
         ],
         resolve: {
             ...base.resolve,
+            // NOTE: only default "node_modules" — no absolute paths.
+            // Absolute paths bypass pnpm's symlink structure and resolve to
+            // hoisted versions instead of the correct dependency-specific ones.
+            // E.g. entities@4.5.0 at Desktop root would shadow entities@1.1.2
+            // that htmlparser2@3.10.0 actually needs.
             modules: [
-                path.resolve(__dirname, 'node_modules'),
-                path.resolve(__dirname, 'node_modules/scratch-gui/node_modules'),
                 'node_modules'
             ],
             alias: {
