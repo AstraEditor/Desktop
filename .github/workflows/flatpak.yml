@@ -11,20 +11,23 @@ jobs:
         uses: actions/checkout@v4
 
       # -----------------------------
-      # 安装  Node
+      # 安装  Node & pnpm
       # -----------------------------
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 24
 
+      - name: Install pnpm
+        run: corepack enable && corepack prepare pnpm@latest --activate
+
       - name: Install dependencies
         run: |
-          rm -f package-lock.json
-          npm install --loglevel=info
+          rm -f pnpm-lock.yaml
+          pnpm install --loglevel=info
 
       - name: Fetch assets
-        run: npm run fetch
+        run: pnpm run fetch
 
       # -----------------------------
       # 安装  Flatpak & Runtime
@@ -50,7 +53,7 @@ jobs:
       # -----------------------------
       - name: Build Linux + Flatpak
         run: |
-          npm run build:linux
+          pnpm run build:linux
 
       # -----------------------------
       # 上传  Flatpak 构建产物

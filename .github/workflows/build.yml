@@ -20,18 +20,20 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: 24
-        cache: 'npm'
+
+    - name: Install pnpm
+      run: corepack enable && corepack prepare pnpm@latest --activate
 
     - name: Install dependencies
       run: |
-        rm -f package-lock.json
-        npm install --loglevel=info
+        rm -f pnpm-lock.yaml
+        pnpm install --loglevel=info
 
     - name: Fetch
-      run: npm run fetch
+      run: pnpm run fetch
 
     - name: Compile (webpack:prod)
-      run: npm run webpack:prod
+      run: pnpm run webpack:prod
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
@@ -84,7 +86,10 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: 24
-        cache: 'npm'
+        cache: 'pnpm'
+
+    - name: Install pnpm
+      run: corepack enable && corepack prepare pnpm@latest --activate
 
     - name: Install fpm
       if: matrix.format == 'pacman' || matrix.format == 'rpm'
@@ -92,8 +97,8 @@ jobs:
 
     - name: Install dependencies (skip postinstall)
       run: |
-        rm -f package-lock.json
-        npm install --loglevel=info --ignore-scripts
+        rm -f pnpm-lock.yaml
+        pnpm install --loglevel=info --ignore-scripts
 
     - name: Package
       run: |
@@ -144,12 +149,15 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: 24
-        cache: 'npm'
+        cache: 'pnpm'
+
+    - name: Install pnpm
+      run: corepack enable && corepack prepare pnpm@latest --activate
 
     - name: Install dependencies (skip postinstall)
       run: |
-        rm -f package-lock.json
-        npm install --loglevel=info --ignore-scripts
+        rm -f pnpm-lock.yaml
+        pnpm install --loglevel=info --ignore-scripts
 
     - name: Package
       run: |
@@ -196,12 +204,15 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: 24
-        cache: 'npm'
+        cache: 'pnpm'
+
+    - name: Install pnpm
+      run: corepack enable && corepack prepare pnpm@latest --activate
 
     - name: Install dependencies (skip postinstall)
       run: |
-        rm -f package-lock.json
-        npm install --loglevel=info --ignore-scripts
+        rm -f pnpm-lock.yaml
+        pnpm install --loglevel=info --ignore-scripts
 
     - name: Package
       run: |
@@ -278,17 +289,20 @@ jobs:
       with:
         node-version: 24
 
-    - name: Configure npm cache
+    - name: Install pnpm
+      shell: pwsh
+      run: corepack enable && corepack prepare pnpm@latest --activate
+
+    - name: Configure pnpm cache
       shell: pwsh
       run: |
-        npm config set cache D:\npm-cache
-        npm config set prefix D:\npm-prefix
+        pnpm config set store-dir D:\pnpm-store
 
     - name: Install dependencies (skip postinstall)
       working-directory: D:\repo
       run: |
-        Remove-Item -Path package-lock.json -Force -ErrorAction SilentlyContinue
-        npm install --loglevel=info --ignore-scripts
+        Remove-Item -Path pnpm-lock.yaml -Force -ErrorAction SilentlyContinue
+        pnpm install --loglevel=info --ignore-scripts
 
     - name: Package
       working-directory: D:\repo

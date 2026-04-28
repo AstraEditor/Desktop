@@ -17,7 +17,9 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: 24
-        cache: npm
+
+    - name: Install pnpm
+      run: corepack enable && corepack prepare pnpm@latest --activate
     - name: Install Python
       uses: actions/setup-python@v5
       with:
@@ -26,10 +28,10 @@ jobs:
       run: python --version
     - name: Install dependencies
       run: |
-        echo "=== Removing package-lock.json to use latest git commits ==="
-        rm package-lock.json
+        echo "=== Removing pnpm-lock.yaml to use latest git commits ==="
+        rm pnpm-lock.yaml
         echo "=== Installing dependencies ==="
-        npm install
+        pnpm install
     - name: Verify scratch-blocks has build files
       run: |
         echo "=== Checking if scratch-blocks has build files ==="
@@ -50,13 +52,13 @@ jobs:
           echo "This means the git commit doesn't have build files"
           exit 1
         fi
-    - name: Debug - Check package-lock.json
+    - name: Debug - Check pnpm-lock.yaml
       run: |
-        echo "=== Checking scratch-blocks in package-lock.json ==="
-        grep -A 5 '"scratch-blocks"' package-lock.json | grep resolved || true
+        echo "=== Checking scratch-blocks in pnpm-lock.yaml ==="
+        grep -A 5 '"scratch-blocks"' pnpm-lock.yaml | grep resolved || true
         echo ""
-        echo "=== Checking @turbowarp/scratch-l10n in package-lock.json ==="
-        grep -A 5 '"@turbowarp/scratch-l10n"' package-lock.json | grep resolved || true
+        echo "=== Checking @turbowarp/scratch-l10n in pnpm-lock.yaml ==="
+        grep -A 5 '"@turbowarp/scratch-l10n"' pnpm-lock.yaml | grep resolved || true
     - name: Debug - Check node_modules structure
       run: |
         echo "=== Scratch-blocks root directory ==="
@@ -105,10 +107,10 @@ jobs:
       # Don't need to do a full fetch, that would just cause a lot of unnecessary traffic
       run: node scripts/prepare-extensions.mjs
     - name: Compile
-      run: npm run webpack:compile
+      run: pnpm run webpack:compile
     - name: Package
       run: |
-        npm run electron:package:dir -- --config.disableSanityCheckAsar=true
+        pnpm run electron:package:dir -- --config.disableSanityCheckAsar=true
         if ! npx --yes asar list dist/linux-unpacked/resources/app.asar | grep -q "src-main/entrypoint.js"; then
           echo "::error::Entry point src-main/entrypoint.js not found in app.asar"
           echo "=== app.asar src-main preview ==="

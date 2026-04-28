@@ -26,17 +26,19 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 24
-          cache: npm
+
+      - name: Install pnpm
+        run: corepack enable && corepack prepare pnpm@latest --activate
 
       - name: Install dependencies
         run: |
-          rm -f package-lock.json
-          npm install --loglevel=info
+          rm -f pnpm-lock.yaml
+          pnpm install --loglevel=info
 
       - name: Fetch & Compile
         run: |
-          npm run fetch
-          npm run webpack:prod
+          pnpm run fetch
+          pnpm run webpack:prod
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
@@ -57,7 +59,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      max-parallel: 6 # 限制并发，防止 IO 竞争导致 ASAR 损坏
+      max-parallel: 6
       matrix:
         format: [debian, tarball, appimage, pacman, rpm]
         arch: [x64, armv7l, arm64]
@@ -68,12 +70,14 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: build-artifacts
-          path: . # 明确解压到当前目录
+          path: .
 
       - uses: actions/setup-node@v4
         with:
           node-version: 24
-          cache: npm
+
+      - name: Install pnpm
+        run: corepack enable && corepack prepare pnpm@latest --activate
 
       - name: Install system deps
         run: |
@@ -83,9 +87,9 @@ jobs:
 
       - name: Install dependencies
         run: |
-          rm -f package-lock.json
-          npm install --ignore-scripts
-          sync # 强制同步文件系统，确保 entrypoint.js 对 builder 可见
+          rm -f pnpm-lock.yaml
+          pnpm install --ignore-scripts
+          sync
 
       - name: Package
         run: |
@@ -118,8 +122,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 24
+      - name: Install pnpm
+        run: corepack enable && corepack prepare pnpm@latest --activate
       - name: Install dependencies
-        run: npm install --ignore-scripts && sync
+        run: pnpm install --ignore-scripts && sync
       - name: Package
         run: node release-automation/build.mjs --snap --x64 --production
       - uses: actions/upload-artifact@v4
@@ -156,8 +162,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 24
+      - name: Install pnpm
+        run: corepack enable && corepack prepare pnpm@latest --activate
       - name: Install dependencies
-        run: npm install --ignore-scripts && sync
+        run: pnpm install --ignore-scripts && sync
       - name: Package
         run: node release-automation/build.mjs ${{ matrix.args }} --production
       - uses: actions/upload-artifact@v4
@@ -228,17 +236,20 @@ jobs:
         with:
           node-version: 24
 
-      - name: Configure npm cache
+      - name: Install pnpm
+        shell: pwsh
+        run: corepack enable && corepack prepare pnpm@latest --activate
+
+      - name: Configure pnpm cache
         shell: pwsh
         run: |
-          npm config set cache D:\npm-cache
-          npm config set prefix D:\npm-prefix
+          pnpm config set store-dir D:\pnpm-store
 
       - name: Install dependencies (skip postinstall)
         working-directory: D:\repo
         run: |
-          Remove-Item -Path package-lock.json -Force -ErrorAction SilentlyContinue
-          npm install --loglevel=info --ignore-scripts
+          Remove-Item -Path pnpm-lock.yaml -Force -ErrorAction SilentlyContinue
+          pnpm install --loglevel=info --ignore-scripts
 
       - name: Package
         working-directory: D:\repo
@@ -253,7 +264,7 @@ jobs:
           retention-days: 1
 
 # ==========================================
-# 发布阶段 (修正了通配符和下载逻辑)
+# 发布阶段
 # ==========================================
   publish:
     needs: [package-linux, package-snap, package-mac, package-windows]
@@ -265,7 +276,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 24 # 
+          node-version: 24
 
       - name: Download all packages
         uses: actions/download-artifact@v4
