@@ -49,7 +49,7 @@
         "postcss-simple-vars": "^6.0.3",
         "process": "^0.11.10",
         "raw-loader": "^4.0.2",
-        "refractor": "^2.2.0",
+        "refractor": "^5.0.0",
         "scratch-blocks": "github:AstraEditor/scratch-blocks#develop-builds",
         "scratch-gui": "github:AstraEditor/scratch-gui#feature",
         "spdx-expression-parse": "^4.0.0",
