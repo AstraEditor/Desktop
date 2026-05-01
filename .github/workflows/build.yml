@@ -4,6 +4,9 @@ on:
   workflow_dispatch:
 
 jobs:
+  # ==========================================
+  # 统一构建步骤 (webpack:prod)
+  # ==========================================
   build:
     runs-on: ubuntu-latest
     steps:
@@ -85,10 +88,11 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: 24
-        cache: 'pnpm'
 
-    - name: Install pnpm
-      run: corepack enable && corepack prepare pnpm@latest --activate
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: latest
 
     - name: Install fpm
       if: matrix.format == 'pacman' || matrix.format == 'rpm'
@@ -148,10 +152,11 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: 24
-        cache: 'pnpm'
 
-    - name: Install pnpm
-      run: corepack enable && corepack prepare pnpm@latest --activate
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: latest
 
     - name: Install dependencies (skip postinstall)
       run: |
@@ -203,10 +208,11 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: 24
-        cache: 'pnpm'
 
-    - name: Install pnpm
-      run: corepack enable && corepack prepare pnpm@latest --activate
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: latest
 
     - name: Install dependencies (skip postinstall)
       run: |
@@ -288,9 +294,10 @@ jobs:
       with:
         node-version: 24
 
-    - name: Install pnpm
-      shell: pwsh
-      run: corepack enable && corepack prepare pnpm@latest --activate
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: latest
 
     - name: Configure pnpm cache
       shell: pwsh
