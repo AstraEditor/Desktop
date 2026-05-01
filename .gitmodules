@@ -1,3 +1,6 @@
 [submodule "docs/screenshots"]
 	path = docs/screenshots
 	url = https://github.com/TurboWarp/desktop-screenshots
+[submodule "mobile"]
+	path = mobile
+	url = https://github.com/AstraEditor/mobile.git

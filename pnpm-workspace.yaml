@@ -1,3 +1,7 @@
+packages:
+  - "."
+  - "mobile"
+
 onlyBuiltDependencies:
   - "electron"
   - "scratch-blocks"
