@@ -138,7 +138,35 @@ jobs:
     - name: Install system dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y strip-nondeterminism fakeroot snapcraft
+        sudo apt-get install -y strip-nondeterminism fakeroot
+
+    - name: Setup Snapcraft
+      run: |
+        # 确保 snapd 正确启动
+        sudo systemctl enable --now snapd
+        sudo systemctl start snapd.socket snapd.service
+        
+        # 等待 snapd 完全启动
+        sleep 10
+        
+        # 检查 snap 状态
+        sudo snap version
+        
+        # 安装 snapcraft，带重试机制
+        for i in {1..5}; do
+          echo "Attempt $i to install snapcraft..."
+          if sudo snap install snapcraft --classic; then
+            echo "snapcraft installed successfully"
+            break
+          else
+            echo "Attempt $i failed, waiting 10 seconds..."
+            sleep 10
+          fi
+        done
+        
+        # 验证安装
+        which snapcraft || (echo "ERROR: snapcraft installation failed" && exit 1)
+        snapcraft --version
 
     - name: Install Node.js
       uses: actions/setup-node@v4
