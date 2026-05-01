@@ -135,39 +135,6 @@ jobs:
       with:
         name: build-artifacts
 
-    - name: Install system dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y strip-nondeterminism fakeroot
-
-    - name: Setup Snapcraft
-      run: |
-        # 确保 snapd 正确启动
-        sudo systemctl enable --now snapd
-        sudo systemctl start snapd.socket snapd.service
-        
-        # 等待 snapd 完全启动
-        sleep 10
-        
-        # 检查 snap 状态
-        sudo snap version
-        
-        # 安装 snapcraft，带重试机制
-        for i in {1..5}; do
-          echo "Attempt $i to install snapcraft..."
-          if sudo snap install snapcraft --classic; then
-            echo "snapcraft installed successfully"
-            break
-          else
-            echo "Attempt $i failed, waiting 10 seconds..."
-            sleep 10
-          fi
-        done
-        
-        # 验证安装
-        which snapcraft || (echo "ERROR: snapcraft installation failed" && exit 1)
-        snapcraft --version
-
     - name: Install Node.js
       uses: actions/setup-node@v4
       with:
@@ -183,15 +150,23 @@ jobs:
         rm -f pnpm-lock.yaml
         pnpm install --loglevel=info --ignore-scripts
 
-    - name: Package
+    - name: Pull Snapcraft Docker image and package
       run: |
-        node release-automation/build.mjs --snap --x64 --production
+        # 拉取官方 snapcraft Docker 镜像
+        docker pull snapcore/snapcraft:stable
+        
+        # 使用 Docker 运行 snapcraft 打包
+        docker run --rm \
+          -v ${{ github.workspace }}:/workspace \
+          -w /workspace \
+          snapcore/snapcraft:stable \
+          bash -c "node release-automation/build.mjs --snap --x64 --production"
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
         name: linux-snap-x64
-        path: dist/*.*
+        path: dist/*.snap
         retention-days: 1
 
   # ==========================================
