@@ -62,7 +62,7 @@ importers:
         version: 8.4.1(@babel/core@7.29.0)(webpack@5.106.2)
       copy-webpack-plugin:
         specifier: ^6.4.1
-        version: 6.4.1(webpack@5.106.2(webpack-cli@5.1.4(webpack@5.106.2)))
+        version: 6.4.1(webpack@5.106.2)
       cross-env:
         specifier: ^10.1.0
         version: 10.1.0
@@ -116,7 +116,7 @@ importers:
         version: 4.0.0(webpack@5.106.2)
       terser-webpack-plugin:
         specifier: ^5.4.0
-        version: 5.5.0(webpack@5.106.2(webpack-cli@5.1.4(webpack@5.106.2)))
+        version: 5.5.0(webpack@5.106.2)
       url:
         specifier: ^0.11.4
         version: 0.11.4
@@ -125,7 +125,7 @@ importers:
         version: 4.1.1(file-loader@6.2.0(webpack@5.106.2))(webpack@5.106.2)
       webpack:
         specifier: ^5.98.0
-        version: 5.106.2(webpack-cli@5.1.4(webpack@5.106.2))
+        version: 5.106.2(webpack-cli@5.1.4)
       webpack-cli:
         specifier: ^5.1.4
         version: 5.1.4(webpack@5.106.2)
@@ -138,46 +138,19 @@ importers:
       '@tauri-apps/plugin-opener':
         specifier: ^2
         version: 2.5.3
-      prop-types:
-        specifier: ^15.8.1
-        version: 15.8.1
       react:
-        specifier: ^16.14.0
-        version: 16.14.0
+        specifier: ^19.1.0
+        version: 19.2.5
       react-dom:
-        specifier: ^16.14.0
-        version: 16.14.0(react@16.14.0)
-      redux:
-        specifier: ^4.2.1
-        version: 4.2.1
-      scratch-gui:
-        specifier: github:AstraEditor/scratch-gui#feature
-        version: https://codeload.github.com/AstraEditor/scratch-gui/tar.gz/0a206a7b416255ac165e5267a6f6e1d4780b52eb(encoding@0.1.13)(react-dom@16.14.0(react@16.14.0))(react-intl-redux@0.7.0(react-intl@2.9.0(prop-types@15.8.1)(react@16.14.0))(react-redux@5.0.7(react@16.14.0)(redux@4.2.1)))(react@16.14.0)(scratch-render-fonts@https://codeload.github.com/TurboWarp/scratch-render-fonts/tar.gz/7b6768fc6dfef6b343a06f992587b74807043961)(tslib@2.8.1)(webpack@5.106.2(webpack-cli@5.1.4(webpack@5.106.2)))
-      scratch-render-fonts:
-        specifier: github:TurboWarp/scratch-render-fonts#master
-        version: https://codeload.github.com/TurboWarp/scratch-render-fonts/tar.gz/7b6768fc6dfef6b343a06f992587b74807043961
-      scratch-vm:
-        specifier: github:AstraEditor/scratch-vm#master
-        version: https://codeload.github.com/AstraEditor/scratch-vm/tar.gz/41e33bf5b621474e4f4f04ce3c4141be2f5ac426(@turbowarp/scratch-svg-renderer@1.0.202505311824)
+        specifier: ^19.1.0
+        version: 19.2.5(react@19.2.5)
     devDependencies:
       '@tauri-apps/cli':
         specifier: ^2
         version: 2.10.1
       '@vitejs/plugin-react':
-        specifier: ^4.7.0
+        specifier: ^4.6.0
         version: 4.7.0(vite@7.3.2(@types/node@25.5.0)(jiti@2.6.1)(terser@5.46.1))
-      autoprefixer:
-        specifier: ^10.4.20
-        version: 10.5.0(postcss@8.5.8)
-      postcss:
-        specifier: ^8.5.3
-        version: 8.5.8
-      postcss-import:
-        specifier: ^16.1.0
-        version: 16.1.1(postcss@8.5.8)
-      postcss-simple-vars:
-        specifier: ^7.0.1
-        version: 7.0.1(postcss@8.5.8)
       vite:
         specifier: ^7.0.4
         version: 7.3.2(@types/node@25.5.0)(jiti@2.6.1)(terser@5.46.1)
@@ -1364,7 +1337,6 @@ packages:
 
   '@turbowarp/scratch-svg-renderer@1.0.202505311824':
     resolution: {integrity: sha512-EaKVqIuEwrr4SzQGOVyr8GBE+DGzUbbn38qiV6DMWFzb++/HgWl1qdlKA/j+mOK+GDwYydMFP0FuWYvWBkt6sA==}
-    version: 1.0.202505311824
     peerDependencies:
       scratch-render-fonts: github:TurboWarp/scratch-render-fonts#master
 
@@ -1700,13 +1672,6 @@ packages:
     engines: {node: '>= 4.5.0'}
     hasBin: true
 
-  autoprefixer@10.5.0:
-    resolution: {integrity: sha512-FMhOoZV4+qR6aTUALKX2rEqGG+oyATvwBt9IIzVR5rMa2HRWPkxf+P+PAJLD1I/H5/II+HuZcBJYEFBpq39ong==}
-    engines: {node: ^10 || ^12 || >=14}
-    hasBin: true
-    peerDependencies:
-      postcss: ^8.1.0
-
   autoprefixer@9.8.8:
     resolution: {integrity: sha512-eM9d/swFopRt5gdJ7jrpCwgvEMIayITpojhkkSMRsFHYuH5bkSQ4p/9qTEHtmNudUZh22Tehu7I6CxAW0IXTKA==}
     hasBin: true
@@ -1779,11 +1744,6 @@ packages:
   base64-loader@1.0.0:
     resolution: {integrity: sha512-p32+F8dg+ANGx7s8QsZS74ZPHfIycmC2yZcoerzFgbersIYWitPbbF39G6SBx3gyvzyLH5nt1ooocxr0IHuWKA==}
 
-  baseline-browser-mapping@2.10.24:
-    resolution: {integrity: sha512-I2NkZOOrj2XuguvWCK6OVh9GavsNjZjK908Rq3mIBK25+GD8vPX5w2WdxVqnQ7xx3SrZJiCiZFu+/Oz50oSYSA==}
-    engines: {node: '>=6.0.0'}
-    hasBin: true
-
   baseline-browser-mapping@2.10.9:
     resolution: {integrity: sha512-OZd0e2mU11ClX8+IdXe3r0dbqMEznRiT4TfbhYIbcRPZkqJ7Qwer8ij3GZAmLsRKa+II9V1v5czCkvmHH3XZBg==}
     engines: {node: '>=6.0.0'}
@@ -1839,11 +1799,6 @@ packages:
 
   browserslist@4.28.1:
     resolution: {integrity: sha512-ZC5Bd0LgJXgwGqUknZY/vkUQ04r8NXnJZ3yYi4vDmSiZmC/pdSN0NbNRPxZpbtO4uAfDUAFffO8IZoM3Gj8IkA==}
-    engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
-    hasBin: true
-
-  browserslist@4.28.2:
-    resolution: {integrity: sha512-48xSriZYYg+8qXna9kwqjIVzuQxi+KYWp2+5nCYnYKPTr0LvD89Jqk2Or5ogxz0NUMfIjhh2lIUX/LyX9B4oIg==}
     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
     hasBin: true
 
@@ -1937,9 +1892,6 @@ packages:
 
   caniuse-lite@1.0.30001780:
     resolution: {integrity: sha512-llngX0E7nQci5BPJDqoZSbuZ5Bcs9F5db7EtgfwBerX9XGtkkiO4NwfDDIRzHTTwcYC8vC7bmeUEPGrKlR/TkQ==}
-
-  caniuse-lite@1.0.30001791:
-    resolution: {integrity: sha512-yk0l/YSrOnFZk3UROpDLQD9+kC1l4meK/wed583AXrzoarMGJcbRi2Q4RaUYbKxYAsZ8sWmaSa/DsLmdBeI1vQ==}
 
   canvas-toBlob@1.0.0:
     resolution: {integrity: sha512-oU5bawygt/Nef9F+C49eTFmzXzz6yKdGqn6J1wn/LZQF5ulnnZVm0KIZzik85I6tjCbZFH6aa47j4bU2tkHxRw==}
@@ -2426,9 +2378,6 @@ packages:
   electron-to-chromium@1.5.321:
     resolution: {integrity: sha512-L2C7Q279W2D/J4PLZLk7sebOILDSWos7bMsMNN06rK482umHUrh/3lM8G7IlHFOYip2oAg5nha1rCMxr/rs6ZQ==}
 
-  electron-to-chromium@1.5.345:
-    resolution: {integrity: sha512-F9JXQGiMrz6yVNPI2qOVPvB9HzjH5cGzhs8oJ6A28V5L/YnzN/0KsuiibqF+F1Fd9qxFzD1BUnYSd8JfULxTwg==}
-
   electron-winstaller@5.4.0:
     resolution: {integrity: sha512-bO3y10YikuUwUuDUQRM4KfwNkKhnpVO7IPdbsrejwN9/AABJzzTQ4GeHwyzNSrVO+tEH3/Np255a3sVZpZDjvg==}
     engines: {node: '>=8.0.0'}
@@ -2819,9 +2768,6 @@ packages:
   forwarded@0.2.0:
     resolution: {integrity: sha512-buRG0fpBtRHSTCOASe6hD258tEubFoRLb4ZNA6NxMVHNw2gOcwHo9wyablzMzOA5z9xA9L1KNjk/Nt6MT9aYow==}
     engines: {node: '>= 0.6'}
-
-  fraction.js@5.3.4:
-    resolution: {integrity: sha512-1X1NTtiJphryn/uLQz3whtY6jK3fTqoE3ohKs0tT+Ujr1W59oopxmoEh7Lu5p6vBaPbgoM0bzveAW4Qi5RyWDQ==}
 
   fresh@2.0.0:
     resolution: {integrity: sha512-Rx/WycZ60HOaqLKAi6cHRKKI7zxWbJ31MhntmtwMoaTeF7XFH9hhBp8vITaMidfljRQ6eYWCKkaTK+ykVJHP2A==}
@@ -4100,12 +4046,6 @@ packages:
     peerDependencies:
       postcss: ^8.0.0
 
-  postcss-import@16.1.1:
-    resolution: {integrity: sha512-2xVS1NCZAfjtVdvXiyegxzJ447GyqCeEI5V7ApgQVOWnros1p5lGNovJNapwPpMombyFBfqDwt7AD3n2l0KOfQ==}
-    engines: {node: '>=18.0.0'}
-    peerDependencies:
-      postcss: ^8.0.0
-
   postcss-load-config@2.1.2:
     resolution: {integrity: sha512-/rDeGV6vMUo3mwJZmeHfEDvwnTKKqQ0S7OHUi/kJvvtx3aWtyWG2/0ZWnzCt2keEclwN6Tf0DST2v9kITdOKYw==}
     engines: {node: '>= 4'}
@@ -4155,12 +4095,6 @@ packages:
   postcss-simple-vars@6.0.3:
     resolution: {integrity: sha512-fkNn4Zio8vN4vIig9IFdb8lVlxWnYR769RgvxCM6YWlFKie/nQaOcaMMMFz/s4gsfHW4/5bJW+i57zD67mQU7g==}
     engines: {node: '>=10.0'}
-    peerDependencies:
-      postcss: ^8.2.1
-
-  postcss-simple-vars@7.0.1:
-    resolution: {integrity: sha512-5GLLXaS8qmzHMOjVxqkk1TZPf1jMqesiI7qLhnlyERalG0sMbHIbJqrcnrpmZdKCLglHnRHoEBB61RtGTsj++A==}
-    engines: {node: '>=14.0'}
     peerDependencies:
       postcss: ^8.2.1
 
@@ -4312,6 +4246,11 @@ packages:
     peerDependencies:
       react: ^16.14.0
 
+  react-dom@19.2.5:
+    resolution: {integrity: sha512-J5bAZz+DXMMwW/wV3xzKke59Af6CHY7G4uYLN1OvBcKEsWOs4pQExj86BBKamxl/Ik5bx9whOrvBlSDfWzgSag==}
+    peerDependencies:
+      react: ^19.2.5
+
   react-draggable@3.0.5:
     resolution: {integrity: sha512-qo76q6+pafyGllbmfc+CgWfOkwY9v3UoJa3jp6xG2vdsRY8uJTN1kqNievLj0uVNjEqCvZ0OFiEBxlAJNj3OTg==}
     peerDependencies:
@@ -4402,6 +4341,10 @@ packages:
 
   react@16.14.0:
     resolution: {integrity: sha512-0X2CImDkJGApiAlcf0ODKIneSwBPhqJawOa5wCtKbu7ZECrmS26NvtSILynQ66cgkT/RJ4LidJOc3bUESwmU8g==}
+    engines: {node: '>=0.10.0'}
+
+  react@19.2.5:
+    resolution: {integrity: sha512-llUJLzz1zTUBrskt2pwZgLq59AemifIftw4aB7JxOqf1HY2FDaGDxgwpAPVzHU1kdWabH7FauP4i1oEeer2WCA==}
     engines: {node: '>=0.10.0'}
 
   read-binary-file-arch@1.0.6:
@@ -4588,6 +4531,9 @@ packages:
   scheduler@0.19.1:
     resolution: {integrity: sha512-n/zwRWRYSUj0/3g/otKDRPMh6qv2SYMWNq85IEa8iZyAv8od9zDYpGSnpBEjNgcMNq6Scbu5KfIPxNF72R/2EA==}
 
+  scheduler@0.27.0:
+    resolution: {integrity: sha512-eNv+WrVbKu1f3vbYJT/xtiF5syA5HPIMtf9IgY/nKg0sWqzAUEvqY/xm7OcZc/qafLx/iO9FgOmeSAp4v5ti/Q==}
+
   schema-utils@0.4.7:
     resolution: {integrity: sha512-v/iwU6wvwGK8HbU9yi3/nhGzP0yGSuhQMzL6ySiec1FSrZZDkhm4noOSWzrNFo/jEc+SJY6jRTwuwbSXJPDUnQ==}
     engines: {node: '>= 4'}
@@ -4608,20 +4554,13 @@ packages:
     resolution: {integrity: sha512-eflK8wEtyOE6+hsaRVPxvUKYCpRgzLqDTb8krvAsRIwOGlHoSgYLgBXoubGgLd2fT41/OUYdb48v4k4WWHQurA==}
     engines: {node: '>= 10.13.0'}
 
-  scratch-audio@https://codeload.github.com/AstraEditor/scratch-audio/tar.gz/aba00cd02e36d95407effafa03f3678e4c669b30:
-    resolution: {tarball: https://codeload.github.com/AstraEditor/scratch-audio/tar.gz/aba00cd02e36d95407effafa03f3678e4c669b30}
+  scratch-audio@https://codeload.github.com/AstraEditor/scratch-audio/tar.gz/ebb2284ecfe56269d6899f6ecfe1fbf41dd70d0c:
+    resolution: {tarball: https://codeload.github.com/AstraEditor/scratch-audio/tar.gz/ebb2284ecfe56269d6899f6ecfe1fbf41dd70d0c}
     version: 0.1.0
 
   scratch-blocks@https://codeload.github.com/AstraEditor/scratch-blocks/tar.gz/3b7e8cb93d9d17c813f687b6720fc5f148c69e1b:
     resolution: {tarball: https://codeload.github.com/AstraEditor/scratch-blocks/tar.gz/3b7e8cb93d9d17c813f687b6720fc5f148c69e1b}
     version: 0.1.0
-
-  scratch-gui@https://codeload.github.com/AstraEditor/scratch-gui/tar.gz/0a206a7b416255ac165e5267a6f6e1d4780b52eb:
-    resolution: {tarball: https://codeload.github.com/AstraEditor/scratch-gui/tar.gz/0a206a7b416255ac165e5267a6f6e1d4780b52eb}
-    version: 3.2.37
-    peerDependencies:
-      react: ^16.0.0
-      react-dom: ^16.0.0
 
   scratch-gui@https://codeload.github.com/AstraEditor/scratch-gui/tar.gz/9354827ab4ecbbe6b4259cef13df2d2114f46f66:
     resolution: {tarball: https://codeload.github.com/AstraEditor/scratch-gui/tar.gz/9354827ab4ecbbe6b4259cef13df2d2114f46f66}
@@ -4649,10 +4588,6 @@ packages:
     resolution: {tarball: https://codeload.github.com/TurboWarp/scratch-parser/tar.gz/5e21d953d58d92672956030b9f93402f11249c96}
     version: 0.0.0-development
     engines: {node: '>=8.0'}
-
-  scratch-render-fonts@https://codeload.github.com/TurboWarp/scratch-render-fonts/tar.gz/7b6768fc6dfef6b343a06f992587b74807043961:
-    resolution: {tarball: https://codeload.github.com/TurboWarp/scratch-render-fonts/tar.gz/7b6768fc6dfef6b343a06f992587b74807043961}
-    version: 1.0.0
 
   scratch-render@https://codeload.github.com/AstraEditor/scratch-render/tar.gz/b865aaf383b7f53d3653c0fdb25c7f5fe65e5f08:
     resolution: {tarball: https://codeload.github.com/AstraEditor/scratch-render/tar.gz/b865aaf383b7f53d3653c0fdb25c7f5fe65e5f08}
@@ -6722,7 +6657,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@turbowarp/scratch-storage@0.0.202505311821(encoding@0.1.13)(webpack@5.106.2(webpack-cli@5.1.4(webpack@5.106.2)))':
+  '@turbowarp/scratch-storage@0.0.202505311821(encoding@0.1.13)(webpack@5.106.2)':
     dependencies:
       '@babel/runtime': 7.21.0
       '@turbowarp/nanolog': 0.2.0
@@ -6730,18 +6665,17 @@ snapshots:
       base64-js: 1.3.0
       cross-fetch: 3.1.5(encoding@0.1.13)
       js-md5: 0.7.3
-      worker-loader: 2.0.0(webpack@5.106.2(webpack-cli@5.1.4(webpack@5.106.2)))
+      worker-loader: 2.0.0(webpack@5.106.2)
     transitivePeerDependencies:
       - encoding
       - webpack
 
-  '@turbowarp/scratch-svg-renderer@1.0.202505311824(scratch-render-fonts@https://codeload.github.com/TurboWarp/scratch-render-fonts/tar.gz/7b6768fc6dfef6b343a06f992587b74807043961)':
+  '@turbowarp/scratch-svg-renderer@1.0.202505311824':
     dependencies:
       '@turbowarp/nanolog': 0.2.0
       base64-js: 1.2.1
       base64-loader: 1.0.0
       dompurify: 2.5.9
-      scratch-render-fonts: https://codeload.github.com/TurboWarp/scratch-render-fonts/tar.gz/7b6768fc6dfef6b343a06f992587b74807043961
       transformation-matrix: 1.15.0
 
   '@turbowarp/scratchblocks@3.6.7': {}
@@ -6944,19 +6878,19 @@ snapshots:
       '@webassemblyjs/ast': 1.14.1
       '@xtuc/long': 4.2.2
 
-  '@webpack-cli/configtest@2.1.1(webpack-cli@5.1.4(webpack@5.106.2))(webpack@5.106.2)':
+  '@webpack-cli/configtest@2.1.1(webpack-cli@5.1.4)(webpack@5.106.2)':
     dependencies:
-      webpack: 5.106.2(webpack-cli@5.1.4(webpack@5.106.2))
+      webpack: 5.106.2(webpack-cli@5.1.4)
       webpack-cli: 5.1.4(webpack@5.106.2)
 
-  '@webpack-cli/info@2.0.2(webpack-cli@5.1.4(webpack@5.106.2))(webpack@5.106.2)':
+  '@webpack-cli/info@2.0.2(webpack-cli@5.1.4)(webpack@5.106.2)':
     dependencies:
-      webpack: 5.106.2(webpack-cli@5.1.4(webpack@5.106.2))
+      webpack: 5.106.2(webpack-cli@5.1.4)
       webpack-cli: 5.1.4(webpack@5.106.2)
 
-  '@webpack-cli/serve@2.0.5(webpack-cli@5.1.4(webpack@5.106.2))(webpack@5.106.2)':
+  '@webpack-cli/serve@2.0.5(webpack-cli@5.1.4)(webpack@5.106.2)':
     dependencies:
-      webpack: 5.106.2(webpack-cli@5.1.4(webpack@5.106.2))
+      webpack: 5.106.2(webpack-cli@5.1.4)
       webpack-cli: 5.1.4(webpack@5.106.2)
 
   '@xmldom/xmldom@0.8.11': {}
@@ -7126,15 +7060,6 @@ snapshots:
 
   atob@2.1.2: {}
 
-  autoprefixer@10.5.0(postcss@8.5.8):
-    dependencies:
-      browserslist: 4.28.2
-      caniuse-lite: 1.0.30001791
-      fraction.js: 5.3.4
-      picocolors: 1.1.1
-      postcss: 8.5.8
-      postcss-value-parser: 4.2.0
-
   autoprefixer@9.8.8:
     dependencies:
       browserslist: 4.28.1
@@ -7160,7 +7085,7 @@ snapshots:
       loader-utils: 2.0.4
       make-dir: 3.1.0
       schema-utils: 2.7.1
-      webpack: 5.106.2(webpack-cli@5.1.4(webpack@5.106.2))
+      webpack: 5.106.2(webpack-cli@5.1.4)
 
   babel-plugin-polyfill-corejs2@0.4.17(@babel/core@7.29.0):
     dependencies:
@@ -7218,8 +7143,6 @@ snapshots:
   base64-js@1.5.1: {}
 
   base64-loader@1.0.0: {}
-
-  baseline-browser-mapping@2.10.24: {}
 
   baseline-browser-mapping@2.10.9: {}
 
@@ -7295,14 +7218,6 @@ snapshots:
       electron-to-chromium: 1.5.321
       node-releases: 2.0.36
       update-browserslist-db: 1.2.3(browserslist@4.28.1)
-
-  browserslist@4.28.2:
-    dependencies:
-      baseline-browser-mapping: 2.10.24
-      caniuse-lite: 1.0.30001791
-      electron-to-chromium: 1.5.345
-      node-releases: 2.0.36
-      update-browserslist-db: 1.2.3(browserslist@4.28.2)
 
   btoa@1.2.1: {}
 
@@ -7451,8 +7366,6 @@ snapshots:
   callsites@3.1.0: {}
 
   caniuse-lite@1.0.30001780: {}
-
-  caniuse-lite@1.0.30001791: {}
 
   canvas-toBlob@1.0.0: {}
 
@@ -7616,7 +7529,7 @@ snapshots:
 
   cookie@0.7.2: {}
 
-  copy-webpack-plugin@6.4.1(webpack@5.106.2(webpack-cli@5.1.4(webpack@5.106.2))):
+  copy-webpack-plugin@6.4.1(webpack@5.106.2):
     dependencies:
       cacache: 15.3.0
       fast-glob: 3.3.3
@@ -7628,7 +7541,7 @@ snapshots:
       p-limit: 3.1.0
       schema-utils: 3.3.0
       serialize-javascript: 5.0.1
-      webpack: 5.106.2(webpack-cli@5.1.4(webpack@5.106.2))
+      webpack: 5.106.2(webpack-cli@5.1.4)
       webpack-sources: 1.4.3
     transitivePeerDependencies:
       - bluebird
@@ -7696,7 +7609,7 @@ snapshots:
       postcss-value-parser: 4.2.0
       semver: 7.7.4
     optionalDependencies:
-      webpack: 5.106.2(webpack-cli@5.1.4(webpack@5.106.2))
+      webpack: 5.106.2(webpack-cli@5.1.4)
 
   css-mediaquery@0.1.2: {}
 
@@ -7978,8 +7891,6 @@ snapshots:
       - supports-color
 
   electron-to-chromium@1.5.321: {}
-
-  electron-to-chromium@1.5.345: {}
 
   electron-winstaller@5.4.0:
     dependencies:
@@ -8324,7 +8235,7 @@ snapshots:
     dependencies:
       loader-utils: 2.0.4
       schema-utils: 3.3.0
-      webpack: 5.106.2(webpack-cli@5.1.4(webpack@5.106.2))
+      webpack: 5.106.2(webpack-cli@5.1.4)
 
   file-type@11.1.0: {}
 
@@ -8437,8 +8348,6 @@ snapshots:
   format@0.2.2: {}
 
   forwarded@0.2.0: {}
-
-  fraction.js@5.3.4: {}
 
   fresh@2.0.0: {}
 
@@ -9709,13 +9618,6 @@ snapshots:
       read-cache: 1.0.0
       resolve: 1.22.11
 
-  postcss-import@16.1.1(postcss@8.5.8):
-    dependencies:
-      postcss: 8.5.8
-      postcss-value-parser: 4.2.0
-      read-cache: 1.0.0
-      resolve: 1.22.11
-
   postcss-load-config@2.1.2:
     dependencies:
       cosmiconfig: 5.2.1
@@ -9736,7 +9638,7 @@ snapshots:
       postcss: 8.5.8
       schema-utils: 3.3.0
       semver: 7.7.4
-      webpack: 5.106.2(webpack-cli@5.1.4(webpack@5.106.2))
+      webpack: 5.106.2(webpack-cli@5.1.4)
 
   postcss-modules-extract-imports@3.1.0(postcss@8.5.8):
     dependencies:
@@ -9769,10 +9671,6 @@ snapshots:
       postcss: 7.0.39
 
   postcss-simple-vars@6.0.3(postcss@8.5.8):
-    dependencies:
-      postcss: 8.5.8
-
-  postcss-simple-vars@7.0.1(postcss@8.5.8):
     dependencies:
       postcss: 8.5.8
 
@@ -9894,7 +9792,7 @@ snapshots:
     dependencies:
       loader-utils: 2.0.4
       schema-utils: 3.3.0
-      webpack: 5.106.2(webpack-cli@5.1.4(webpack@5.106.2))
+      webpack: 5.106.2(webpack-cli@5.1.4)
 
   react-contextmenu@2.9.4(prop-types@15.8.1)(react-dom@16.14.0(react@16.14.0))(react@16.14.0):
     dependencies:
@@ -9912,6 +9810,11 @@ snapshots:
       react: 16.14.0
       scheduler: 0.19.1
 
+  react-dom@19.2.5(react@19.2.5):
+    dependencies:
+      react: 19.2.5
+      scheduler: 0.27.0
+
   react-draggable@3.0.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0):
     dependencies:
       classnames: 2.2.6
@@ -9928,7 +9831,7 @@ snapshots:
     dependencies:
       prop-types: 15.8.1
       react-intl: 2.9.0(prop-types@15.8.1)(react@16.14.0)
-      react-redux: 5.0.7(react@16.14.0)(redux@3.7.2)
+      react-redux: 5.0.7(react@16.14.0)(redux@4.2.1)
 
   react-intl@2.9.0(prop-types@15.8.1)(react@16.14.0):
     dependencies:
@@ -10052,6 +9955,8 @@ snapshots:
       loose-envify: 1.4.0
       object-assign: 4.1.1
       prop-types: 15.8.1
+
+  react@19.2.5: {}
 
   read-binary-file-arch@1.0.6:
     dependencies:
@@ -10314,6 +10219,8 @@ snapshots:
       loose-envify: 1.4.0
       object-assign: 4.1.1
 
+  scheduler@0.27.0: {}
+
   schema-utils@0.4.7:
     dependencies:
       ajv: 6.14.0
@@ -10344,7 +10251,7 @@ snapshots:
       ajv-formats: 2.1.1(ajv@8.20.0)
       ajv-keywords: 5.1.0(ajv@8.20.0)
 
-  scratch-audio@https://codeload.github.com/AstraEditor/scratch-audio/tar.gz/aba00cd02e36d95407effafa03f3678e4c669b30:
+  scratch-audio@https://codeload.github.com/AstraEditor/scratch-audio/tar.gz/ebb2284ecfe56269d6899f6ecfe1fbf41dd70d0c:
     dependencies:
       '@turbowarp/nanolog': 0.2.0
       '@turbowarp/startaudiocontext': 1.0.0
@@ -10354,93 +10261,14 @@ snapshots:
       exports-loader: 0.7.0
       imports-loader: 0.8.0
 
-  scratch-gui@https://codeload.github.com/AstraEditor/scratch-gui/tar.gz/0a206a7b416255ac165e5267a6f6e1d4780b52eb(encoding@0.1.13)(react-dom@16.14.0(react@16.14.0))(react-intl-redux@0.7.0(react-intl@2.9.0(prop-types@15.8.1)(react@16.14.0))(react-redux@5.0.7(react@16.14.0)(redux@4.2.1)))(react@16.14.0)(scratch-render-fonts@https://codeload.github.com/TurboWarp/scratch-render-fonts/tar.gz/7b6768fc6dfef6b343a06f992587b74807043961)(tslib@2.8.1)(webpack@5.106.2(webpack-cli@5.1.4(webpack@5.106.2))):
-    dependencies:
-      '@microbit/microbit-universal-hex': 0.2.2(tslib@2.8.1)
-      '@turbowarp/jszip': 3.12.0
-      '@turbowarp/nanolog': 1.0.1
-      '@turbowarp/scratch-l10n': https://codeload.github.com/AstraEditor/scratch-l10n/tar.gz/de6aa6e2813a30a2ad63d531147eed9b1056308a
-      '@turbowarp/scratch-storage': 0.0.202505311821(encoding@0.1.13)(webpack@5.106.2(webpack-cli@5.1.4(webpack@5.106.2)))
-      '@turbowarp/scratch-svg-renderer': 1.0.202505311824(scratch-render-fonts@https://codeload.github.com/TurboWarp/scratch-render-fonts/tar.gz/7b6768fc6dfef6b343a06f992587b74807043961)
-      '@turbowarp/startaudiocontext': 1.0.0
-      arraybuffer-loader: 1.0.8
-      autoprefixer: 9.8.8
-      babel-plugin-react-intl: 3.5.1
-      balance-text: 3.3.1
-      base64-loader: 1.0.0
-      bowser: 1.9.4
-      chart.js: 4.5.1
-      classnames: 2.2.6
-      computed-style-to-inline-style: 3.0.0
-      cookie: 0.5.0
-      copy-webpack-plugin: 6.4.1(webpack@5.106.2(webpack-cli@5.1.4(webpack@5.106.2)))
-      core-js: 3.49.0
-      dapjs: 2.3.0
-      es6-object-assign: 1.1.0
-      get-float-time-domain-data: 0.1.0
-      get-user-media-promise: 1.1.4
-      immutable: 3.8.2
-      intl: 1.2.5
-      intl-messageformat: 2.2.0
-      js-base64: 2.4.9
-      keymirror: 0.1.1
-      lodash.bindall: 4.4.0
-      lodash.debounce: 4.0.8
-      lodash.defaultsdeep: 4.6.1
-      lodash.omit: 4.5.0
-      lodash.throttle: 4.0.1
-      omggif: 1.0.9
-      papaparse: 5.3.0
-      postcss-import: 12.0.1
-      postcss-loader: 3.0.0
-      postcss-simple-vars: 5.0.2
-      prop-types: 15.8.1
-      query-string: 5.1.1
-      react: 16.14.0
-      react-contextmenu: 2.9.4(prop-types@15.8.1)(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
-      react-dom: 16.14.0(react@16.14.0)
-      react-draggable: 3.0.5(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
-      react-ga: 2.5.3
-      react-intl: 2.9.0(prop-types@15.8.1)(react@16.14.0)
-      react-markdown: 4.3.1(react@16.14.0)
-      react-modal: 3.9.1(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
-      react-popover: 0.5.10
-      react-redux: 5.0.7(react@16.14.0)(redux@3.7.2)
-      react-responsive: 5.0.0(react@16.14.0)
-      react-string-replace: 0.4.4
-      react-style-proptype: 3.2.2
-      react-syntax-highlighter: 16.1.1(react@16.14.0)
-      react-tabs: 2.3.0(react@16.14.0)
-      react-tooltip: 3.8.0(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
-      react-virtualized: 9.20.1(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
-      redux: 3.7.2
-      redux-throttle: 0.1.1
-      scratch-audio: https://codeload.github.com/AstraEditor/scratch-audio/tar.gz/aba00cd02e36d95407effafa03f3678e4c669b30
-      scratch-blocks: https://codeload.github.com/AstraEditor/scratch-blocks/tar.gz/3b7e8cb93d9d17c813f687b6720fc5f148c69e1b
-      scratch-paint: https://codeload.github.com/AstraEditor/scratch-paint/tar.gz/dba550ca8a0e0616473e1a3503ad37399fa69b6b(react-dom@16.14.0(react@16.14.0))(react-intl-redux@0.7.0(react-intl@2.9.0(prop-types@15.8.1)(react@16.14.0))(react-redux@5.0.7(react@16.14.0)(redux@4.2.1)))(react-intl@2.9.0(prop-types@15.8.1)(react@16.14.0))(react-popover@0.5.10)(react-redux@5.0.7(react@16.14.0)(redux@4.2.1))(react-responsive@5.0.0(react@16.14.0))(react-style-proptype@3.2.2)(react-tooltip@3.8.0(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react@16.14.0)(redux@3.7.2)
-      scratch-render: https://codeload.github.com/AstraEditor/scratch-render/tar.gz/b865aaf383b7f53d3653c0fdb25c7f5fe65e5f08(scratch-render-fonts@https://codeload.github.com/TurboWarp/scratch-render-fonts/tar.gz/7b6768fc6dfef6b343a06f992587b74807043961)(webpack@5.106.2(webpack-cli@5.1.4(webpack@5.106.2)))
-      scratch-vm: https://codeload.github.com/AstraEditor/scratch-vm/tar.gz/41e33bf5b621474e4f4f04ce3c4141be2f5ac426(@turbowarp/scratch-svg-renderer@1.0.202505311824)
-      text-encoding: 0.7.0
-      to-style: 1.3.3
-      wav-encoder: 1.3.0
-      xhr: 2.5.0
-    transitivePeerDependencies:
-      - bluebird
-      - encoding
-      - react-intl-redux
-      - scratch-render-fonts
-      - supports-color
-      - tslib
-      - webpack
-
   scratch-gui@https://codeload.github.com/AstraEditor/scratch-gui/tar.gz/9354827ab4ecbbe6b4259cef13df2d2114f46f66(encoding@0.1.13)(react-dom@16.14.0(react@16.14.0))(react-intl-redux@0.7.0(react-intl@2.9.0(prop-types@15.8.1)(react@16.14.0))(react-redux@5.0.7(react@16.14.0)(redux@4.2.1)))(react@16.14.0)(tslib@2.8.1)(webpack@5.106.2):
     dependencies:
       '@microbit/microbit-universal-hex': 0.2.2(tslib@2.8.1)
       '@turbowarp/jszip': 3.12.0
       '@turbowarp/nanolog': 1.0.1
       '@turbowarp/scratch-l10n': https://codeload.github.com/AstraEditor/scratch-l10n/tar.gz/de6aa6e2813a30a2ad63d531147eed9b1056308a
-      '@turbowarp/scratch-storage': 0.0.202505311821(encoding@0.1.13)(webpack@5.106.2(webpack-cli@5.1.4(webpack@5.106.2)))
-      '@turbowarp/scratch-svg-renderer': 1.0.202505311824(scratch-render-fonts@https://codeload.github.com/TurboWarp/scratch-render-fonts/tar.gz/7b6768fc6dfef6b343a06f992587b74807043961)
+      '@turbowarp/scratch-storage': 0.0.202505311821(encoding@0.1.13)(webpack@5.106.2)
+      '@turbowarp/scratch-svg-renderer': 1.0.202505311824
       '@turbowarp/startaudiocontext': 1.0.0
       arraybuffer-loader: 1.0.8
       autoprefixer: 9.8.8
@@ -10452,7 +10280,7 @@ snapshots:
       classnames: 2.2.6
       computed-style-to-inline-style: 3.0.0
       cookie: 0.5.0
-      copy-webpack-plugin: 6.4.1(webpack@5.106.2(webpack-cli@5.1.4(webpack@5.106.2)))
+      copy-webpack-plugin: 6.4.1(webpack@5.106.2)
       core-js: 3.49.0
       dapjs: 2.3.0
       es6-object-assign: 1.1.0
@@ -10494,10 +10322,10 @@ snapshots:
       react-virtualized: 9.20.1(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
       redux: 3.7.2
       redux-throttle: 0.1.1
-      scratch-audio: https://codeload.github.com/AstraEditor/scratch-audio/tar.gz/aba00cd02e36d95407effafa03f3678e4c669b30
+      scratch-audio: https://codeload.github.com/AstraEditor/scratch-audio/tar.gz/ebb2284ecfe56269d6899f6ecfe1fbf41dd70d0c
       scratch-blocks: https://codeload.github.com/AstraEditor/scratch-blocks/tar.gz/3b7e8cb93d9d17c813f687b6720fc5f148c69e1b
       scratch-paint: https://codeload.github.com/AstraEditor/scratch-paint/tar.gz/dba550ca8a0e0616473e1a3503ad37399fa69b6b(react-dom@16.14.0(react@16.14.0))(react-intl-redux@0.7.0(react-intl@2.9.0(prop-types@15.8.1)(react@16.14.0))(react-redux@5.0.7(react@16.14.0)(redux@4.2.1)))(react-intl@2.9.0(prop-types@15.8.1)(react@16.14.0))(react-popover@0.5.10)(react-redux@5.0.7(react@16.14.0)(redux@4.2.1))(react-responsive@5.0.0(react@16.14.0))(react-style-proptype@3.2.2)(react-tooltip@3.8.0(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react@16.14.0)(redux@3.7.2)
-      scratch-render: https://codeload.github.com/AstraEditor/scratch-render/tar.gz/b865aaf383b7f53d3653c0fdb25c7f5fe65e5f08(scratch-render-fonts@https://codeload.github.com/TurboWarp/scratch-render-fonts/tar.gz/7b6768fc6dfef6b343a06f992587b74807043961)(webpack@5.106.2(webpack-cli@5.1.4(webpack@5.106.2)))
+      scratch-render: https://codeload.github.com/AstraEditor/scratch-render/tar.gz/b865aaf383b7f53d3653c0fdb25c7f5fe65e5f08(webpack@5.106.2)
       scratch-vm: https://codeload.github.com/AstraEditor/scratch-vm/tar.gz/41e33bf5b621474e4f4f04ce3c4141be2f5ac426(@turbowarp/scratch-svg-renderer@1.0.202505311824)
       text-encoding: 0.7.0
       to-style: 1.3.3
@@ -10527,7 +10355,7 @@ snapshots:
       react-intl: 2.9.0(prop-types@15.8.1)(react@16.14.0)
       react-intl-redux: 0.7.0(react-intl@2.9.0(prop-types@15.8.1)(react@16.14.0))(react-redux@5.0.7(react@16.14.0)(redux@4.2.1))
       react-popover: 0.5.10
-      react-redux: 5.0.7(react@16.14.0)(redux@3.7.2)
+      react-redux: 5.0.7(react@16.14.0)(redux@4.2.1)
       react-responsive: 5.0.0(react@16.14.0)
       react-style-proptype: 3.2.2
       react-tooltip: 3.8.0(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
@@ -10541,15 +10369,11 @@ snapshots:
       ajv: 6.3.0
       pify: 4.0.1
 
-  scratch-render-fonts@https://codeload.github.com/TurboWarp/scratch-render-fonts/tar.gz/7b6768fc6dfef6b343a06f992587b74807043961:
-    dependencies:
-      base64-loader: 1.0.0
-
-  scratch-render@https://codeload.github.com/AstraEditor/scratch-render/tar.gz/b865aaf383b7f53d3653c0fdb25c7f5fe65e5f08(scratch-render-fonts@https://codeload.github.com/TurboWarp/scratch-render-fonts/tar.gz/7b6768fc6dfef6b343a06f992587b74807043961)(webpack@5.106.2(webpack-cli@5.1.4(webpack@5.106.2))):
+  scratch-render@https://codeload.github.com/AstraEditor/scratch-render/tar.gz/b865aaf383b7f53d3653c0fdb25c7f5fe65e5f08(webpack@5.106.2):
     dependencies:
       '@turbowarp/ancient-hull.js': 0.2.13
       '@turbowarp/nanolog': 0.2.0
-      '@turbowarp/scratch-svg-renderer': 1.0.202505311824(scratch-render-fonts@https://codeload.github.com/TurboWarp/scratch-render-fonts/tar.gz/7b6768fc6dfef6b343a06f992587b74807043961)
+      '@turbowarp/scratch-svg-renderer': 1.0.202505311824
       buffer: 6.0.3
       core-js: 3.49.0
       grapheme-breaker: 0.3.2
@@ -10558,7 +10382,7 @@ snapshots:
       path-browserify: 1.0.1
       process: 0.11.10
       regenerator-runtime: 0.14.1
-      scratch-storage: 1.3.6(webpack@5.106.2(webpack-cli@5.1.4(webpack@5.106.2)))
+      scratch-storage: 1.3.6(webpack@5.106.2)
       twgl.js: 4.4.0
     transitivePeerDependencies:
       - scratch-render-fonts
@@ -10570,14 +10394,14 @@ snapshots:
       minilog: 3.1.0
       text-encoding: 0.7.0
 
-  scratch-storage@1.3.6(webpack@5.106.2(webpack-cli@5.1.4(webpack@5.106.2))):
+  scratch-storage@1.3.6(webpack@5.106.2):
     dependencies:
       arraybuffer-loader: 1.0.8
       base64-js: 1.3.0
       fastestsmallesttextencoderdecoder: 1.0.22
       js-md5: 0.7.3
       minilog: 3.1.0
-      worker-loader: 2.0.0(webpack@5.106.2(webpack-cli@5.1.4(webpack@5.106.2)))
+      worker-loader: 2.0.0(webpack@5.106.2)
     transitivePeerDependencies:
       - webpack
 
@@ -10588,7 +10412,7 @@ snapshots:
       '@turbowarp/json': 0.1.2
       '@turbowarp/jszip': 3.12.0
       '@turbowarp/nanolog': 0.2.0
-      '@turbowarp/scratch-svg-renderer': 1.0.202505311824(scratch-render-fonts@https://codeload.github.com/TurboWarp/scratch-render-fonts/tar.gz/7b6768fc6dfef6b343a06f992587b74807043961)
+      '@turbowarp/scratch-svg-renderer': 1.0.202505311824
       '@vernier/godirect': 1.5.0
       atob: 2.1.2
       btoa: 1.2.1
@@ -10906,7 +10730,7 @@ snapshots:
 
   style-loader@4.0.0(webpack@5.106.2):
     dependencies:
-      webpack: 5.106.2(webpack-cli@5.1.4(webpack@5.106.2))
+      webpack: 5.106.2(webpack-cli@5.1.4)
 
   sumchecker@3.0.1:
     dependencies:
@@ -10969,13 +10793,13 @@ snapshots:
       mkdirp: 0.5.6
       rimraf: 2.6.3
 
-  terser-webpack-plugin@5.5.0(webpack@5.106.2(webpack-cli@5.1.4(webpack@5.106.2))):
+  terser-webpack-plugin@5.5.0(webpack@5.106.2):
     dependencies:
       '@jridgewell/trace-mapping': 0.3.31
       jest-worker: 27.5.1
       schema-utils: 4.3.3
       terser: 5.46.1
-      webpack: 5.106.2(webpack-cli@5.1.4(webpack@5.106.2))
+      webpack: 5.106.2(webpack-cli@5.1.4)
 
   terser@5.46.1:
     dependencies:
@@ -11181,12 +11005,6 @@ snapshots:
       escalade: 3.2.0
       picocolors: 1.1.1
 
-  update-browserslist-db@1.2.3(browserslist@4.28.2):
-    dependencies:
-      browserslist: 4.28.2
-      escalade: 3.2.0
-      picocolors: 1.1.1
-
   uri-js@4.4.1:
     dependencies:
       punycode: 2.3.1
@@ -11196,7 +11014,7 @@ snapshots:
       loader-utils: 2.0.4
       mime-types: 2.1.35
       schema-utils: 3.3.0
-      webpack: 5.106.2(webpack-cli@5.1.4(webpack@5.106.2))
+      webpack: 5.106.2(webpack-cli@5.1.4)
     optionalDependencies:
       file-loader: 6.2.0(webpack@5.106.2)
 
@@ -11288,9 +11106,9 @@ snapshots:
   webpack-cli@5.1.4(webpack@5.106.2):
     dependencies:
       '@discoveryjs/json-ext': 0.5.7
-      '@webpack-cli/configtest': 2.1.1(webpack-cli@5.1.4(webpack@5.106.2))(webpack@5.106.2)
-      '@webpack-cli/info': 2.0.2(webpack-cli@5.1.4(webpack@5.106.2))(webpack@5.106.2)
-      '@webpack-cli/serve': 2.0.5(webpack-cli@5.1.4(webpack@5.106.2))(webpack@5.106.2)
+      '@webpack-cli/configtest': 2.1.1(webpack-cli@5.1.4)(webpack@5.106.2)
+      '@webpack-cli/info': 2.0.2(webpack-cli@5.1.4)(webpack@5.106.2)
+      '@webpack-cli/serve': 2.0.5(webpack-cli@5.1.4)(webpack@5.106.2)
       colorette: 2.0.20
       commander: 10.0.1
       cross-spawn: 7.0.6
@@ -11299,7 +11117,7 @@ snapshots:
       import-local: 3.2.0
       interpret: 3.1.1
       rechoir: 0.8.0
-      webpack: 5.106.2(webpack-cli@5.1.4(webpack@5.106.2))
+      webpack: 5.106.2(webpack-cli@5.1.4)
       webpack-merge: 5.10.0
 
   webpack-merge@5.10.0:
@@ -11315,7 +11133,7 @@ snapshots:
 
   webpack-sources@3.4.0: {}
 
-  webpack@5.106.2(webpack-cli@5.1.4(webpack@5.106.2)):
+  webpack@5.106.2(webpack-cli@5.1.4):
     dependencies:
       '@types/eslint-scope': 3.7.7
       '@types/estree': 1.0.8
@@ -11338,7 +11156,7 @@ snapshots:
       neo-async: 2.6.2
       schema-utils: 4.3.3
       tapable: 2.3.3
-      terser-webpack-plugin: 5.5.0(webpack@5.106.2(webpack-cli@5.1.4(webpack@5.106.2)))
+      terser-webpack-plugin: 5.5.0(webpack@5.106.2)
       watchpack: 2.5.1
       webpack-sources: 3.4.0
     optionalDependencies:
@@ -11375,11 +11193,11 @@ snapshots:
 
   word-wrap@1.2.5: {}
 
-  worker-loader@2.0.0(webpack@5.106.2(webpack-cli@5.1.4(webpack@5.106.2))):
+  worker-loader@2.0.0(webpack@5.106.2):
     dependencies:
       loader-utils: 1.4.2
       schema-utils: 0.4.7
-      webpack: 5.106.2(webpack-cli@5.1.4(webpack@5.106.2))
+      webpack: 5.106.2(webpack-cli@5.1.4)
 
   wrap-ansi@7.0.0:
     dependencies:
