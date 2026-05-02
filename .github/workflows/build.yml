@@ -21,8 +21,10 @@ jobs:
       with:
         node-version: 24
 
-    - name: Install pnpm
-      run: corepack enable && corepack prepare pnpm@latest --activate
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: latest
 
     - name: Install dependencies
       run: |
@@ -86,10 +88,11 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: 24
-        cache: 'pnpm'
 
-    - name: Install pnpm
-      run: corepack enable && corepack prepare pnpm@latest --activate
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: latest
 
     - name: Install fpm
       if: matrix.format == 'pacman' || matrix.format == 'rpm'
@@ -111,64 +114,6 @@ jobs:
         path: dist/*.*
         retention-days: 1
 
-  # ==========================================
-  # Linux Snap 打包 (仅 x64)
-  # ==========================================
-  package-linux-snap:
-    needs: build
-    runs-on: ubuntu-latest
-    env:
-      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
-      
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        submodules: recursive
-        persist-credentials: false
-
-    - name: Download build artifacts
-      uses: actions/download-artifact@v4
-      with:
-        name: build-artifacts
-
-    - name: Install system dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y strip-nondeterminism fakeroot snapd
-
-    - name: Setup Snapcraft
-      run: |
-        sudo snap install snapcraft --classic
-        sudo snap install lxd
-        sudo lxd init --auto
-        sudo usermod -aG lxd $USER
-        newgrp lxd
-
-    - name: Install Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: 24
-        cache: 'pnpm'
-
-    - name: Install pnpm
-      run: corepack enable && corepack prepare pnpm@latest --activate
-
-    - name: Install dependencies (skip postinstall)
-      run: |
-        rm -f pnpm-lock.yaml
-        pnpm install --loglevel=info --ignore-scripts
-
-    - name: Package
-      run: |
-        node release-automation/build.mjs --snap --x64 --production
-
-    - name: Upload artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: linux-snap-x64
-        path: dist/*.*
-        retention-days: 1
 
   # ==========================================
   # Mac 打包
@@ -204,10 +149,11 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: 24
-        cache: 'pnpm'
 
-    - name: Install pnpm
-      run: corepack enable && corepack prepare pnpm@latest --activate
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: latest
 
     - name: Install dependencies (skip postinstall)
       run: |
@@ -289,9 +235,10 @@ jobs:
       with:
         node-version: 24
 
-    - name: Install pnpm
-      shell: pwsh
-      run: corepack enable && corepack prepare pnpm@latest --activate
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: latest
 
     - name: Configure pnpm cache
       shell: pwsh
