@@ -50,7 +50,7 @@ importers:
         version: 2.1.0
       '@turbowarp/extensions':
         specifier: github:TurboWarp/extensions#master
-        version: https://codeload.github.com/TurboWarp/extensions/tar.gz/c391f9ef87a83370f2c6c8e0ebb007ad5254c36f(jiti@2.6.1)
+        version: https://codeload.github.com/TurboWarp/extensions/tar.gz/8b27fe92f4674e53e3c677a11e609c77254df08f(jiti@2.6.1)
       adm-zip:
         specifier: ^0.5.16
         version: 0.5.16
@@ -60,6 +60,9 @@ importers:
       babel-loader:
         specifier: ^8.4.1
         version: 8.4.1(@babel/core@7.29.0)(webpack@5.106.2)
+      buffer:
+        specifier: ^6.0.3
+        version: 6.0.3
       copy-webpack-plugin:
         specifier: ^6.4.1
         version: 6.4.1(webpack@5.106.2)
@@ -104,10 +107,10 @@ importers:
         version: 5.0.0
       scratch-blocks:
         specifier: github:AstraEditor/scratch-blocks#develop
-        version: https://codeload.github.com/AstraEditor/scratch-blocks/tar.gz/3b7e8cb93d9d17c813f687b6720fc5f148c69e1b
+        version: https://codeload.github.com/AstraEditor/scratch-blocks/tar.gz/adda4dcc5a3c61c1854adb29daaa121b7591d329
       scratch-gui:
         specifier: github:AstraEditor/scratch-gui#feature
-        version: https://codeload.github.com/AstraEditor/scratch-gui/tar.gz/9354827ab4ecbbe6b4259cef13df2d2114f46f66(encoding@0.1.13)(react-dom@16.14.0(react@16.14.0))(react-intl-redux@0.7.0(react-intl@2.9.0(prop-types@15.8.1)(react@16.14.0))(react-redux@5.0.7(react@16.14.0)(redux@4.2.1)))(react@16.14.0)(tslib@2.8.1)(webpack@5.106.2)
+        version: https://codeload.github.com/AstraEditor/scratch-gui/tar.gz/d2fbec7de856f9b8716ebf86a5a4407b8fc3176d(encoding@0.1.13)(react-dom@16.14.0(react@16.14.0))(react-intl-redux@0.7.0(react-intl@2.9.0(prop-types@15.8.1)(react@16.14.0))(react-redux@5.0.7(react@16.14.0)(redux@4.2.1)))(react@16.14.0)(tslib@2.8.1)(webpack@5.106.2)
       spdx-expression-parse:
         specifier: ^4.0.0
         version: 4.0.0
@@ -1304,8 +1307,8 @@ packages:
   '@turbowarp/ancient-hull.js@0.2.13':
     resolution: {integrity: sha512-lpVDr18qRjOLWcPtw9H+nlFhY7hbdgQlLU1b6nJfEn2pMYRnOEtzFXZbprG5JgmUCIzGx/H9WPajbkjRdvUC+Q==}
 
-  '@turbowarp/extensions@https://codeload.github.com/TurboWarp/extensions/tar.gz/c391f9ef87a83370f2c6c8e0ebb007ad5254c36f':
-    resolution: {tarball: https://codeload.github.com/TurboWarp/extensions/tar.gz/c391f9ef87a83370f2c6c8e0ebb007ad5254c36f}
+  '@turbowarp/extensions@https://codeload.github.com/TurboWarp/extensions/tar.gz/8b27fe92f4674e53e3c677a11e609c77254df08f':
+    resolution: {tarball: https://codeload.github.com/TurboWarp/extensions/tar.gz/8b27fe92f4674e53e3c677a11e609c77254df08f}
     version: 0.0.1
 
   '@turbowarp/json@0.1.2':
@@ -1327,8 +1330,8 @@ packages:
   '@turbowarp/sb3fix@0.4.0':
     resolution: {integrity: sha512-DC1u1B2nugkANEzQyioPFEYPYtZvr8NFvZkpYlxkoBOsn+LPJP1F486vNzvkGu2MAGTfWR0QmsBTRdanrppCrg==}
 
-  '@turbowarp/scratch-l10n@https://codeload.github.com/AstraEditor/scratch-l10n/tar.gz/de6aa6e2813a30a2ad63d531147eed9b1056308a':
-    resolution: {tarball: https://codeload.github.com/AstraEditor/scratch-l10n/tar.gz/de6aa6e2813a30a2ad63d531147eed9b1056308a}
+  '@turbowarp/scratch-l10n@https://codeload.github.com/AstraEditor/scratch-l10n/tar.gz/ccbe1a758d6e8cc87643ced543e943d598203e67':
+    resolution: {tarball: https://codeload.github.com/AstraEditor/scratch-l10n/tar.gz/ccbe1a758d6e8cc87643ced543e943d598203e67}
     version: 3.1001.0
     hasBin: true
 
@@ -4558,19 +4561,19 @@ packages:
     resolution: {tarball: https://codeload.github.com/AstraEditor/scratch-audio/tar.gz/ebb2284ecfe56269d6899f6ecfe1fbf41dd70d0c}
     version: 0.1.0
 
-  scratch-blocks@https://codeload.github.com/AstraEditor/scratch-blocks/tar.gz/3b7e8cb93d9d17c813f687b6720fc5f148c69e1b:
-    resolution: {tarball: https://codeload.github.com/AstraEditor/scratch-blocks/tar.gz/3b7e8cb93d9d17c813f687b6720fc5f148c69e1b}
+  scratch-blocks@https://codeload.github.com/AstraEditor/scratch-blocks/tar.gz/adda4dcc5a3c61c1854adb29daaa121b7591d329:
+    resolution: {tarball: https://codeload.github.com/AstraEditor/scratch-blocks/tar.gz/adda4dcc5a3c61c1854adb29daaa121b7591d329}
     version: 0.1.0
 
-  scratch-gui@https://codeload.github.com/AstraEditor/scratch-gui/tar.gz/9354827ab4ecbbe6b4259cef13df2d2114f46f66:
-    resolution: {tarball: https://codeload.github.com/AstraEditor/scratch-gui/tar.gz/9354827ab4ecbbe6b4259cef13df2d2114f46f66}
+  scratch-gui@https://codeload.github.com/AstraEditor/scratch-gui/tar.gz/d2fbec7de856f9b8716ebf86a5a4407b8fc3176d:
+    resolution: {tarball: https://codeload.github.com/AstraEditor/scratch-gui/tar.gz/d2fbec7de856f9b8716ebf86a5a4407b8fc3176d}
     version: 3.2.37
     peerDependencies:
       react: ^16.0.0
       react-dom: ^16.0.0
 
-  scratch-paint@https://codeload.github.com/AstraEditor/scratch-paint/tar.gz/dba550ca8a0e0616473e1a3503ad37399fa69b6b:
-    resolution: {tarball: https://codeload.github.com/AstraEditor/scratch-paint/tar.gz/dba550ca8a0e0616473e1a3503ad37399fa69b6b}
+  scratch-paint@https://codeload.github.com/AstraEditor/scratch-paint/tar.gz/19ee3cfcbab70443b432b2dff795d2470c978e43:
+    resolution: {tarball: https://codeload.github.com/AstraEditor/scratch-paint/tar.gz/19ee3cfcbab70443b432b2dff795d2470c978e43}
     version: 2.1.61
     peerDependencies:
       react: ^16
@@ -6609,7 +6612,7 @@ snapshots:
 
   '@turbowarp/ancient-hull.js@0.2.13': {}
 
-  '@turbowarp/extensions@https://codeload.github.com/TurboWarp/extensions/tar.gz/c391f9ef87a83370f2c6c8e0ebb007ad5254c36f(jiti@2.6.1)':
+  '@turbowarp/extensions@https://codeload.github.com/TurboWarp/extensions/tar.gz/8b27fe92f4674e53e3c677a11e609c77254df08f(jiti@2.6.1)':
     dependencies:
       '@turbowarp/json': 0.1.2
       '@turbowarp/scratchblocks': 3.6.7
@@ -6646,7 +6649,7 @@ snapshots:
     dependencies:
       '@turbowarp/jszip': 3.12.0
 
-  '@turbowarp/scratch-l10n@https://codeload.github.com/AstraEditor/scratch-l10n/tar.gz/de6aa6e2813a30a2ad63d531147eed9b1056308a':
+  '@turbowarp/scratch-l10n@https://codeload.github.com/AstraEditor/scratch-l10n/tar.gz/ccbe1a758d6e8cc87643ced543e943d598203e67':
     dependencies:
       '@babel/cli': 7.28.6(@babel/core@7.29.0)
       '@babel/core': 7.29.0
@@ -10256,17 +10259,17 @@ snapshots:
       '@turbowarp/nanolog': 0.2.0
       '@turbowarp/startaudiocontext': 1.0.0
 
-  scratch-blocks@https://codeload.github.com/AstraEditor/scratch-blocks/tar.gz/3b7e8cb93d9d17c813f687b6720fc5f148c69e1b:
+  scratch-blocks@https://codeload.github.com/AstraEditor/scratch-blocks/tar.gz/adda4dcc5a3c61c1854adb29daaa121b7591d329:
     dependencies:
       exports-loader: 0.7.0
       imports-loader: 0.8.0
 
-  scratch-gui@https://codeload.github.com/AstraEditor/scratch-gui/tar.gz/9354827ab4ecbbe6b4259cef13df2d2114f46f66(encoding@0.1.13)(react-dom@16.14.0(react@16.14.0))(react-intl-redux@0.7.0(react-intl@2.9.0(prop-types@15.8.1)(react@16.14.0))(react-redux@5.0.7(react@16.14.0)(redux@4.2.1)))(react@16.14.0)(tslib@2.8.1)(webpack@5.106.2):
+  scratch-gui@https://codeload.github.com/AstraEditor/scratch-gui/tar.gz/d2fbec7de856f9b8716ebf86a5a4407b8fc3176d(encoding@0.1.13)(react-dom@16.14.0(react@16.14.0))(react-intl-redux@0.7.0(react-intl@2.9.0(prop-types@15.8.1)(react@16.14.0))(react-redux@5.0.7(react@16.14.0)(redux@4.2.1)))(react@16.14.0)(tslib@2.8.1)(webpack@5.106.2):
     dependencies:
       '@microbit/microbit-universal-hex': 0.2.2(tslib@2.8.1)
       '@turbowarp/jszip': 3.12.0
       '@turbowarp/nanolog': 1.0.1
-      '@turbowarp/scratch-l10n': https://codeload.github.com/AstraEditor/scratch-l10n/tar.gz/de6aa6e2813a30a2ad63d531147eed9b1056308a
+      '@turbowarp/scratch-l10n': https://codeload.github.com/AstraEditor/scratch-l10n/tar.gz/ccbe1a758d6e8cc87643ced543e943d598203e67
       '@turbowarp/scratch-storage': 0.0.202505311821(encoding@0.1.13)(webpack@5.106.2)
       '@turbowarp/scratch-svg-renderer': 1.0.202505311824
       '@turbowarp/startaudiocontext': 1.0.0
@@ -10323,8 +10326,8 @@ snapshots:
       redux: 3.7.2
       redux-throttle: 0.1.1
       scratch-audio: https://codeload.github.com/AstraEditor/scratch-audio/tar.gz/ebb2284ecfe56269d6899f6ecfe1fbf41dd70d0c
-      scratch-blocks: https://codeload.github.com/AstraEditor/scratch-blocks/tar.gz/3b7e8cb93d9d17c813f687b6720fc5f148c69e1b
-      scratch-paint: https://codeload.github.com/AstraEditor/scratch-paint/tar.gz/dba550ca8a0e0616473e1a3503ad37399fa69b6b(react-dom@16.14.0(react@16.14.0))(react-intl-redux@0.7.0(react-intl@2.9.0(prop-types@15.8.1)(react@16.14.0))(react-redux@5.0.7(react@16.14.0)(redux@4.2.1)))(react-intl@2.9.0(prop-types@15.8.1)(react@16.14.0))(react-popover@0.5.10)(react-redux@5.0.7(react@16.14.0)(redux@4.2.1))(react-responsive@5.0.0(react@16.14.0))(react-style-proptype@3.2.2)(react-tooltip@3.8.0(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react@16.14.0)(redux@3.7.2)
+      scratch-blocks: https://codeload.github.com/AstraEditor/scratch-blocks/tar.gz/adda4dcc5a3c61c1854adb29daaa121b7591d329
+      scratch-paint: https://codeload.github.com/AstraEditor/scratch-paint/tar.gz/19ee3cfcbab70443b432b2dff795d2470c978e43(react-dom@16.14.0(react@16.14.0))(react-intl-redux@0.7.0(react-intl@2.9.0(prop-types@15.8.1)(react@16.14.0))(react-redux@5.0.7(react@16.14.0)(redux@4.2.1)))(react-intl@2.9.0(prop-types@15.8.1)(react@16.14.0))(react-popover@0.5.10)(react-redux@5.0.7(react@16.14.0)(redux@4.2.1))(react-responsive@5.0.0(react@16.14.0))(react-style-proptype@3.2.2)(react-tooltip@3.8.0(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react@16.14.0)(redux@3.7.2)
       scratch-render: https://codeload.github.com/AstraEditor/scratch-render/tar.gz/b865aaf383b7f53d3653c0fdb25c7f5fe65e5f08(webpack@5.106.2)
       scratch-vm: https://codeload.github.com/AstraEditor/scratch-vm/tar.gz/41e33bf5b621474e4f4f04ce3c4141be2f5ac426(@turbowarp/scratch-svg-renderer@1.0.202505311824)
       text-encoding: 0.7.0
@@ -10340,7 +10343,7 @@ snapshots:
       - tslib
       - webpack
 
-  scratch-paint@https://codeload.github.com/AstraEditor/scratch-paint/tar.gz/dba550ca8a0e0616473e1a3503ad37399fa69b6b(react-dom@16.14.0(react@16.14.0))(react-intl-redux@0.7.0(react-intl@2.9.0(prop-types@15.8.1)(react@16.14.0))(react-redux@5.0.7(react@16.14.0)(redux@4.2.1)))(react-intl@2.9.0(prop-types@15.8.1)(react@16.14.0))(react-popover@0.5.10)(react-redux@5.0.7(react@16.14.0)(redux@4.2.1))(react-responsive@5.0.0(react@16.14.0))(react-style-proptype@3.2.2)(react-tooltip@3.8.0(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react@16.14.0)(redux@3.7.2):
+  scratch-paint@https://codeload.github.com/AstraEditor/scratch-paint/tar.gz/19ee3cfcbab70443b432b2dff795d2470c978e43(react-dom@16.14.0(react@16.14.0))(react-intl-redux@0.7.0(react-intl@2.9.0(prop-types@15.8.1)(react@16.14.0))(react-redux@5.0.7(react@16.14.0)(redux@4.2.1)))(react-intl@2.9.0(prop-types@15.8.1)(react@16.14.0))(react-popover@0.5.10)(react-redux@5.0.7(react@16.14.0)(redux@4.2.1))(react-responsive@5.0.0(react@16.14.0))(react-style-proptype@3.2.2)(react-tooltip@3.8.0(react-dom@16.14.0(react@16.14.0))(react@16.14.0))(react@16.14.0)(redux@3.7.2):
     dependencies:
       '@turbowarp/nanolog': 0.2.0
       '@turbowarp/paper': 0.13.0

@@ -1,6 +1,7 @@
 const path = require('path');
 const { DefinePlugin, ProvidePlugin } = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const { url } = require('inspector');
 
 const base = {
     mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
@@ -42,6 +43,8 @@ const base = {
                     {
                         loader: 'css-loader',
                         options: {
+                            url: true,
+                            esModule: false,
                             importLoaders: 1,
                             modules: {
                                 localIdentName: '[name]_[local]_[hash:base64:5]',
@@ -95,6 +98,10 @@ module.exports = [
                 // webpack 5 no longer auto-polyfills process; provide it for
                 // dependencies that reference process.env.* or process directly.
                 process: 'process/browser'
+            }),
+            new ProvidePlugin({
+                Buffer: ['buffer', 'Buffer'],
+                process: 'process/browser',
             }),
             new CopyWebpackPlugin({
                 patterns: [
