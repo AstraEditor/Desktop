@@ -36,7 +36,8 @@ const generateCSS = (alphaGain) => `
         }
 
         [class*=blocklySvg]{
-            background-color: color-mix(in srgb, $ui-secondary, transparent ${20 * alphaGain}%) !important
+            background-color: color-mix(in srgb, $ui-secondary, transparent ${20 * alphaGain}%) !important;
+            --enable-workspace-background: color-mix(in srgb, $ui-secondary, transparent ${20 * alphaGain}%) !important;
         }
 
         [class*=blocklyFlyoutBackground]{
@@ -51,6 +52,10 @@ const generateCSS = (alphaGain) => `
         }
         [class*=categorySelected]{
             background-color: color-mix(in srgb, $ui-secondary, transparent ${20 * alphaGain}%) !important
+        }
+
+        .sa-hide-flyout-not-fullscreen .sa-body-editor [class*="gui_stage-and-target-wrapper"] {
+            background-color: transparent !important
         }
 `;
 

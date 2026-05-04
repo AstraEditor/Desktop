@@ -2,10 +2,22 @@ This document is the authoritative source for TurboWarp's changelogs. Everything
 
 Prefix notes with "Windows:", "macOS:", or "Linux:" as needed. Do not use **formatting** or [links](https://desktop.turbowarp.org/).
 
-# 1.2.0 (2026-04-xx)
+# 1.2.0 (2026-05-05)
 
 - 增加扩展编辑器
+- 增加“窗口背景模糊”
 - 修改桌面端控制栏，和菜单栏融为一体
+- 修改默认项目
+- 更好的README,兼容了更多语法！
+- 新的扩展编辑器
+- 崩溃时保存项目
+- ToDo插件
+- 背景插件
+- 终端插件
+- 插件不兼容提示
+- 修复一堆bug
+- 同步插件
+- 可能还有更多？
 
 # 1.1.4 (2026-03-18)
 

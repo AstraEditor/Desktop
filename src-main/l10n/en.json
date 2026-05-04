@@ -287,6 +287,10 @@
     "string": "Open User Data",
     "developer_comment": "Button in desktop settings to open the user data folder"
   },
+  "desktop-settings.learnMore":{
+    "string": "(more information)",
+    "developer_comment": "Button in desktop settings to open the link"
+  },
   "migrate.title": {
     "string": "Finishing update...",
     "developer_comment": "Title of window that does various things to finish an update"

@@ -1802,6 +1802,7 @@
         "desktop-settings.title": "桌面设置",
         "desktop-settings.update-checker": "更新检查",
         "desktop-settings.update-checker-not-allowed": "此应用的更新由你安装此应用程序的应用商店控制。",
+        "desktop-settings.learnMore":"（更多信息）",
         "downgrade-warning.continue-anyways": "仍然继续（不安全）",
         "downgrade-warning.exit": "退出并更新",
         "downgrade-warning.message": "您正在使用旧版本{APP_NAME}，在使用较新版本之前，请退出并从此处下载最新版本。{website}\n\n如果你继续，可能因为版本问题永久丢失你的设置和背包。这些数据将无法被恢复。\n\n（调试信息：{debugInfo}）",
@@ -1881,6 +1882,9 @@
         "update.permanently-ignore": "忽略此次更新",
         "update.security-description": "{appNameVersion}现在可用。此版本包含了安全补丁。强烈建议更新。",
         "update.security-title": "安全更新可用",
-        "update.window-title": "更新可用"
+        "update.window-title": "更新可用",
+        "update.up-to-date": "您已跟上日程！",
+        "update.up-to-date-detail": "{version} 是最新版本",
+        "in-app-about.check-for-updates": "检查更新"
     }
 }
