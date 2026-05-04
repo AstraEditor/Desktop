@@ -104,7 +104,8 @@ class DesktopSettingsWindow extends AbstractWindow {
     });
 
     this.ipc.handle('use-blur-background', async (event, useBlurBackground) => {
-      if (process.platform !== 'win32' && process.platform !== 'darwin') return;
+      // if (process.platform !== 'win32' && process.platform !== 'darwin') return;
+      // 让用户自己配置去吧，给你个透明就行
       settings.useBlurBackground = useBlurBackground;
       await settings.save();
 
