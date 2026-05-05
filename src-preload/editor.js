@@ -20,6 +20,13 @@ contextBridge.exposeInMainWorld('EditorPreload', {
   checkForUpdates: () => ipcRenderer.invoke('check-for-updates'),
   minimizeWindow: () => ipcRenderer.invoke('minimize-window'),
   maximizeWindow: () => ipcRenderer.invoke('maximize-window'),
+  isMaximized: () => ipcRenderer.invoke('is-maximized'),
+  onMaximizeStateChanged: (callback) => {
+    const listener = (event, isMaximized) => callback(isMaximized);
+    ipcRenderer.on('maximize-state-changed', listener);
+    // Return an unsubscribe function
+    return () => ipcRenderer.removeListener('maximize-state-changed', listener);
+  },
   closeWindow: () => ipcRenderer.invoke('close-window'),
   getPreferredMediaDevices: () => ipcRenderer.invoke('get-preferred-media-devices'),
   getAdvancedCustomizations: () => ipcRenderer.invoke('get-advanced-customizations'),

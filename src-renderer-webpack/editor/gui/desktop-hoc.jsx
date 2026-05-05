@@ -249,6 +249,15 @@ const DesktopHOC = function (WrappedComponent) {
           onClickDesktopSettings={handleClickDesktopSettings}
           onClickMinimize={handleClickMinimize}
           onClickMaximize={handleClickMaximize}
+          isMaximize={EditorPreload.isMaximized}
+          setWindowMaximizeStateHandler={(handler) => {
+            if (handler) {
+              this._unsubscribeMaximizeState = EditorPreload.onMaximizeStateChanged(handler);
+            } else if (this._unsubscribeMaximizeState) {
+              this._unsubscribeMaximizeState();
+              this._unsubscribeMaximizeState = null;
+            }
+          }}
           onClickClose={handleClickClose}
           securityManager={securityManager}
           {...props}

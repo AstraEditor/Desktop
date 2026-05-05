@@ -650,6 +650,18 @@ class EditorWindow extends ProjectRunningWindow {
       }
     });
 
+    this.ipc.handle('is-maximized', () => {
+      return this.window.isMaximized();
+    });
+
+    const notifyMaximizeState = () => {
+      this.window.webContents.send('maximize-state-changed', this.window.isMaximized());
+    };
+    this.window.on('maximize', notifyMaximizeState);
+    this.window.on('unmaximize', notifyMaximizeState);
+    this.window.on('enter-full-screen', notifyMaximizeState);
+    this.window.on('leave-full-screen', notifyMaximizeState);
+
     this.ipc.handle('close-window', () => {
       this.window.close();
     });

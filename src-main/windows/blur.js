@@ -20,6 +20,11 @@ const generateCSS = (alphaGain) => `
         [class*=menu-bar_main-menu],[class*=menu-bar_controlButton],[class*=menu-bar_control-bar]{
             background-color: transparent !important;
         }
+
+        [class*=menu-bar_controlButton]:hover{
+            background-color: #ffffff20 !important;
+        }
+
         [class*=menu-bar_menu-bar]:not([class*=menu-bar_menu-bar-item]):not([class*=menu-bar_menu-bar-button]){
             background-color: color-mix(in srgb, $menu-bar-background, transparent ${20 * alphaGain}%) !important;
         }
@@ -92,11 +97,11 @@ const blurCSS = async (webContents) => {
 const updateBlurCSS = async (webContents) => {
     const id = webContents.id;
     const existingKey = cssKeys.get(id);
-    
+
     if (existingKey) {
         await webContents.removeInsertedCSS(existingKey);
     }
-    
+
     if (settings.useBlurBackground) {
         const css = generateCSS(getAlphaGain());
         const key = await webContents.insertCSS(css.replace(/\$([a-zA-Z0-9_-]+)/g, 'var(--$1)'));

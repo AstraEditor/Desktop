@@ -8,6 +8,7 @@ Prefix notes with "Windows:", "macOS:", or "Linux:" as needed. Do not use **form
 - 修复扩展编辑器不存在问题
 - 在扩展管理器中增加按钮来打开扩展编辑器
 - 移位侧边栏
+- 修复窗口控制的问题
 
 # 1.2.0 (2026-05-05)
 
