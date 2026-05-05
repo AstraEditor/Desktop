@@ -7,10 +7,11 @@ const generateCSS = (alphaGain) => `
              background: color-mix(in srgb, $ui-primary, transparent 70%) !important
         } 
         [class*=gui_tab-list]{
+            background-color: transparent !important;
             background: linear-gradient(to right, color-mix(in srgb, $ui-primary, transparent ${10 * alphaGain}%), color-mix(in srgb, $ui-primary, transparent ${20 * alphaGain}%));
         }
         [class*=gui_vscode]{
-            background: linear-gradient(to bottom, color-mix(in srgb, $ui-primary, transparent ${10 * alphaGain}%), color-mix(in srgb, $ui-primary, transparent ${60 * alphaGain}%)) !important;
+            background: linear-gradient(to bottom, color-mix(in srgb, $ui-primary, transparent ${10 * alphaGain}%), color-mix(in srgb, $ui-primary, transparent ${20 * alphaGain}%)) !important
         }
         [class*=gui_stage-and-target-wrapper]{
             background: linear-gradient(to left, color-mix(in srgb, $ui-primary, transparent ${10 * alphaGain}%), color-mix(in srgb, $ui-primary, transparent ${20 * alphaGain}%));
@@ -36,16 +37,18 @@ const generateCSS = (alphaGain) => `
         }
 
         [class*=blocklySvg]{
-            background-color: color-mix(in srgb, $ui-secondary, transparent ${20 * alphaGain}%) !important;
-            --enable-workspace-background: color-mix(in srgb, $ui-secondary, transparent ${20 * alphaGain}%) !important;
+            background-color: color-mix(in srgb, $ui-secondary, transparent ${60 * alphaGain}%) !important;
+            --enable-workspace-background: color-mix(in srgb, $ui-secondary, transparent ${60 * alphaGain}%) !important;
+        }
+        [class*=gui_editor-wrapper]{
+            background-color: transparent !important;
         }
 
         [class*=blocklyFlyoutBackground]{
             fill-opacity: .10 !important
         }
         [class*=blocklyToolboxDiv]{
-            background-color: transparent !important;
-            backdrop-filter: blur(10px)
+            background-color: color-mix(in srgb, $ui-secondary, transparent ${10 * alphaGain}%) !important;
         }
         [class*=scratchCategoryMenu]{
             background: transparent !important
@@ -56,6 +59,22 @@ const generateCSS = (alphaGain) => `
 
         .sa-hide-flyout-not-fullscreen .sa-body-editor [class*="gui_stage-and-target-wrapper"] {
             background-color: transparent !important
+        }
+
+        [class*=input_input-form] {
+            background-color: color-mix(in srgb, $input-background, transparent ${20 * alphaGain}%) !important
+        }
+
+        [class*=sa-file-list-toolbar] {
+            background-color: color-mix(in srgb, $ui-secondary, transparent ${20 * alphaGain}%) !important
+        }
+
+        [class*=stage-selector_header] {
+            background-color: color-mix(in srgb, $ui-white, transparent ${20 * alphaGain}%) !important
+        }
+
+        [class*=blocklyZoom] {
+            opacity: ${80 * alphaGain}%
         }
 `;
 

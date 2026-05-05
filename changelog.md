@@ -2,6 +2,13 @@ This document is the authoritative source for TurboWarp's changelogs. Everything
 
 Prefix notes with "Windows:", "macOS:", or "Linux:" as needed. Do not use **formatting** or [links](https://desktop.turbowarp.org/).
 
+# 1.2.1 (2026-05-05)
+
+- 优化模糊效果
+- 修复扩展编辑器不存在问题
+- 在扩展管理器中增加按钮来打开扩展编辑器
+- 移位侧边栏
+
 # 1.2.0 (2026-05-05)
 
 - 增加扩展编辑器

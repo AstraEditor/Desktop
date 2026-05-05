@@ -337,7 +337,21 @@ class EditorWindow extends ProjectRunningWindow {
           noLink: true
         });
         if (choice === 1) {
-          this.window.destroy();
+          this.window.webContents.executeJavaScript('window.__ae_reload_via_addons')
+            .then(isAddonsReload => {
+              if (isAddonsReload) {
+                this.window.webContents.executeJavaScript(`
+                  window.onbeforeunload = null;
+                  window.__ae_reload_via_addons = false;
+                  location.reload();
+                `);
+              } else {
+                this.window.destroy();
+              }
+            })
+            .catch(() => {
+              this.window.destroy();
+            });
         }
         processingWillPreventUnload = false;
       });

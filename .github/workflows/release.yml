@@ -46,6 +46,7 @@ jobs:
           name: build-artifacts
           path: |
             dist-astra-extensions/
+            dist-extension-editor/
             dist-extensions/
             dist-library-files/
             dist-renderer-webpack/
