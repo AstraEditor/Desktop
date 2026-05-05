@@ -50,7 +50,7 @@ const generateCSS = (alphaGain) => `
         }
 
         [class*=blocklyFlyoutBackground]{
-            fill-opacity: .10 !important
+            fill-opacity: .5 !important
         }
         [class*=blocklyToolboxDiv]{
             background-color: color-mix(in srgb, $ui-secondary, transparent ${10 * alphaGain}%) !important;
@@ -66,7 +66,7 @@ const generateCSS = (alphaGain) => `
             background-color: transparent !important
         }
 
-        [class*=input_input-form] {
+        [class*=gui_target-wrapper] [class*=input_input-form] {
             background-color: color-mix(in srgb, $input-background, transparent ${20 * alphaGain}%) !important
         }
 
