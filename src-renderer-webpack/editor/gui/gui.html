@@ -24,12 +24,11 @@
         font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
         overflow: hidden;
       }
-      .splash-screen[hidden],
-      .tw-loaded .splash-screen {
+      .splash-screen[hidden] {
         display: none;
       }
       .splash-screen[data-theme="dark"] {
-        background-color: #333;
+        background-color: #222;
         color: white;
       }
 
@@ -125,17 +124,35 @@
 
       .splash-errors {
         font-family: monospace;
-        max-width: 40%;
+        max-height: 50vh;
+        max-width: 50vw;
+        overflow: auto;
+        z-index: 9999;
         margin-left: auto;
         margin-top: 20px;
         margin-bottom: 20px;
         background-color: #ffffff44;
         padding: 5px;
         border-radius: 10px;
+        position: relative;
       }
 
       .splash-error-list {
         white-space: pre-wrap;
+      }
+
+      .splash-reset {
+        color: inherit;
+        background: none;
+        padding: 0;
+        margin: 0;
+        border: none;
+        text-decoration: underline;
+        cursor: pointer;
+      }
+
+      .splash-reset:disabled {
+        opacity: 0.8;
       }
     </style>
   </head>
@@ -147,89 +164,217 @@
         <div class="circle" id="circle_3"></div>
       </div>
       <div>
-        <div class="splash-error-title" hidden><span class="splash-error-title-text">Something went wrong. </span><a class="splash-error-link"
+        <div class="splash-error-title" hidden><span class="splash-error-title-text1">Something went wrong. </span><a class="splash-error-link"
             href="https://github.com/AstraEditor/desktop/issues" target="_blank" rel="noreferrer">Please report</a>
           <span class="splash-error-title-text2">with the information below.</span></div>
         <div class="splash-errors splash-error-list" hidden></div>
+        <button class="splash-reset" hidden>Click here to reset caches (can fix some errors)</button>
       </div>
     </div>
 
     <script>
-      (function() {
+      (function () {
         'use strict';
+
+        var logoAll = document.getElementsByClassName('logo')[0];
+        logoAll.style.transform = 'scale(1.5, 1.5) translateY(40px)';
 
         var theme = '';
         var accent = '#0099ff';
 
+        const Texts = {
+          "zh-CN": {
+            "title_1": "一些地方出错了！",
+            "title_2_link": "请报告",
+            "title_3": "这个错误并附上下面的信息。",
+            "reset": "单击此处重置缓存（可以修复一些错误）"
+          },
+          "en-US": {
+            "title_1": "Something went wrong. ",
+            "title_2_like": "Please report",
+            "title_3": "with the information below.",
+            "reset": 'Click here to reset caches (can fix some errors)'
+          },
+          "ja": {
+            "title_1": "何かが間違っています。",
+            "title_2_link": "報告してください",
+            "title_3": "このエラーと以下の情報。",
+            "reset": "キャッシュをリセットするにはここをクリックしてください（一部のエラーを修正できます）"
+          },
+          "ko": {
+            "title_1": "문제가 발생했습니다.",
+            "title_2_link": "보고해 주세요",
+            "title_3": "이 오류와 아래 정보를 함께.",
+            "reset": "캐시를 재설정하려면 여기를 클릭하세요 (일부 오류를 수정할 수 있음)"
+          },
+          "es": {
+            "title_1": "Algo salió mal.",
+            "title_2_link": "Por favor informe",
+            "title_3": "este error con la información a continuación.",
+            "reset": "Haga clic aquí para restablecer caché (puede solucionar algunos errores)"
+          },
+          "fr": {
+            "title_1": "Quelque chose s'est mal passé.",
+            "title_2_link": "Veuillez signaler",
+            "title_3": "cette erreur avec les informations ci-dessous.",
+            "reset": "Cliquez ici pour réinitialiser le cache (peut corriger certaines erreurs)"
+          },
+          "de": {
+            "title_1": "Etwas ist schiefgelaufen.",
+            "title_2_link": "Bitte melden Sie",
+            "title_3": "diesen Fehler mit den folgenden Informationen.",
+            "reset": "Klicken Sie hier, um den Cache zurückzusetzen (kann einige Fehler beheben)"
+          },
+          "ru": {
+            "title_1": "Что-то пошло не так.",
+            "title_2_link": "Пожалуйста, сообщите",
+            "title_3": "об этой ошибке с информацией ниже.",
+            "reset": "Нажмите здесь, чтобы сбросить кэш (может исправить некоторые ошибки)"
+          }
+        }
+        const getText = (id) => {
+          try {
+            return Texts[navigator.language][id]
+          } catch (e) {
+            try {
+              return Texts['en-US'][id]
+            } catch (e) {
+              return id
+            }
+          }
+        }
+
         try {
-          var themeSetting = localStorage.getItem('tw:theme');
+          var themeSetting = JSON.parse(localStorage.getItem('tw:theme'));
+        } catch {
+          // ignore
+        }
+
+        // dark, accent: ae
+        theme = 'dark';
+        accent = '#0099ff';
+
+        try {
+          theme = themeSetting.gui || 'dark';
+          var parsed = themeSetting.accent;
+          switch (parsed) {
+            case ('purple'):
+              accent = '#855cd6';
+              break
+            case ('blue'):
+              accent = '#4c97ff';
+              break
+            case ('red'):
+              accent = '#ff4c4c';
+              break
+            case ('rainbow'):
+              accent = '#ff4c4c';
+              break
+            case ('ce'):
+              accent = '#ff9b86';
+              break
+            case ('ty'):
+              accent = '#66ccff';
+              break
+            case ('miku'):
+              accent = '#39c5bb';
+              break
+            case ('astraeditor'):
+              accent = '#0099ff';
+              break
+            default:
+              accent = '#0099ff';
+
+          }
+
+          if (parsed.gui === 'dark' || parsed.gui === 'light') {
+            theme = parsed.gui;
+          }
         } catch (e) {
           // ignore
         }
-        if (themeSetting === 'light') {
-          theme = 'light';
-        } else if (themeSetting === 'dark') {
-          theme = 'dark';
-        } else if (themeSetting) {
-          try {
-            var parsed = JSON.parse(themeSetting);
-            if (parsed.accent === 'purple') {
-              accent = '#855cd6';
-            } else if (parsed.accent === 'blue') {
-              accent = '#4c97ff';
-            } else {
-              accent = '#0099ff';
-            }
-            if (parsed.gui === 'dark' || parsed.gui === 'light') {
-              theme = parsed.gui;
-            }
-          } catch (e) {
-            // ignore
-          }
-        }
+
 
         if (!theme) {
           theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
         }
 
         var splash = document.querySelector('.spash-waiting-for-js');
-        var circles = document.getElementsByClassName('circle');
+        var logo = document.getElementsByClassName('circle');
         splash.setAttribute('data-theme', theme);
 
-        if (theme !== 'dark') {
-          for (var i = 0; i < circles.length; i++) {
-            circles[i].style.backgroundColor = accent + '50';
-            circles[i].style.borderColor = accent + '10';
-          }
+        if (theme !== 'dark' && !!theme) {
+          for (let element = 0; element < logo.length; element += 1) {
+            logo[element].style.backgroundColor = '#ffffff50';
+            logo[element].style.borderColor = '#ffffff10';
+          };
           splash.style.backgroundColor = accent;
           splash.style.color = 'white';
         } else {
-          for (var j = 0; j < circles.length; j++) {
-            circles[j].style.backgroundColor = '#ffffff50';
-            circles[j].style.borderColor = '#ffffff10';
-          }
+          splash.style.backgroundColor = '#222';
+          splash.style.color = 'white';
+          for (let element = 0; element < logo.length; element += 1) {
+            logo[element].style.backgroundColor = '#ffffff50';
+            logo[element].style.borderColor = '#ffffff10';
+          };
         }
+
         splash.hidden = false;
 
         var splashErrorTitle = document.querySelector('.splash-error-title');
         var splashError = document.querySelector('.splash-errors');
+        var splashReset = document.querySelector('.splash-reset');
+
+        var splashErrorLink = document.querySelector('.splash-error-link');
+        var splashErrorText1 = document.querySelector('.splash-error-title-text1');
+        var splashErrorText2 = document.querySelector('.splash-error-title-text2');
 
         var totalErrors = 0;
         window.onerror = function (event, source, line, col, err) {
-          if (++totalErrors > 5) return;
-          splashErrorTitle.hidden = splashError.hidden = false;
+          if (++totalErrors > 5) return; // dont bother logging more
+          splashErrorTitle.hidden = splashError.hidden = splashReset.hidden = false;
+
+          splashErrorText1.textContent = getText('title_1');
+          splashErrorLink.textContent = getText('title_2_link');
+          splashErrorText2.textContent = getText('title_3');
+          splashReset.textContent = getText('reset')
 
           var el = document.createElement('div');
           el.textContent = 'Error (splash) in ' + source + ' (' + line + ':' + col + '): ' + err;
           splashError.appendChild(el);
+          logoAll.style.transform = 'scale(6, 6) translate(20px, 40px)';
           splash.style.backgroundColor = '#ff8888';
-          for (var k = 0; k < circles.length; k++) {
-            circles[k].style.backgroundColor = '#ffffff50';
-            circles[k].style.borderColor = '#ffffff10';
+          splash.style.color = 'white';
+          splashErrorTitle.style.color = 'white';
+          for (let element = 0; element < logo.length; element += 1) {
+            logo[element].style.backgroundColor = '#ffffff50';
+            logo[element].style.borderColor = '#ffffff10';
+          };
+        };
+
+        splashReset.onclick = function () {
+          splashReset.disabled = true;
+          function hardRefresh() {
+            var search = location.search.replace(/[?&]nocache=[\d.]+(?=$|&)/, '');
+            document.cookie = 'tw_clear_cache_once=1; max-age=60; path=/; samesite=strict; secure';
+            location.replace(location.pathname + search + (search ? '&' : '?') + 'nocache=' + Math.floor(Math.random() * 10000000));
+          }
+          if ('serviceWorker' in navigator) {
+            setTimeout(hardRefresh, 5000);
+            navigator.serviceWorker.getRegistration('/')
+              .then(function (registration) {
+                if (registration) {
+                  return registration.unregister();
+                }
+              })
+              .then(hardRefresh)
+              .catch(hardRefresh);
+          } else {
+            hardRefresh();
           }
         };
 
-        window.SplashEnd = function () {
+        window.SplashEnd = () => {
           splash.hidden = true;
           window.onerror = null;
         };

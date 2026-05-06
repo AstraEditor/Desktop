@@ -714,7 +714,7 @@ class EditorWindow extends ProjectRunningWindow {
     this.show();
 
     // Windows acrylic blur effect (theme controlled by nativeTheme.themeSource in index.js)
-    if (process.platform === 'win32' && process.platform === 'darwin' && settings.useBlurBackground) {
+    if (process.platform === 'win32' && settings.useBlurBackground) {
       this.window.setBackgroundMaterial('acrylic');
     }
   }

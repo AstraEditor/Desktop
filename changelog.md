@@ -2,6 +2,13 @@ This document is the authoritative source for TurboWarp's changelogs. Everything
 
 Prefix notes with "Windows:", "macOS:", or "Linux:" as needed. Do not use **formatting** or [links](https://desktop.turbowarp.org/).
 
+# 1.2.2 (2026-05-06)
+
+- 修复桌面端浅色模式的加载动画缺失问题
+- 修复Windows的模糊效果无法在一开始应用
+- 修复启用紧凑的编辑器插件后Tab的按钮没有隐藏
+- 将版本过久的网站文本改为AE官网
+
 # 1.2.1 (2026-05-05)
 
 - 优化模糊效果
