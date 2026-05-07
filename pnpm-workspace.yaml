@@ -8,3 +8,6 @@ onlyBuiltDependencies:
   - "scratch-gui"
   - "scratch-extension-editor"
   - "@turbowarp/extensions"
+
+allowBuilds:
+  scratch-blocks: true

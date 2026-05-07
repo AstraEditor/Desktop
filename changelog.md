@@ -2,6 +2,12 @@ This document is the authoritative source for TurboWarp's changelogs. Everything
 
 Prefix notes with "Windows:", "macOS:", or "Linux:" as needed. Do not use **formatting** or [links](https://desktop.turbowarp.org/).
 
+# 1.2.3 (2026-05-07)
+
+- 修复下拉栏图层的问题
+- 修复全屏Modal的滚动条的问题
+- 修复打包器部分项目会报错的问题
+
 # 1.2.2 (2026-05-06)
 
 - 修复桌面端浅色模式的加载动画缺失问题
