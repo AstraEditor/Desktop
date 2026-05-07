@@ -19,7 +19,7 @@ jobs:
         node-version: 24
 
     - name: Install pnpm
-      run: corepack enable && corepack prepare pnpm@latest --activate
+      run: corepack enable && corepack prepare pnpm@10.33.2 --activate
     - name: Install Python
       uses: actions/setup-python@v5
       with:
