@@ -11,3 +11,4 @@ onlyBuiltDependencies:
 
 allowBuilds:
   scratch-blocks: true
+  scratch-gui: true
