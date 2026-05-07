@@ -81,6 +81,22 @@ const generateCSS = (alphaGain) => `
         [class*=blocklyZoom] {
             opacity: ${80 * alphaGain}%
         }
+
+        [class*=backpack_backpack-list]{
+            background-color: color-mix(in srgb, $ui-white, transparent ${20 * alphaGain}%) !important
+        }
+
+        [class*=gui_vscode] [class*=gui_tab][class*=gui_is-selected]{
+            background-color: color-mix(in srgb, $ui-white, transparent ${20 * alphaGain}%) !important
+        }
+
+        [class*=asset-panel_wrapper] {
+            background-color: color-mix(in srgb, var(--assets-background), transparent ${70 * alphaGain}%) !important
+        }
+
+        [class*=selector_wrapper] {
+            background-color: color-mix(in srgb, $ui-secondary, transparent ${70 * alphaGain}%) !important
+        }
 `;
 
 // Map to store CSS keys for each webContents id
