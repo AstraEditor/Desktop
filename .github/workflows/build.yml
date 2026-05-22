@@ -84,10 +84,8 @@ jobs:
       with:
         node-version: 24
 
-    - name: Setup pnpm
-      uses: pnpm/action-setup@v4
-      with:
-        version: latest
+    - name: Install pnpm
+      run: corepack enable && corepack prepare pnpm@10.33.2 --activate
 
     - name: Install system dependencies
       run: |
@@ -98,10 +96,10 @@ jobs:
       if: matrix.format == 'pacman' || matrix.format == 'rpm'
       run: sudo gem install --no-document fpm
 
-    - name: Install dependencies (skip postinstall)
+    - name: Install dependencies
       run: |
-        rm -f pnpm-lock.yaml
-        pnpm install --loglevel=info --ignore-scripts
+          rm -f pnpm-lock.yaml
+          pnpm install --loglevel=info
 
     - name: Package
       run: |
@@ -134,15 +132,13 @@ jobs:
       with:
         node-version: 24
 
-    - name: Setup pnpm
-      uses: pnpm/action-setup@v4
-      with:
-        version: latest
+    - name: Install pnpm
+      run: corepack enable && corepack prepare pnpm@10.33.2 --activate
 
-    - name: Install dependencies (skip postinstall)
+    - name: Install dependencies
       run: |
-        rm -f pnpm-lock.yaml
-        pnpm install --loglevel=info --ignore-scripts
+          rm -f pnpm-lock.yaml
+          pnpm install --loglevel=info
 
     - name: Get version
       id: ver
@@ -253,15 +249,13 @@ jobs:
       with:
         node-version: 24
 
-    - name: Setup pnpm
-      uses: pnpm/action-setup@v4
-      with:
-        version: latest
+    - name: Install pnpm
+      run: corepack enable && corepack prepare pnpm@10.33.2 --activate
 
-    - name: Install dependencies (skip postinstall)
+    - name: Install dependencies
       run: |
-        rm -f pnpm-lock.yaml
-        pnpm install --loglevel=info --ignore-scripts
+          rm -f pnpm-lock.yaml
+          pnpm install --loglevel=info
 
     - name: Package
       run: |
@@ -338,10 +332,9 @@ jobs:
       with:
         node-version: 24
 
-    - name: Setup pnpm
-      uses: pnpm/action-setup@v4
-      with:
-        version: latest
+    - name: Install pnpm
+      run: corepack enable && corepack prepare pnpm@10.33.2 --activate
+
 
     - name: Configure pnpm cache
       shell: pwsh
