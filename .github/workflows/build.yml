@@ -80,11 +80,6 @@ jobs:
       with:
         name: build-artifacts
 
-    - name: Install system dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y strip-nondeterminism fakeroot ${{ matrix.extra-deps }}
-
     - name: Install Node.js
       uses: actions/setup-node@v4
       with:
@@ -94,6 +89,11 @@ jobs:
       uses: pnpm/action-setup@v4
       with:
         version: latest
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y strip-nondeterminism fakeroot ${{ matrix.extra-deps }}
 
     - name: Install fpm
       if: matrix.format == 'pacman' || matrix.format == 'rpm'
@@ -115,6 +115,109 @@ jobs:
         path: dist/*.*
         retention-days: 1
 
+  # ==========================================
+  # FreeBSD 打包（从 tarball 提取 app.asar，无签名）
+  # ==========================================
+  package-freebsd:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: build-artifacts
+
+    - name: Install Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 24
+
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: latest
+
+    - name: Install dependencies (skip postinstall)
+      run: |
+        rm -f pnpm-lock.yaml
+        pnpm install --loglevel=info --ignore-scripts
+
+    - name: Get version
+      id: ver
+      run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+
+    - name: Build tarball & extract app.asar
+      run: |
+        node release-automation/build.mjs --tarball --x64 --production
+        mkdir -p _extract
+        tar -xzf dist/*.tar.gz -C _extract
+        find _extract -name "app.asar" -exec cp {} app.asar \;
+        ls -la app.asar
+
+    - name: Assemble pkg contents
+      run: |
+        mkdir -p staging/usr/local/share/astraeditor
+        mkdir -p staging/usr/local/bin
+        mkdir -p staging/usr/local/share/applications
+        mkdir -p staging/usr/local/share/icons/hicolor/256x256/apps
+
+        cp app.asar staging/usr/local/share/astraeditor/
+
+        cat > staging/usr/local/bin/astraeditor-desktop << 'EOF'
+        #!/bin/sh
+        exec /usr/local/bin/electron /usr/local/share/astraeditor/app.asar "$@"
+        EOF
+        chmod +x staging/usr/local/bin/astraeditor-desktop
+
+        cat > staging/usr/local/share/applications/astraeditor-desktop.desktop << 'EOF'
+        [Desktop Entry]
+        Name=AstraEditor
+        Comment=TurboWarp mod with compiler and more features
+        Exec=astraeditor-desktop %U
+        Terminal=false
+        Type=Application
+        Icon=astraeditor
+        Categories=Development;Education;
+        EOF
+
+        if [ -f "build/icons/256x256.png" ]; then
+          cp build/icons/256x256.png staging/usr/local/share/icons/hicolor/256x256/apps/astraeditor.png
+        fi
+
+    - name: Generate +MANIFEST
+      run: |
+        cat > staging/+MANIFEST << EOF
+        {
+          "name": "astraeditor",
+          "version": "${{ steps.ver.outputs.version }}",
+          "origin": "devel/astraeditor",
+          "comment": "AstraEditor - TurboWarp mod",
+          "maintainer": "LuoTianyi_arm64 <2153585992@qq.com>",
+          "www": "https://github.com/AstraEditor/Desktop",
+          "prefix": "/usr/local",
+          "deps": {
+            "electron": {
+              "origin": "devel/electron",
+              "version": ">=28.0.0"
+            }
+          }
+        }
+        EOF
+
+    - name: Create .pkg
+      run: |
+        cd staging
+        tar -cf - +MANIFEST $(find usr -type f | sort) | xz -9 > ../astraeditor-freebsd-x64.pkg
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: freebsd-x64
+        path: astraeditor-freebsd-x64.pkg
+        retention-days: 1
 
   # ==========================================
   # Mac 打包
