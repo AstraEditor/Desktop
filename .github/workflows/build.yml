@@ -184,10 +184,11 @@ jobs:
 
     - name: Generate +MANIFEST
       run: |
-        cat > staging/+MANIFEST << EOF
+        cd staging
+        cat > +MANIFEST << 'MANIFEST'
         {
           "name": "astraeditor",
-          "version": "${{ steps.ver.outputs.version }}",
+          "version": "VERSION_PLACEHOLDER",
           "origin": "devel/astraeditor",
           "comment": "AstraEditor - TurboWarp mod",
           "desc": "AstraEditor is a TurboWarp mod used to add more practical features to make your writing lightning fast.",
@@ -199,8 +200,13 @@ jobs:
               "origin": "devel/electron",
               "version": ">=28.0.0"
             }
-          }
-        }
+          },
+          "files": {
+        MANIFEST
+        find usr -type f | sed 's|^|    "/|g; s|$|": "1"|g' | sed '$!s/$/,/' >> +MANIFEST
+        echo "  }" >> +MANIFEST
+        echo "}" >> +MANIFEST
+        sed -i "s/VERSION_PLACEHOLDER/${{ steps.ver.outputs.version }}/g" +MANIFEST
         EOF
         
     - name: Create .pkg
