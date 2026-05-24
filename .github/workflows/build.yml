@@ -177,9 +177,9 @@ jobs:
         Icon=astraeditor
         Categories=Development;Education;
         EOF
-        for _res in 48 64 128 256 512; do
+        for res in 48 64 128 256 512; do
           if [ -f "build/icons/256x256.png" ]; then
-            cp build/icons/${_res}x${_res}.png staging/usr/local/share/icons/hicolor/${_res}x${_res}/apps/astraeditor.png
+            cp build/icons/${res}x${res}.png staging/usr/local/share/icons/hicolor/${res}x${res}/apps/astraeditor.png
           fi
         done
 
