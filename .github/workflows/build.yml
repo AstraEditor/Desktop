@@ -113,7 +113,7 @@ jobs:
         retention-days: 1
 
   # ==========================================
-  # FreeBSD 打包（从 tarball 提取 app.asar，无签名）
+  # FreeBSD 打包
   # ==========================================
   package-freebsd:
     needs: build
