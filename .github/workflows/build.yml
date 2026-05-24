@@ -117,7 +117,7 @@ jobs:
   # ==========================================
   package-freebsd:
     needs: build
-    runs-on: macos-13
+    runs-on: ubuntu-latest
     steps:
     - name: Checkout
       uses: actions/checkout@v4
@@ -214,12 +214,15 @@ jobs:
       with:
         usesh: true
         mem: 4096
+        # 指定 x86_64 FreeBSD 镜像
+        release: "14.1"
+        arch: x86_64
         prepare: |
           pkg install -y node npm
         run: |
-          cd /Users/runner/work/Desktop/Desktop/staging
+          cd /home/runner/work/Desktop/Desktop/staging
           pkg create -M +MANIFEST -r . -o /tmp/
-          cp /tmp/astraeditor-*.pkg /Users/runner/work/Desktop/Desktop/astraeditor-freebsd-x64.pkg
+          cp /tmp/astraeditor-*.pkg /home/runner/work/Desktop/Desktop/astraeditor-freebsd-x64.pkg
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4
