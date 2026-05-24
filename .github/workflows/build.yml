@@ -177,6 +177,7 @@ jobs:
         Icon=astraeditor
         Categories=Development;Education;
         EOF
+        local _res
         for _res in 48 64 128 256 512; do
           local _icon_path="build/icons/${_res}x${_res}.png"
           if [ -f "build/icons/256x256.png" ]; then
