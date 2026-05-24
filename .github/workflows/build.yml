@@ -211,7 +211,6 @@ jobs:
         echo "  }" >> +MANIFEST
         echo "}" >> +MANIFEST
         sed -i "s/VERSION_PLACEHOLDER/${{ steps.ver.outputs.version }}/g" +MANIFEST
-        EOF
         
     - name: Create .pkg
       run: |
