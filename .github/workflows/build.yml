@@ -179,7 +179,8 @@ jobs:
         EOF
         for res in 48 64 128 256 512; do
           if [ -f "build/icons/${res}x${res}.png" ]; then
-            cp build/icons/${res}x${res}.png staging/usr/local/share/icons/hicolor/${res}x${res}/apps/astraeditor.png
+            mkdir -p "staging/usr/local/share/icons/hicolor/${res}x${res}/apps"
+            cp "build/icons/${res}x${res}.png" "staging/usr/local/share/icons/hicolor/${res}x${res}/apps/astraeditor.png"
           fi
         done
 
