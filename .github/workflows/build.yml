@@ -137,8 +137,8 @@ jobs:
 
     - name: Install dependencies
       run: |
-        rm -f pnpm-lock.yaml
-        pnpm install --loglevel=info
+          rm -f pnpm-lock.yaml
+          pnpm install --loglevel=info
 
     - name: Get version
       id: ver
@@ -152,17 +152,18 @@ jobs:
         find _extract -name "app.asar" -exec cp {} app.asar \;
         ls -la app.asar
 
-    - name: Assemble staging
+    - name: Assemble pkg contents
       run: |
         mkdir -p staging/usr/local/share/astraeditor
         mkdir -p staging/usr/local/bin
         mkdir -p staging/usr/local/share/applications
+        mkdir -p staging/usr/local/share/icons/hicolor/256x256/apps
 
         cp app.asar staging/usr/local/share/astraeditor/
 
         cat > staging/usr/local/bin/astraeditor-desktop << 'EOF'
         #!/bin/sh
-        exec /usr/local/bin/electron39 /usr/local/share/astraeditor/app.asar "$@"
+        exec /usr/local/bin/electron /usr/local/share/astraeditor/app.asar "$@"
         EOF
         chmod +x staging/usr/local/bin/astraeditor-desktop
 
@@ -176,13 +177,14 @@ jobs:
         Icon=astraeditor
         Categories=Development;Education;
         EOF
-
         for res in 48 64 128 256 512; do
           if [ -f "build/icons/${res}x${res}.png" ]; then
             mkdir -p "staging/usr/local/share/icons/hicolor/${res}x${res}/apps"
             cp "build/icons/${res}x${res}.png" "staging/usr/local/share/icons/hicolor/${res}x${res}/apps/astraeditor.png"
           fi
         done
+
+        
 
     - name: Generate +MANIFEST
       run: |
@@ -198,8 +200,9 @@ jobs:
           "www": "https://github.com/AstraEditor/Desktop",
           "prefix": "/usr/local",
           "deps": {
-            "electron39": {
-              "origin": "devel/electron39"
+            "electron": {
+              "origin": "devel/electron",
+              "version": ">=28.0.0"
             }
           },
           "files": {
@@ -207,22 +210,12 @@ jobs:
         find usr -type f | sed 's|^|    "/|g; s|$|": "1"|g' | sed '$!s/$/,/' >> +MANIFEST
         echo "  }" >> +MANIFEST
         echo "}" >> +MANIFEST
-        sed -i '' "s/VERSION_PLACEHOLDER/${{ steps.ver.outputs.version }}/g" +MANIFEST
-
-    - name: Create .pkg in FreeBSD VM
-      uses: vmactions/freebsd-vm@v1
-      with:
-        usesh: true
-        mem: 4096
-        # 指定 x86_64 FreeBSD 镜像
-        release: "14.1"
-        arch: x86_64
-        prepare: |
-          pkg install -y node npm
-        run: |
-          cd /home/runner/work/Desktop/Desktop/staging
-          pkg create -M +MANIFEST -r . -o /tmp/
-          cp /tmp/astraeditor-*.pkg /home/runner/work/Desktop/Desktop/astraeditor-freebsd-x64.pkg
+        sed -i "s/VERSION_PLACEHOLDER/${{ steps.ver.outputs.version }}/g" +MANIFEST
+        
+    - name: Create .pkg
+      run: |
+        cd staging
+        tar --format=posix -cf - +MANIFEST $(find usr -type f | sort) | xz -9 > ../astraeditor-freebsd-x64.pkg
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4
