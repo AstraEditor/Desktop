@@ -163,7 +163,7 @@ jobs:
 
         cat > staging/usr/local/bin/astraeditor-desktop << 'EOF'
         #!/bin/sh
-        exec /usr/local/bin/electron39 /usr/local/share/astraeditor/app.asar "$@"
+        exec /usr/local/bin/electron /usr/local/share/astraeditor/app.asar "$@"
         EOF
         chmod +x staging/usr/local/bin/astraeditor-desktop
 
