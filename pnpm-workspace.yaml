@@ -8,7 +8,12 @@ onlyBuiltDependencies:
   - "scratch-gui"
   - "scratch-extension-editor"
   - "@turbowarp/extensions"
+  - "core-js"
+  - "electron-winstaller"
 
 allowBuilds:
   scratch-blocks: true
   scratch-gui: true
+  electron: true
+  core-js: true
+  electron-winstaller: true
