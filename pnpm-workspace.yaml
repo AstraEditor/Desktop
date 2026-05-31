@@ -2,6 +2,9 @@ packages:
   - "."
   - "mobile"
 
+blockExoticSubdeps: false
+shamefullyHoist: true
+
 onlyBuiltDependencies:
   - "electron"
   - "scratch-blocks"
