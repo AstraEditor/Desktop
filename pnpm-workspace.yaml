@@ -6,15 +6,5 @@ blockExoticSubdeps: false
 shamefullyHoist: true
 dangerouslyAllowAllBuilds: true
 
-onlyBuiltDependencies:
-  - "electron"
-  - "scratch-blocks"
-  - "scratch-gui"
-  - "scratch-extension-editor"
-  - "@turbowarp/extensions"
-  - "core-js"
-  - "electron-winstaller"
-
-allowBuilds:
-  scratch-blocks@https://codeload.github.com/AstraEditor/scratch-blocks/tar.gz/37f3d4892e0cc6fad2f62f503269e35f5de21931: true
-  scratch-gui@https://codeload.github.com/AstraEditor/scratch-gui/tar.gz/8fdc0be427239d586438f772626d8702e96e66a8: true
+neverBuiltDependencies:
+  - chromedriver
