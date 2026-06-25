@@ -32,7 +32,20 @@ jobs:
         rm pnpm-lock.yaml
         echo "=== Installing dependencies ==="
         pnpm install --no-frozen-lockfile --ignore-scripts
-        pnpm prepublish
+    - name: Build scratch-gui (run prepublish)
+        run: |
+            GUI_PKG=$(pnpm list --parseable --depth=-1 | grep 'scratch-gui@' | head -n1)
+            if [ -z "$GUI_PKG" ]; then
+                echo "❌ scratch-gui package not found"
+                exit 1
+            fi
+            echo "📦 Found scratch-gui at $GUI_PKG"
+            cd "$GUI_PKG"
+            echo "▶️ Running pnpm prepublish..."
+            pnpm run prepublish || {
+                echo "⚠️ prepublish failed, trying build..."
+                pnpm run build
+            }
     - name: Verify scratch-blocks has build files
       run: |
         echo "=== Checking if scratch-blocks has build files ==="
