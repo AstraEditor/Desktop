@@ -1,7 +1,7 @@
 name: Build (Manual)
 
 on:
-  workflow_dispatch:
+  workflow_patch:
 
 jobs:
   # ==========================================
