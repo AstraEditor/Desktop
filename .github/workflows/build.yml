@@ -27,19 +27,19 @@ jobs:
 
     - name: Install dependencies
       run: |
-          rm -f pnpm-lock.yaml
-          pnpm install --no-frozen-lockfile --ignore-scripts
+        rm -f pnpm-lock.yaml
+        pnpm install --no-frozen-lockfile --ignore-scripts
 
     - name: Build scratch-gui (run prepublish)
       run: |
-          GUI_PKG=$(pnpm list --parseable --depth=-1 | grep 'scratch-gui@' | head -n1)
-          if [ -z "$GUI_PKG" ]; then
-              exit 1
-          fi
-          cd "$GUI_PKG"
-          pnpm run prepublish || {
-              pnpm run build
-          }
+        GUI_PKG=$(pnpm list --parseable --depth=-1 | grep 'scratch-gui@' | head -n1)
+        if [ -z "$GUI_PKG" ]; then
+            exit 1
+        fi
+        cd "$GUI_PKG"
+        pnpm run prepublish || {
+            pnpm run build
+        }
     - name: Fetch
       run: pnpm run fetch
 
@@ -108,8 +108,8 @@ jobs:
 
     - name: Install dependencies
       run: |
-          rm -f pnpm-lock.yaml
-          pnpm install --loglevel=info
+        rm -f pnpm-lock.yaml
+        pnpm install --loglevel=info --ignore-scripts
 
     - name: Package
       run: |
@@ -147,8 +147,8 @@ jobs:
 
     - name: Install dependencies
       run: |
-          rm -f pnpm-lock.yaml
-          pnpm install --loglevel=info
+        rm -f pnpm-lock.yaml
+        pnpm install --loglevel=info --ignore-scripts
 
     - name: Get version
       id: ver
@@ -194,8 +194,6 @@ jobs:
           fi
         done
 
-        
-
     - name: Generate +MANIFEST
       run: |
         cd staging
@@ -220,8 +218,7 @@ jobs:
         find usr -type f | sed 's|^|    "/|g; s|$|": "1"|g' | sed '$!s/$/,/' >> +MANIFEST
         echo "  }" >> +MANIFEST
         echo "}" >> +MANIFEST
-        sed -i "s/VERSION_PLACEHOLDER/${{ steps.ver.outputs.version }}/g" +MANIFEST
-        
+        sed -i "s|VERSION_PLACEHOLDER|${{ steps.ver.outputs.version }}|g" +MANIFEST
     - name: Create .pkg
       run: |
         cd staging
@@ -274,8 +271,8 @@ jobs:
 
     - name: Install dependencies
       run: |
-          rm -f pnpm-lock.yaml
-          pnpm install --loglevel=info
+        rm -f pnpm-lock.yaml
+        pnpm install --loglevel=info --ignore-scripts
 
     - name: Package
       run: |

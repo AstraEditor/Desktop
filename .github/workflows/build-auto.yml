@@ -29,7 +29,7 @@ jobs:
     - name: Install dependencies
       run: |
         echo "=== Removing pnpm-lock.yaml to use latest git commits ==="
-        rm pnpm-lock.yaml
+        rm -f pnpm-lock.yaml
         echo "=== Installing dependencies ==="
         pnpm install --no-frozen-lockfile --ignore-scripts
     - name: Build scratch-gui (run prepublish)
