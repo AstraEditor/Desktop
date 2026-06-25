@@ -32,6 +32,7 @@ jobs:
         rm pnpm-lock.yaml
         echo "=== Installing dependencies ==="
         pnpm install --no-frozen-lockfile --ignore-scripts
+        pnpm prepublish
     - name: Verify scratch-blocks has build files
       run: |
         echo "=== Checking if scratch-blocks has build files ==="

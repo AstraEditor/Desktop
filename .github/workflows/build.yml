@@ -29,6 +29,7 @@ jobs:
       run: |
           rm -f pnpm-lock.yaml
           pnpm install --no-frozen-lockfile --ignore-scripts
+          pnpm prepublish
 
     - name: Fetch
       run: pnpm run fetch
