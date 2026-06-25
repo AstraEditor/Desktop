@@ -31,7 +31,7 @@ jobs:
         echo "=== Removing pnpm-lock.yaml to use latest git commits ==="
         rm pnpm-lock.yaml
         echo "=== Installing dependencies ==="
-        pnpm install
+        pnpm install --no-frozen-lockfile --ignore-scripts
     - name: Verify scratch-blocks has build files
       run: |
         echo "=== Checking if scratch-blocks has build files ==="

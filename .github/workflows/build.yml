@@ -28,7 +28,7 @@ jobs:
     - name: Install dependencies
       run: |
           rm -f pnpm-lock.yaml
-          pnpm install --loglevel=info
+          pnpm install --no-frozen-lockfile --ignore-scripts
 
     - name: Fetch
       run: pnpm run fetch
