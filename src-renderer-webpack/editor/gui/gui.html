@@ -321,6 +321,30 @@
 
         splash.hidden = false;
 
+        try {
+          var splashBg = theme !== 'dark' && !!theme ? accent : '#222222';
+          window.EditorPreload.setWindowControlsStyle({
+            color: splashBg,
+            symbolColor: '#ffffff',
+            height: Math.round(48 * window.devicePixelRatio)
+          });
+        } catch {}
+
+        // 自适应窗口控件高度（考虑缩放），插件接管时跳过以避免冲突
+        var updateWindowControlsHeight = function () {
+          try {
+            if (window.EditorPreload && window.EditorPreload.platform === 'darwin') return;
+            if (window.__windowControlsManagedByAddon) return;
+            if (window.EditorPreload && window.EditorPreload.setWindowControlsStyle) {
+              window.EditorPreload.setWindowControlsStyle({
+                height: Math.round(48 * window.devicePixelRatio)
+              });
+            }
+          } catch {}
+        };
+        updateWindowControlsHeight();
+        window.addEventListener('resize', updateWindowControlsHeight);
+
         var splashErrorTitle = document.querySelector('.splash-error-title');
         var splashError = document.querySelector('.splash-errors');
         var splashReset = document.querySelector('.splash-reset');

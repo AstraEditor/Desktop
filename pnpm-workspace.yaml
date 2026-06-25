@@ -20,3 +20,5 @@ allowBuilds:
   electron: true
   core-js: true
   electron-winstaller: true
+  scratch-gui@https://codeload.github.com/AstraEditor/scratch-gui/tar.gz/ac4f06e82a7b7d57325a163cf3a94100ea6c13f7: true
+  scratch-blocks@https://codeload.github.com/AstraEditor/scratch-blocks/tar.gz/5f85db91abc2bf06599b60dfd31eefc98cebaa70: true

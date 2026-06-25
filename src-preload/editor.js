@@ -1,6 +1,7 @@
 const {contextBridge, ipcRenderer} = require('electron');
 
 contextBridge.exposeInMainWorld('EditorPreload', {
+  platform: process.platform,
   isInitiallyFullscreen: () => ipcRenderer.sendSync('is-initially-fullscreen'),
   getInitialFile: () => ipcRenderer.invoke('get-initial-file'),
   getFile: (id) => ipcRenderer.invoke('get-file', id),
@@ -38,6 +39,7 @@ contextBridge.exposeInMainWorld('EditorPreload', {
   },
   setIsFullScreen: (isFullScreen) => ipcRenderer.invoke('set-is-full-screen', isFullScreen),
   getLocalStorage: (key) => localStorage.getItem(key),
+  setWindowControlsStyle: (config) => ipcRenderer.invoke('changed-window-controls-style', config),
 });
 
 let exportForPackager = () => Promise.reject(new Error('exportForPackager missing'));

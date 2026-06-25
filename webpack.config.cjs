@@ -3,6 +3,22 @@ const { DefinePlugin, ProvidePlugin } = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const { url } = require('inspector');
 
+const globalCssFiles = new Set([
+    'bottom-panel.css',
+    'side-bar.css'
+]);
+const useCssModules = resourcePath => {
+    if (globalCssFiles.has(path.basename(resourcePath))) {
+        return false;
+    }
+    // The monaco-editor npm package's CSS must stay global because the library's
+    // JS references class names as string literals (e.g. ".monaco-editor").
+    if (resourcePath.includes('node_modules') && resourcePath.includes('monaco-editor')) {
+        return false;
+    }
+    return true;
+};
+
 const base = {
     mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
     devtool: process.env.NODE_ENV === 'production' ? false : 'cheap-source-map',
@@ -20,7 +36,7 @@ const base = {
                 }
             },
             {
-                test: /\.(svg|png|wav|gif|jpg|mp3|woff2|hex)$/,
+                test: /\.(svg|png|wav|gif|jpg|mp3|woff2|hex|ttf)$/,
                 loader: 'file-loader',
                 options: {
                     outputPath: 'static/assets/',
@@ -47,6 +63,7 @@ const base = {
                             esModule: false,
                             importLoaders: 1,
                             modules: {
+                                auto: useCssModules,
                                 localIdentName: '[name]_[local]_[hash:base64:5]',
                                 exportLocalsConvention: 'camelCase'
                             }

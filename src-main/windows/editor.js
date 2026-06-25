@@ -722,6 +722,8 @@ class EditorWindow extends ProjectRunningWindow {
       FileAccessWindow.check(filePath);
     });
 
+    this.ipc.handle("changed-window-controls-style", (event, config) => this.updateWindowControls(config));
+
     /**
      * Refers to the full screen button in the editor, not the OS-level fullscreen through
      * F11/Alt+Enter (Windows, Linux) or buttons provided by the OS (macOS).
@@ -744,7 +746,6 @@ class EditorWindow extends ProjectRunningWindow {
 
     this.loadURL("tw-editor://./gui/gui.html");
     this.show();
-
     // Windows acrylic blur effect (theme controlled by nativeTheme.themeSource in index.js)
     if (process.platform === "win32" && settings.useBlurBackground) {
       try {
@@ -773,7 +774,8 @@ class EditorWindow extends ProjectRunningWindow {
 
   getWindowOptions() {
     const options = super.getWindowOptions();
-    options.frame = false;
+    options.titleBarStyle = 'hidden';
+    if(process.platform !== 'darwin') options.titleBarOverlay = true;
     options.minWidth = 1024;
     options.minHeight = 640;
 
@@ -811,6 +813,18 @@ class EditorWindow extends ProjectRunningWindow {
       } catch {}
       await this.clearBlurAlphaGain();
     }
+  }
+
+  updateWindowControls(config){
+    // macOS uses native traffic lights, no titleBarOverlay
+    if (process.platform === 'darwin') return;
+    try {
+      this.window.setTitleBarOverlay({
+        color: config.color,
+        symbolColor: config.symbolColor,
+        height: config.height
+      });
+    } catch {}
   }
 
   async updateBlurAlphaGain() {

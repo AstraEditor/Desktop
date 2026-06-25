@@ -1,7 +1,7 @@
 {
     "name": "astraeditor-desktop",
     "description": "TurboWarp mod with more features",
-    "version": "1.2.3",
+    "version": "1.2.4",
     "license": "GPL-3.0",
     "author": {
         "email": "2381068747@qq.com",
@@ -18,6 +18,7 @@
         "build:linux": "node release-automation/build.mjs --flatpak"
     },
     "dependencies": {
+        "electron": "39.8.3",
         "https-proxy-agent": "^7.0.6",
         "prop-types": "^15.8.1",
         "react": "^16.0.0",
@@ -40,7 +41,6 @@
         "copy-webpack-plugin": "^6.4.1",
         "cross-env": "^10.1.0",
         "css-loader": "^6.11.0",
-        "electron": "39.8.3",
         "electron-builder": "^26.3.5",
         "file-loader": "^6.2.0",
         "path-browserify": "^1.0.1",
@@ -52,7 +52,7 @@
         "raw-loader": "^4.0.2",
         "refractor": "^5.0.0",
         "scratch-blocks": "github:AstraEditor/scratch-blocks#develop",
-        "scratch-gui": "github:AstraEditor/scratch-gui#develop",
+        "scratch-gui": "link://d:/Project/scratch-gui",
         "spdx-expression-parse": "^4.0.0",
         "style-loader": "^4.0.0",
         "terser-webpack-plugin": "^5.4.0",

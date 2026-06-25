@@ -2,6 +2,20 @@ This document is the authoritative source for TurboWarp's changelogs. Everything
 
 Prefix notes with "Windows:", "macOS:", or "Linux:" as needed. Do not use **formatting** or [links](https://desktop.turbowarp.org/).
 
+# 1.2.4 (2026-06-25)
+
+- 修复当切换工作区时可能会卡顿非常久的问题
+- 修复部分扩展没法在舞台上加东西的问题
+- 重做“窗口控制按钮”
+- 修复RTL时菜单栏的问题
+- 修改壁纸插件
+- 长按菜单栏600毫秒后可以拖拽整个菜单栏而不居于空白处
+- 修复打包器无法使用的问题
+- 修复扩展编辑器可能会溢出屏幕的问题
+- 修复画板可能会顶出舞台的问题
+- 新的扩展：逻辑运算——提供更多逻辑积木
+- 新的扩展：ShangCloud——和其他人互动，比如多人游戏！
+
 # 1.2.3 (2026-05-07)
 
 - 修复下拉栏图层的问题
