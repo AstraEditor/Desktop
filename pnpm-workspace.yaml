@@ -4,6 +4,7 @@ packages:
 
 blockExoticSubdeps: false
 shamefullyHoist: true
+dangerouslyAllowAllBuilds: true
 
 onlyBuiltDependencies:
   - "electron"
@@ -15,8 +16,10 @@ onlyBuiltDependencies:
   - "electron-winstaller"
 
 allowBuilds:
-  scratch-blocks: true
-  scratch-gui: true
+  scratch-blocks@https://codeload.github.com/AstraEditor/scratch-blocks/tar.gz/37f3d4892e0cc6fad2f62f503269e35f5de21931: true
+  scratch-gui@https://codeload.github.com/AstraEditor/scratch-gui/tar.gz/8fdc0be427239d586438f772626d8702e96e66a8: true
+  scratch-extension-editor: true
+  "@turbowarp/extensions": true
   electron: true
   core-js: true
   electron-winstaller: true
