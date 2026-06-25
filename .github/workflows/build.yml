@@ -30,7 +30,7 @@ jobs:
           rm -f pnpm-lock.yaml
           pnpm install --no-frozen-lockfile --ignore-scripts
 
-    - name: Build scratch-gui
+    - name: Build scratch-gui (run prepublish)
         run: |
             GUI_PKG=$(pnpm list --parseable --depth=-1 | grep 'scratch-gui@' | head -n1)
             if [ -z "$GUI_PKG" ]; then
