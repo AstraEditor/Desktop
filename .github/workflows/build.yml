@@ -32,7 +32,7 @@ jobs:
 
     - name: Build scratch-gui (run prepublish)
       run: |
-        GUI_PKG=$(pnpm list --parseable --depth=-1 | grep 'scratch-gui@' | head -n1)
+        GUI_PKG=$(node -e "console.log(require('path').dirname(require.resolve('scratch-gui/package.json')))")
         if [ -z "$GUI_PKG" ]; then
             exit 1
         fi

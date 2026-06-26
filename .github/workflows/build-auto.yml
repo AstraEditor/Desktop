@@ -34,7 +34,7 @@ jobs:
         pnpm install --no-frozen-lockfile --ignore-scripts
     - name: Build scratch-gui (run prepublish)
       run: |
-        GUI_PKG=$(pnpm list --parseable --depth=-1 | grep 'scratch-gui@' | head -n1)
+        GUI_PKG=$(node -e "console.log(require('path').dirname(require.resolve('scratch-gui/package.json')))")
         if [ -z "$GUI_PKG" ]; then
             echo "❌ scratch-gui package not found"
             exit 1
