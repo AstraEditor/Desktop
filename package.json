@@ -20,8 +20,8 @@
     "dependencies": {
         "https-proxy-agent": "^7.0.6",
         "prop-types": "^15.8.1",
-        "react": "^16.0.0",
-        "react-dom": "^16.0.0",
+        "react": "^16.8.0",
+        "react-dom": "^16.8.0",
         "react-intl": "2.9.0",
         "react-redux": "5.0.7",
         "redux": "^4.2.1",
