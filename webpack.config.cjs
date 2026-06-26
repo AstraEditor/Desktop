@@ -1,6 +1,7 @@
 const path = require('path');
 const { DefinePlugin, ProvidePlugin } = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 const { url } = require('inspector');
 
 const globalCssFiles = new Set([
@@ -33,6 +34,19 @@ const base = {
                 // ESM/CJS for each file instead of treating all .js files as CommonJS.
                 type: 'javascript/auto',
                 loader: 'babel-loader',
+                include: function (filepath) {
+                    if (filepath.includes(path.resolve(__dirname, 'src-renderer-webpack'))) return true;
+                    if (filepath.includes(path.resolve(__dirname, 'src'))) return true;
+                    if (filepath.includes(path.resolve(__dirname, 'src-main'))) return true;
+                    if (/node_modules[\\/]scratch-[^\\/]+[\\/]/.test(filepath)) return true;
+                    if (/[\\/]scratch-[^\\/]+[\\/]/.test(filepath)) return true;
+                    if (/node_modules[\\/]@turbowarp[\\/]/.test(filepath)) return true;
+                    if (/[\\/]@turbowarp[\\/]/.test(filepath)) return true;
+                    if (/node_modules[\\/]htmlparser2/.test(filepath)) return true;
+                    if (/node_modules[\\/]pify/.test(filepath)) return true;
+                    if (/node_modules[\\/]refractor/.test(filepath)) return true;
+                    return false;
+                },
                 options: {
                     presets: ['@babel/preset-env', '@babel/preset-react']
                 }
@@ -170,6 +184,22 @@ module.exports = [
                 '../reducers/gui': path.resolve(__dirname, 'node_modules/scratch-gui/src/reducers/gui.js'),
                 './tw-scratch-paint': path.resolve(__dirname, 'node_modules/scratch-gui/src/lib/tw-scratch-paint.js'),
             }
+        },
+        optimization: {
+            concatenateModules: false,
+            mangleExports: false,
+            usedExports: false,
+            minimizer: [
+                new TerserPlugin({
+                    terserOptions: {
+                        compress: {
+                            reduce_vars: false,
+                            reduce_funcs: false
+                        },
+                        mangle: false
+                    }
+                })
+            ]
         }
     },
 
