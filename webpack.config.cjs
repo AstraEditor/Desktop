@@ -13,7 +13,9 @@ const useCssModules = resourcePath => {
     }
     // The monaco-editor npm package's CSS must stay global because the library's
     // JS references class names as string literals (e.g. ".monaco-editor").
-    if (resourcePath.includes('node_modules') && resourcePath.includes('monaco-editor')) {
+    // Only match the actual monaco-editor npm package, not scratch-gui's
+    // components/monaco-editor/ which needs CSS Modules for styles.editorWrapper etc.
+    if (resourcePath.includes('node_modules/monaco-editor/') && !resourcePath.includes('scratch-gui')) {
         return false;
     }
     return true;
