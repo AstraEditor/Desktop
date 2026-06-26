@@ -8,9 +8,6 @@ importers:
 
   .:
     dependencies:
-      electron:
-        specifier: 39.8.3
-        version: 39.8.3
       https-proxy-agent:
         specifier: ^7.0.6
         version: 7.0.6
@@ -72,6 +69,9 @@ importers:
       css-loader:
         specifier: ^6.11.0
         version: 6.11.0(webpack@5.107.2)
+      electron:
+        specifier: 39.8.3
+        version: 39.8.3
       electron-builder:
         specifier: ^26.3.5
         version: 26.15.3(electron-builder-squirrel-windows@26.15.3)

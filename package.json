@@ -18,7 +18,6 @@
         "build:linux": "node release-automation/build.mjs --flatpak"
     },
     "dependencies": {
-        "electron": "39.8.3",
         "https-proxy-agent": "^7.0.6",
         "prop-types": "^15.8.1",
         "react": "^16.0.0",
@@ -41,6 +40,7 @@
         "copy-webpack-plugin": "^6.4.1",
         "cross-env": "^10.1.0",
         "css-loader": "^6.11.0",
+        "electron": "39.8.3",
         "electron-builder": "^26.3.5",
         "file-loader": "^6.2.0",
         "path-browserify": "^1.0.1",
