@@ -1,35 +1,35 @@
-const fsPromises = require("fs/promises");
-const path = require("path");
-const nodeURL = require("url");
-const zlib = require("zlib");
-const nodeCrypto = require("crypto");
-const { app, dialog, nativeTheme } = require("electron");
-const ProjectRunningWindow = require("./project-running-window");
-const AddonsWindow = require("./addons");
-const DesktopSettingsWindow = require("./desktop-settings");
-const PrivacyWindow = require("./privacy");
-const AboutWindow = require("./about");
-const PackagerWindow = require("./packager");
-const { createAtomicWriteStream } = require("../atomic-write-stream");
-const { translate, updateLocale, getStrings } = require("../l10n");
-const { APP_NAME } = require("../brand");
-const prompts = require("../prompts");
-const settings = require("../settings");
-const privilegedFetch = require("../fetch");
-const RichPresence = require("../rich-presence.js");
-const FileAccessWindow = require("./file-access-window.js");
-const ExtensionDocumentationWindow = require("./extension-documentation.js");
-const ExtensionEditorWindow = require("./extension-editor.js");
-const blur = require("./blur");
+const fsPromises = require('fs/promises');
+const path = require('path');
+const nodeURL = require('url');
+const zlib = require('zlib');
+const nodeCrypto = require('crypto');
+const { app, dialog, nativeTheme } = require('electron');
+const ProjectRunningWindow = require('./project-running-window');
+const AddonsWindow = require('./addons');
+const DesktopSettingsWindow = require('./desktop-settings');
+const PrivacyWindow = require('./privacy');
+const AboutWindow = require('./about');
+const PackagerWindow = require('./packager');
+const { createAtomicWriteStream } = require('../atomic-write-stream');
+const { translate, updateLocale, getStrings } = require('../l10n');
+const { APP_NAME } = require('../brand');
+const prompts = require('../prompts');
+const settings = require('../settings');
+const privilegedFetch = require('../fetch');
+const RichPresence = require('../rich-presence.js');
+const FileAccessWindow = require('./file-access-window.js');
+const ExtensionDocumentationWindow = require('./extension-documentation.js');
+const ExtensionEditorWindow = require('./extension-editor.js');
+const blur = require('./blur');
 
-const TYPE_FILE = "file";
-const TYPE_URL = "url";
-const TYPE_SCRATCH = "scratch";
-const TYPE_SAMPLE = "sample";
-const TYPE_SAMPLE_ASTRA = "sample-astra";
-const TURBOWARP_EXTENSIONS_ORIGIN = "https://extensions.turbowarp.org";
-const ASTRA_EXTENSIONS_ORIGIN = "https://editors.astras.top";
-const ASTRA_EXTENSIONS_PREFIX = "/extensions";
+const TYPE_FILE = 'file';
+const TYPE_URL = 'url';
+const TYPE_SCRATCH = 'scratch';
+const TYPE_SAMPLE = 'sample';
+const TYPE_SAMPLE_ASTRA = 'sample-astra';
+const TURBOWARP_EXTENSIONS_ORIGIN = 'https://extensions.turbowarp.org';
+const ASTRA_EXTENSIONS_ORIGIN = 'https://editors.astras.top';
+const ASTRA_EXTENSIONS_PREFIX = '/extensions';
 
 /**
  * Convert supported online extension-library URLs to local protocol redirects.
@@ -46,21 +46,23 @@ const getCachedExtensionsRedirect = (input) => {
 
   if (parsed.origin === TURBOWARP_EXTENSIONS_ORIGIN) {
     return {
-      protocol: "tw-extensions",
-      path: parsed.pathname,
+      protocol: 'tw-extensions',
+      path: parsed.pathname
     };
   }
 
   if (
     parsed.origin === ASTRA_EXTENSIONS_ORIGIN &&
-    (parsed.pathname === ASTRA_EXTENSIONS_PREFIX ||
-      parsed.pathname.startsWith(`${ASTRA_EXTENSIONS_PREFIX}/`))
+    (
+      parsed.pathname === ASTRA_EXTENSIONS_PREFIX ||
+      parsed.pathname.startsWith(`${ASTRA_EXTENSIONS_PREFIX}/`)
+    )
   ) {
     const stripped = parsed.pathname.slice(ASTRA_EXTENSIONS_PREFIX.length);
-    const normalized = (stripped || "/").replace(/\/{2,}/g, "/");
+    const normalized = (stripped || '/').replace(/\/{2,}/g, '/');
     return {
-      protocol: "tw-astra-extensions",
-      path: normalized,
+      protocol: 'tw-astra-extensions',
+      path: normalized
     };
   }
 
@@ -83,7 +85,7 @@ class OpenedFile {
     if (this.type === TYPE_FILE) {
       return {
         name: path.basename(this.path),
-        data: await fsPromises.readFile(this.path),
+        data: await fsPromises.readFile(this.path)
       };
     }
 
@@ -91,23 +93,19 @@ class OpenedFile {
       const buffer = await privilegedFetch(this.path);
       return {
         name: decodeURIComponent(path.basename(this.path)),
-        data: buffer,
+        data: buffer
       };
     }
 
     if (this.type === TYPE_SCRATCH) {
-      const metadata = await privilegedFetch.json(
-        `https://api.scratch.mit.edu/projects/${this.path}`,
-      );
+      const metadata = await privilegedFetch.json(`https://api.scratch.mit.edu/projects/${this.path}`);
       const token = metadata.project_token;
       const title = metadata.title;
 
-      const projectBuffer = await privilegedFetch(
-        `https://projects.scratch.mit.edu/${this.path}?token=${token}`,
-      );
+      const projectBuffer = await privilegedFetch(`https://projects.scratch.mit.edu/${this.path}?token=${token}`);
       return {
         name: title,
-        data: projectBuffer,
+        data: projectBuffer
       };
     }
 
@@ -115,9 +113,7 @@ class OpenedFile {
       const isAstraSample = this.type === TYPE_SAMPLE_ASTRA;
       const sampleRoot = path.resolve(
         __dirname,
-        isAstraSample ?
-          "../../dist-astra-extensions/samples/"
-        : "../../dist-extensions/samples/",
+        isAstraSample ? '../../dist-astra-extensions/samples/' : '../../dist-extensions/samples/'
       );
       const resolvedPath = path.join(sampleRoot, this.path);
       if (resolvedPath.startsWith(sampleRoot)) {
@@ -142,10 +138,10 @@ class OpenedFile {
 
         return {
           name: this.path,
-          data,
+          data
         };
       }
-      throw new Error("Unsafe join");
+      throw new Error('Unsafe join');
     }
 
     throw new Error(`Unknown type: ${this.type}`);
@@ -166,11 +162,9 @@ const parseOpenedFile = (file, workingDirectory) => {
   }
 
   if (url) {
-    if (url.protocol === "http:" || url.protocol === "https:") {
+    if (url.protocol === 'http:' || url.protocol === 'https:') {
       // Scratch URLs require special treatment as they are not direct downloads.
-      const scratchMatch = file.match(
-        /^https?:\/\/scratch\.mit\.edu\/projects\/(\d+)\/?/,
-      );
+      const scratchMatch = file.match(/^https?:\/\/scratch\.mit\.edu\/projects\/(\d+)\/?/);
       if (scratchMatch) {
         return new OpenedFile(TYPE_SCRATCH, scratchMatch[1]);
       }
@@ -179,15 +173,11 @@ const parseOpenedFile = (file, workingDirectory) => {
       // fetching code will not go through web request handlers or custom protocols.
       const cachedExtensionsRedirect = getCachedExtensionsRedirect(file);
       if (cachedExtensionsRedirect) {
-        const sampleMatch = cachedExtensionsRedirect.path.match(
-          /^\/samples\/(.+\.sb3)$/,
-        );
+        const sampleMatch = cachedExtensionsRedirect.path.match(/^\/samples\/(.+\.sb3)$/);
         if (sampleMatch) {
           return new OpenedFile(
-            cachedExtensionsRedirect.protocol === "tw-astra-extensions" ?
-              TYPE_SAMPLE_ASTRA
-            : TYPE_SAMPLE,
-            decodeURIComponent(sampleMatch[1]),
+            cachedExtensionsRedirect.protocol === 'tw-astra-extensions' ? TYPE_SAMPLE_ASTRA : TYPE_SAMPLE,
+            decodeURIComponent(sampleMatch[1])
           );
         }
       }
@@ -198,7 +188,7 @@ const parseOpenedFile = (file, workingDirectory) => {
     // Parse file:// URLs.
     // Notably we receive these in the flatpak version of the app when we can only access a file through
     // the XDG document portal instead of having direct access with eg. --filesystem=home
-    if (url.protocol === "file:") {
+    if (url.protocol === 'file:') {
       let filePath;
       try {
         filePath = nodeURL.fileURLToPath(file);
@@ -207,10 +197,7 @@ const parseOpenedFile = (file, workingDirectory) => {
       }
 
       if (filePath) {
-        return new OpenedFile(
-          TYPE_FILE,
-          path.resolve(workingDirectory, filePath),
-        );
+        return new OpenedFile(TYPE_FILE, path.resolve(workingDirectory, filePath));
       }
     }
 
@@ -225,48 +212,43 @@ const parseOpenedFile = (file, workingDirectory) => {
  * @returns {Array<{path: string; app: string;}>}
  */
 const getUnsafePaths = () => {
-  if (process.platform !== "win32") {
+  if (process.platform !== 'win32') {
     // This problem doesn't really exist on other platforms
     return [];
   }
 
-  const localPrograms = path.join(
-    app.getPath("home"),
-    "AppData",
-    "Local",
-    "Programs",
-  );
-  const appData = app.getPath("appData");
+  const localPrograms = path.join(app.getPath('home'), 'AppData', 'Local', 'Programs');
+  const appData = app.getPath('appData');
   return [
     // Current app, regardless of where it is installed or how modded it is
     {
-      path: path.dirname(app.getPath("exe")),
+      path: path.dirname(app.getPath('exe')),
       app: APP_NAME,
     },
     {
-      path: app.getPath("userData"),
+      path: app.getPath('userData'),
       app: APP_NAME,
     },
 
     // TurboWarp Desktop defaults
     {
-      path: path.join(appData, "astraeditor-desktop"),
-      app: "AstraEditor Desktop",
+      path: path.join(appData, 'astraeditor-desktop'),
+      app: 'AstraEditor Desktop'
     },
     {
-      path: path.join(localPrograms, "AstraEditor"),
-      app: "AstraEditor Desktop",
+      path: path.join(localPrograms, 'AstraEditor'),
+      app: 'AstraEditor Desktop'
     },
 
     // Scratch Desktop defaults
     {
-      path: path.join(appData, "Scratch"),
-      app: "Scratch Desktop",
+      path: path.join(appData, 'Scratch'),
+      app: 'Scratch Desktop'
     },
     {
-      path: path.join(localPrograms, "Scratch 3"),
-      app: "Scratch Desktop",
-    },
+      path: path.join(localPrograms, 'Scratch 3'),
+      app: 'Scratch Desktop'
+    }
   ];
 };
 
@@ -277,7 +259,7 @@ const getUnsafePaths = () => {
  */
 const isChildPath = (parent, child) => {
   const relative = path.relative(parent, child);
-  return !!relative && !relative.startsWith("..") && !path.isAbsolute(relative);
+  return !!relative && !relative.startsWith('..') && !path.isAbsolute(relative);
 };
 
 /**
@@ -320,13 +302,13 @@ class EditorWindow extends ProjectRunningWindow {
      */
     const getFileById = (id) => {
       if (!this.openedFiles.has(id)) {
-        throw new Error("Invalid file ID");
+        throw new Error('Invalid file ID');
       }
       return this.openedFiles.get(id);
     };
 
     let processingWillPreventUnload = false;
-    this.window.webContents.on("will-prevent-unload", () => {
+    this.window.webContents.on('will-prevent-unload', () => {
       // Using showMessageBoxSync synchronously in the event handler causes broken focus on Windows.
       // See https://github.com/TurboWarp/desktop/issues/1245
       // To work around that, we won't cancel that will-prevent-unload event so the window stays
@@ -343,18 +325,20 @@ class EditorWindow extends ProjectRunningWindow {
       setTimeout(() => {
         const choice = dialog.showMessageBoxSync(this.window, {
           title: APP_NAME,
-          type: "info",
-          buttons: [translate("unload.stay"), translate("unload.leave")],
+          type: 'info',
+          buttons: [
+            translate('unload.stay'),
+            translate('unload.leave')
+          ],
           cancelId: 0,
           defaultId: 0,
-          message: translate("unload.message"),
-          detail: translate("unload.detail"),
-          noLink: true,
+          message: translate('unload.message'),
+          detail: translate('unload.detail'),
+          noLink: true
         });
         if (choice === 1) {
-          this.window.webContents
-            .executeJavaScript("window.__ae_reload_via_addons")
-            .then((isAddonsReload) => {
+          this.window.webContents.executeJavaScript('window.__ae_reload_via_addons')
+            .then(isAddonsReload => {
               if (isAddonsReload) {
                 this.window.webContents.executeJavaScript(`
                   window.onbeforeunload = null;
@@ -373,88 +357,88 @@ class EditorWindow extends ProjectRunningWindow {
       });
     });
 
-    this.window.on("page-title-updated", (event, title, explicitSet) => {
+    this.window.on('page-title-updated', (event, title, explicitSet) => {
       event.preventDefault();
       if (explicitSet && title) {
         this.window.setTitle(`${title} - ${APP_NAME}`);
         this.projectTitle = title;
       } else {
         this.window.setTitle(APP_NAME);
-        this.projectTitle = "";
+        this.projectTitle = '';
       }
 
       this.updateRichPresence();
     });
     this.window.setTitle(APP_NAME);
 
-    this.window.on("focus", () => {
+    this.window.on('focus', () => {
       this.updateRichPresence();
     });
 
-    this.ipc.on("is-initially-fullscreen", (e) => {
+    this.ipc.on('is-initially-fullscreen', (e) => {
       e.returnValue = isInitiallyFullscreen;
     });
 
-    this.ipc.handle("get-initial-file", () => {
+    this.ipc.handle('get-initial-file', () => {
       return this.activeFileId;
     });
 
-    this.ipc.handle("get-file", async (event, id) => {
+    this.ipc.handle('get-file', async (event, id) => {
       const file = getFileById(id);
       const { name, data } = await file.read();
       return {
         name,
         type: file.type,
-        data,
+        data
       };
     });
 
-    this.ipc.on("set-locale", async (event, locale) => {
+    this.ipc.on('set-locale', async (event, locale) => {
       if (settings.locale !== locale) {
         settings.locale = locale;
         updateLocale(locale);
 
         // Imported late due to circular dependency
-        const rebuildMenuBar = require("../menu-bar");
+        const rebuildMenuBar = require('../menu-bar');
         rebuildMenuBar();
 
         // Let the save happen in the background, not important
         Promise.resolve().then(() => settings.save());
       }
       event.returnValue = {
-        strings: getStrings(),
+        strings: getStrings()
       };
     });
 
-    this.ipc.handle("set-changed", (event, changed) => {
+    this.ipc.handle('set-changed', (event, changed) => {
       this.window.setDocumentEdited(changed);
     });
 
-    this.ipc.handle("opened-file", (event, id) => {
+    this.ipc.handle('opened-file', (event, id) => {
       const file = getFileById(id);
       if (file.type !== TYPE_FILE) {
-        throw new Error("Not a file");
+        throw new Error('Not a file');
       }
       this.activeFileId = id;
       this.openedProjectAt = Date.now();
       this.window.setRepresentedFilename(file.path);
     });
 
-    this.ipc.handle("closed-file", () => {
+    this.ipc.handle('closed-file', () => {
       this.activeFileId = null;
-      this.window.setRepresentedFilename("");
+      this.window.setRepresentedFilename('');
     });
 
-    this.ipc.handle("show-open-file-picker", async () => {
+    this.ipc.handle('show-open-file-picker', async () => {
       const result = await dialog.showOpenDialog(this.window, {
-        properties: ["openFile"],
+        properties: ['openFile'],
         defaultPath: settings.lastDirectory,
         filters: [
           {
-            name: "Scratch Project",
-            extensions: ["sb3", "sb2", "sb"],
-          },
-        ],
+            name: 'Scratch Project',
+            extensions: ['sb3', 'sb2', 'sb'],
+          }
+        ]
       });
       if (result.canceled) {
         return null;
@@ -469,19 +453,19 @@ class EditorWindow extends ProjectRunningWindow {
 
       return {
         id,
-        name: path.basename(filePath),
+        name: path.basename(filePath)
       };
     });
 
-    this.ipc.handle("show-save-file-picker", async (event, suggestedName) => {
+    this.ipc.handle('show-save-file-picker', async (event, suggestedName) => {
       const result = await dialog.showSaveDialog(this.window, {
         defaultPath: path.join(settings.lastDirectory, suggestedName),
         filters: [
           {
-            name: "Scratch 3 Project",
-            extensions: ["sb3"],
-          },
-        ],
+            name: 'Scratch 3 Project',
+            extensions: ['sb3'],
+          }
+        ]
       });
       if (result.canceled) {
         return null;
@@ -489,19 +473,17 @@ class EditorWindow extends ProjectRunningWindow {
 
       const filePath = result.filePath;
 
-      const unsafePath = getUnsafePaths().find((i) =>
-        isChildPath(i.path, filePath),
-      );
+      const unsafePath = getUnsafePaths().find(i => isChildPath(i.path, filePath));
       if (unsafePath) {
         // No need to block until the message box is closed
         dialog.showMessageBox(this.window, {
-          type: "error",
+          type: 'error',
           title: APP_NAME,
-          message: translate("unsafe-path.title"),
+          message: translate('unsafe-path.title'),
           detail: translate(`unsafe-path.details`)
-            .replace("{APP_NAME}", unsafePath.app)
-            .replace("{file}", filePath),
-          noLink: true,
+            .replace('{APP_NAME}', unsafePath.app)
+            .replace('{file}', filePath),
+          noLink: true
         });
         return null;
       }
@@ -514,21 +496,21 @@ class EditorWindow extends ProjectRunningWindow {
 
       return {
         id,
-        name: path.basename(filePath),
+        name: path.basename(filePath)
       };
     });
 
-    this.ipc.handle("get-preferred-media-devices", () => {
+    this.ipc.handle('get-preferred-media-devices', () => {
       return {
         microphone: settings.microphone,
-        camera: settings.camera,
+        camera: settings.camera
       };
     });
 
-    this.ipc.on("start-write-stream", async (startEvent, id) => {
+    this.ipc.on('start-write-stream', async (startEvent, id) => {
       const file = getFileById(id);
       if (file.type !== TYPE_FILE) {
-        throw new Error("Not a file");
+        throw new Error('Not a file');
       }
 
       const port = startEvent.ports[0];
@@ -537,9 +519,9 @@ class EditorWindow extends ProjectRunningWindow {
       let writeStream = null;
 
       const handleError = (error) => {
-        console.error("Write stream error", error);
+        console.error('Write stream error', error);
         port.postMessage({
-          error,
+          error
         });
 
         // Make sure the port is started in case we encounter an error before we normally
@@ -554,7 +536,7 @@ class EditorWindow extends ProjectRunningWindow {
         return;
       }
 
-      writeStream.on("atomic-error", handleError);
+      writeStream.on('atomic-error', handleError);
 
       const handleMessage = (data) => {
         if (data.write) {
@@ -563,23 +545,23 @@ class EditorWindow extends ProjectRunningWindow {
             return;
           }
           // Wait for the buffer to become empty before asking for more.
-          return new Promise((resolve) => {
-            writeStream.once("drain", resolve);
+          return new Promise(resolve => {
+            writeStream.once('drain', resolve);
           });
         } else if (data.finish) {
           // Wait for the atomic file write to complete.
-          return new Promise((resolve) => {
-            writeStream.once("atomic-finish", resolve);
+          return new Promise(resolve => {
+            writeStream.once('atomic-finish', resolve);
             writeStream.end();
           });
         } else if (data.abort) {
-          writeStream.emit("error", new Error("Aborted by renderer process"));
+          writeStream.emit('error', new Error('Aborted by renderer process'));
           return;
         }
-        throw new Error("Unknown message from renderer");
+        throw new Error('Unknown message from renderer');
       };
 
-      port.on("message", async (messageEvent) => {
+      port.on('message', async (messageEvent) => {
         try {
           const data = messageEvent.data;
           const id = data.id;
@@ -587,8 +569,8 @@ class EditorWindow extends ProjectRunningWindow {
           port.postMessage({
             response: {
               id,
-              result,
-            },
+              result
+            }
           });
         } catch (error) {
           handleError(error);
@@ -598,72 +580,69 @@ class EditorWindow extends ProjectRunningWindow {
       port.start();
     });
 
-    this.ipc.on("alert", (event, message) => {
+    this.ipc.on('alert', (event, message) => {
       event.returnValue = prompts.alert(this.window, message);
     });
 
-    this.ipc.on("confirm", (event, message) => {
+    this.ipc.on('confirm', (event, message) => {
       event.returnValue = prompts.confirm(this.window, message);
     });
 
-    this.ipc.handle("open-packager", () => {
+    this.ipc.handle('open-packager', () => {
       PackagerWindow.forEditor(this);
     });
 
-    this.ipc.handle("open-new-window", () => {
+    this.ipc.handle('open-new-window', () => {
       EditorWindow.newWindow();
     });
 
-    this.ipc.handle("open-addon-settings", (event, search) => {
+    this.ipc.handle('open-addon-settings', (event, search) => {
       AddonsWindow.show(search);
     });
 
-    this.ipc.handle("open-desktop-settings", () => {
+    this.ipc.handle('open-desktop-settings', () => {
       DesktopSettingsWindow.show();
     });
 
-    this.ipc.handle("open-extension-editor", () => {
+    this.ipc.handle('open-extension-editor', () => {
       ExtensionEditorWindow.forEditor(this);
     });
 
-    this.ipc.handle("open-privacy", () => {
+    this.ipc.handle('open-privacy', () => {
       PrivacyWindow.show();
     });
 
-    this.ipc.handle("open-about", () => {
+    this.ipc.handle('open-about', () => {
       AboutWindow.show();
     });
 
-    this.ipc.handle("check-for-updates", async () => {
-      const { manualCheckForUpdates } = require("../update-checker");
+    this.ipc.handle('check-for-updates', async () => {
+      const { manualCheckForUpdates } = require('../update-checker');
       const result = await manualCheckForUpdates();
       if (result.error) {
         dialog.showMessageBox(this.window, {
-          type: "error",
+          type: 'error',
           title: APP_NAME,
-          message: translate("update.check-error"),
+          message: translate('update.check-error'),
           detail: result.error.message,
-          noLink: true,
+          noLink: true
         });
       } else if (!result.hasUpdate) {
         dialog.showMessageBox(this.window, {
-          type: "info",
+          type: 'info',
           title: APP_NAME,
-          message: translate("update.up-to-date"),
-          detail: translate("update.up-to-date-detail").replace(
-            "{version}",
-            result.currentVersion,
-          ),
-          noLink: true,
+          message: translate('update.up-to-date'),
+          detail: translate('update.up-to-date-detail').replace('{version}', result.currentVersion),
+          noLink: true
         });
       }
     });
 
-    this.ipc.handle("minimize-window", () => {
+    this.ipc.handle('minimize-window', () => {
       this.window.minimize();
     });
 
-    this.ipc.handle("maximize-window", () => {
+    this.ipc.handle('maximize-window', () => {
       if (this.window.isMaximized()) {
         this.window.unmaximize();
       } else {
@@ -671,58 +650,45 @@ class EditorWindow extends ProjectRunningWindow {
       }
     });
 
-    this.ipc.handle("is-maximized", () => {
+    this.ipc.handle('is-maximized', () => {
       return this.window.isMaximized();
     });
 
     const notifyMaximizeState = () => {
-      this.window.webContents.send(
-        "maximize-state-changed",
-        this.window.isMaximized(),
-      );
+      this.window.webContents.send('maximize-state-changed', this.window.isMaximized());
     };
-    this.window.on("maximize", notifyMaximizeState);
-    this.window.on("unmaximize", notifyMaximizeState);
-    this.window.on("enter-full-screen", notifyMaximizeState);
-    this.window.on("leave-full-screen", notifyMaximizeState);
+    this.window.on('maximize', notifyMaximizeState);
+    this.window.on('unmaximize', notifyMaximizeState);
+    this.window.on('enter-full-screen', notifyMaximizeState);
+    this.window.on('leave-full-screen', notifyMaximizeState);
 
-    this.ipc.handle("close-window", () => {
+    this.ipc.handle('close-window', () => {
       this.window.close();
     });
 
-    this.ipc.on("get-local-storage", (event, key) => {
-      const result = this.window.webContents.executeJavaScript(
-        `localStorage.getItem('${key}')`,
-      );
+    this.ipc.on('get-local-storage', (event, key) => {
+      const result = this.window.webContents.executeJavaScript(`localStorage.getItem('${key}')`);
       event.returnValue = result;
     });
 
-    this.ipc.handle("get-advanced-customizations", async () => {
-      const USERSCRIPT_PATH = path.join(
-        app.getPath("userData"),
-        "userscript.js",
-      );
-      const USERSTYLE_PATH = path.join(
-        app.getPath("userData"),
-        "userstyle.css",
-      );
+    this.ipc.handle('get-advanced-customizations', async () => {
+      const USERSCRIPT_PATH = path.join(app.getPath('userData'), 'userscript.js');
+      const USERSTYLE_PATH = path.join(app.getPath('userData'), 'userstyle.css');
 
       const [userscript, userstyle] = await Promise.all([
-        fsPromises.readFile(USERSCRIPT_PATH, "utf-8").catch(() => ""),
-        fsPromises.readFile(USERSTYLE_PATH, "utf-8").catch(() => ""),
+        fsPromises.readFile(USERSCRIPT_PATH, 'utf-8').catch(() => ''),
+        fsPromises.readFile(USERSTYLE_PATH, 'utf-8').catch(() => '')
       ]);
 
       return {
         userscript,
-        userstyle,
+        userstyle
       };
     });
 
-    this.ipc.handle("check-drag-and-drop-path", (event, filePath) => {
+    this.ipc.handle('check-drag-and-drop-path', (event, filePath) => {
       FileAccessWindow.check(filePath);
     });
-
-    this.ipc.handle("changed-window-controls-style", (event, config) => this.updateWindowControls(config));
 
     /**
      * Refers to the full screen button in the editor, not the OS-level fullscreen through
@@ -730,63 +696,61 @@ class EditorWindow extends ProjectRunningWindow {
      */
     this.isInEditorFullScreen = false;
 
-    this.ipc.handle("set-is-full-screen", (event, isFullScreen) => {
+    this.ipc.handle('set-is-full-screen', (event, isFullScreen) => {
       this.isInEditorFullScreen = !!isFullScreen;
     });
 
-    this.ipc.handle("set-window-theme", (event, theme) => {
-      if (process.platform === "win32") {
-        if (theme === "light" || theme === "dark") {
+    this.ipc.handle('set-window-theme', (event, theme) => {
+      if (process.platform === 'win32') {
+        if (theme === 'light' || theme === 'dark') {
           nativeTheme.themeSource = theme;
         } else {
-          nativeTheme.themeSource = "dark"; // default
+          nativeTheme.themeSource = 'dark'; // default
         }
       }
     });
 
-    this.loadURL("tw-editor://./gui/gui.html");
+    this.loadURL('tw-editor://./gui/gui.html');
     this.show();
+
     // Windows acrylic blur effect (theme controlled by nativeTheme.themeSource in index.js)
-    if (process.platform === "win32" && settings.useBlurBackground) {
-      try {
-        this.window.setBackgroundMaterial("acrylic");
-      } catch {}
+    if (process.platform === 'win32' && settings.useBlurBackground) {
+      this.window.setBackgroundMaterial('acrylic');
     }
   }
 
   getPreload() {
-    return "editor";
+    return 'editor';
   }
 
   getDimensions() {
     return {
       width: 1280,
-      height: 800,
+      height: 800
     };
   }
 
   getBackgroundColor() {
-    if (process.platform === "win32") {
-      return "#333333";
+    if (process.platform === 'win32') {
+      return '#333333';
     }
-    return "#33333300";
+    return '#33333300';
   }
 
   getWindowOptions() {
     const options = super.getWindowOptions();
-    options.titleBarStyle = 'hidden';
-    if(process.platform !== 'darwin') options.titleBarOverlay = true;
+    options.frame = false;
     options.minWidth = 1024;
     options.minHeight = 640;
 
     // macOS vibrancy blur effect
-    if (process.platform === "darwin") {
-      options.vibrancy = "under-window";
+    if (process.platform === 'darwin') {
+      options.vibrancy = 'under-window';
       options.transparent = true;
     }
 
     // Windows use setBackgroundMaterial instead of transparent
-    if (process.platform === "win32") {
+    if (process.platform === 'win32') {
       options.transparent = false;
     } else {
       options.transparent = true;
@@ -796,35 +760,17 @@ class EditorWindow extends ProjectRunningWindow {
   }
 
   applySettings() {
-    this.window.webContents.setBackgroundThrottling(
-      settings.backgroundThrottling,
-    );
+    this.window.webContents.setBackgroundThrottling(settings.backgroundThrottling);
   }
 
   async updateBlurBackground(useBlurBackground) {
     if (useBlurBackground) {
-      try {
-        this.window.setBackgroundMaterial("acrylic");
-      } catch {}
-      await this.updateBlurAlphaGain();
+      this.window.setBackgroundMaterial('acrylic');
+      await this.updateBlurAlphaGain()
     } else {
-      try {
-        this.window.setBackgroundMaterial("none");
-      } catch {}
-      await this.clearBlurAlphaGain();
+      this.window.setBackgroundMaterial('none');
+      await this.clearBlurAlphaGain()
     }
-  }
-
-  updateWindowControls(config){
-    // macOS uses native traffic lights, no titleBarOverlay
-    if (process.platform === 'darwin') return;
-    try {
-      this.window.setTitleBarOverlay({
-        color: config.color,
-        symbolColor: config.symbolColor,
-        height: config.height
-      });
-    } catch {}
   }
 
   async updateBlurAlphaGain() {
@@ -840,14 +786,14 @@ class EditorWindow extends ProjectRunningWindow {
   enumerateMediaDevices() {
     // Used by desktop settings
     return new Promise((resolve, reject) => {
-      this.ipc.once("enumerated-media-devices", (event, result) => {
-        if (typeof result.error !== "undefined") {
+      this.ipc.once('enumerated-media-devices', (event, result) => {
+        if (typeof result.error !== 'undefined') {
           reject(result.error);
         } else {
           resolve(result.devices);
         }
       });
-      this.window.webContents.send("enumerate-media-devices");
+      this.window.webContents.send('enumerate-media-devices');
     });
   }
 
@@ -857,32 +803,29 @@ class EditorWindow extends ProjectRunningWindow {
 
     // Open extension library upload page in-app
     if (
-      url.protocol === "tw-editor:" &&
-      url.host === "." &&
-      url.pathname === "/gui/upload.html"
+      url.protocol === 'tw-editor:' &&
+      url.host === '.' &&
+      url.pathname === '/gui/upload.html'
     ) {
-      const UploadWindow = require("./upload");
+      const UploadWindow = require('./upload');
       UploadWindow.open(this.window);
       return {
-        action: "deny",
+        action: 'deny'
       };
     }
 
     // Open extension sample projects in-app
     if (
-      url.protocol === "tw-editor:" &&
-      url.host === "." &&
-      params.has("project_url")
+      url.protocol === 'tw-editor:' &&
+      url.host === '.' &&
+      params.has('project_url')
     ) {
-      const projectUrl = params.get("project_url");
+      const projectUrl = params.get('project_url');
       const parsedFile = parseOpenedFile(projectUrl, null);
-      if (
-        parsedFile.type === TYPE_SAMPLE ||
-        parsedFile.type === TYPE_SAMPLE_ASTRA
-      ) {
+      if (parsedFile.type === TYPE_SAMPLE || parsedFile.type === TYPE_SAMPLE_ASTRA) {
         new EditorWindow(parsedFile, null);
         return {
-          action: "deny",
+          action: 'deny'
         };
       }
     }
@@ -890,14 +833,11 @@ class EditorWindow extends ProjectRunningWindow {
     // Open extension documentation in-app
     const cachedExtensionsRedirect = getCachedExtensionsRedirect(details.url);
     if (cachedExtensionsRedirect) {
-      const docsPath = cachedExtensionsRedirect.path.replace(/^\//, "");
+      const docsPath = cachedExtensionsRedirect.path.replace(/^\//, '');
       if (docsPath) {
-        ExtensionDocumentationWindow.open(
-          docsPath,
-          cachedExtensionsRedirect.protocol,
-        );
+        ExtensionDocumentationWindow.open(docsPath, cachedExtensionsRedirect.protocol);
         return {
-          action: "deny",
+          action: 'deny'
         };
       }
     }

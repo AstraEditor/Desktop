@@ -154,9 +154,54 @@
       .splash-reset:disabled {
         opacity: 0.8;
       }
+
+      #window-controls {
+        position: fixed;
+        top: 0;
+        right: 0;
+        z-index: 10001;
+        display: flex;
+        height: 48px;
+        -webkit-app-region: no-drag;
+      }
+      #window-controls button {
+        width: 46px;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        border: none;
+        background: transparent;
+        padding: 0;
+        -webkit-app-region: no-drag;
+        user-select: none;
+      }
+      #window-controls button:hover {
+        background-color: rgba(255,255,255,0.12);
+      }
+      #window-controls button:active {
+        background-color: rgba(255,255,255,0.18);
+      }
+      #wc-close:hover {
+        background-color: #e81123 !important;
+      }
+      #wc-close:active {
+        background-color: #bf0f1d !important;
+      }
+      #window-controls svg {
+        width: 16px;
+        height: 16px;
+        pointer-events: none;
+      }
     </style>
   </head>
   <body>
+    <div id="window-controls">
+      <button id="wc-minimize" title="Minimize"><svg><path d="M3 8C3 7.72386 3.22386 7.5 3.5 7.5H12.5C12.7761 7.5 13 7.72386 13 8C13 8.27614 12.7761 8.5 12.5 8.5H3.5C3.22386 8.5 3 8.27614 3 8Z" fill="#fff"/></svg></button>
+      <button id="wc-maximize" title="Maximize"><svg><path id="wc-maximize-icon" d="M4.5 3C3.67157 3 3 3.67157 3 4.5V11.5C3 12.3284 3.67157 13 4.5 13H11.5C12.3284 13 13 12.3284 13 11.5V4.5C13 3.67157 12.3284 3 11.5 3H4.5ZM4.5 4H11.5C11.7761 4 12 4.22386 12 4.5V11.5C12 11.7761 11.7761 12 11.5 12H4.5C4.22386 12 4 11.7761 4 11.5V4.5C4 4.22386 4.22386 4 4.5 4Z" fill="#fff"/></svg></button>
+      <button id="wc-close" title="Close"><svg><path d="M2.58859 2.71569L2.64645 2.64645C2.82001 2.47288 3.08944 2.4536 3.28431 2.58859L3.35355 2.64645L8 7.293L12.6464 2.64645C12.8417 2.45118 13.1583 2.45118 13.3536 2.64645C13.5488 2.84171 13.5488 3.15829 13.3536 3.35355L8.707 8L13.3536 12.6464C13.5271 12.82 13.5464 13.0894 13.4114 13.2843L13.3536 13.3536C13.18 13.5271 12.9106 13.5464 12.7157 13.4114L12.6464 13.3536L8 8.707L3.35355 13.3536C3.15829 13.5488 2.84171 13.5488 2.64645 13.3536C2.45118 13.1583 2.45118 12.8417 2.64645 12.6464L7.293 8L2.64645 3.35355C2.47288 3.17999 2.4536 2.91056 2.58859 2.71569L2.64645 2.64645L2.58859 2.71569Z" fill="#fff"/></svg></button>
+    </div>
     <div class="splash-screen spash-waiting-for-js" hidden>
       <div class="logo">
         <div class="circle" id="circle_1"></div>
@@ -321,30 +366,6 @@
 
         splash.hidden = false;
 
-        try {
-          var splashBg = theme !== 'dark' && !!theme ? accent : '#222222';
-          window.EditorPreload.setWindowControlsStyle({
-            color: splashBg,
-            symbolColor: '#ffffff',
-            height: Math.round(48 * window.devicePixelRatio)
-          });
-        } catch {}
-
-        // 自适应窗口控件高度（考虑缩放），插件接管时跳过以避免冲突
-        var updateWindowControlsHeight = function () {
-          try {
-            if (window.EditorPreload && window.EditorPreload.platform === 'darwin') return;
-            if (window.__windowControlsManagedByAddon) return;
-            if (window.EditorPreload && window.EditorPreload.setWindowControlsStyle) {
-              window.EditorPreload.setWindowControlsStyle({
-                height: Math.round(48 * window.devicePixelRatio)
-              });
-            }
-          } catch {}
-        };
-        updateWindowControlsHeight();
-        window.addEventListener('resize', updateWindowControlsHeight);
-
         var splashErrorTitle = document.querySelector('.splash-error-title');
         var splashError = document.querySelector('.splash-errors');
         var splashReset = document.querySelector('.splash-reset');
@@ -402,6 +423,25 @@
           splash.hidden = true;
           window.onerror = null;
         };
+      })();
+
+      (function () {
+        var maxIcon = document.getElementById('wc-maximize-icon');
+        var maxPath = 'M4.5 3C3.67157 3 3 3.67157 3 4.5V11.5C3 12.3284 3.67157 13 4.5 13H11.5C12.3284 13 13 12.3284 13 11.5V4.5C13 3.67157 12.3284 3 11.5 3H4.5ZM4.5 4H11.5C11.7761 4 12 4.22386 12 4.5V11.5C12 11.7761 11.7761 12 11.5 12H4.5C4.22386 12 4 11.7761 4 11.5V4.5C4 4.22386 4.22386 4 4.5 4Z';
+        var restorePath = 'M5 6h8c.55 0 1 .45 1 1v8c0 .55-.45 1-1 1H5c-.55 0-1-.45-1-1V7c0-.55.45-1 1-1zm0 1v8h8V7H5zm2-4h8c1.1 0 2 .9 2 2v8h-1V5c0-.55-.45-1-1-1H7V3z';
+
+        document.getElementById('wc-minimize').onclick = function () { try { window.EditorPreload.minimizeWindow(); } catch(e) {} };
+        document.getElementById('wc-maximize').onclick = function () { try { window.EditorPreload.maximizeWindow(); } catch(e) {} };
+        document.getElementById('wc-close').onclick = function () { try { window.EditorPreload.closeWindow(); } catch(e) {} };
+
+        try {
+          window.EditorPreload.onMaximizeStateChanged(function (isMaximized) {
+            maxIcon.setAttribute('d', isMaximized ? restorePath : maxPath);
+          });
+          window.EditorPreload.isMaximized().then(function (isMaximized) {
+            maxIcon.setAttribute('d', isMaximized ? restorePath : maxPath);
+          });
+        } catch(e) {}
       })();
     </script>
 
