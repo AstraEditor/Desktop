@@ -33,12 +33,24 @@ jobs:
       - name: Install dependencies
         run: |
           rm -f pnpm-lock.yaml
-          pnpm install --loglevel=info
+          pnpm install --no-frozen-lockfile --ignore-scripts
 
-      - name: Fetch & Compile
+      - name: Build scratch-gui (run prepublish)
         run: |
-          pnpm run fetch
-          pnpm run webpack:prod
+          GUI_PKG=$(node -e "console.log(require('path').dirname(require.resolve('scratch-gui/package.json')))")
+          if [ -z "$GUI_PKG" ]; then
+              exit 1
+          fi
+          cd "$GUI_PKG"
+          pnpm run prepublish || {
+              pnpm run build
+          }
+
+      - name: Fetch
+        run: pnpm run fetch
+
+      - name: Compile (webpack:prod)
+        run: pnpm run webpack:prod
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
@@ -51,6 +63,7 @@ jobs:
             dist-library-files/
             dist-renderer-webpack/
             src-renderer/packager/
+          retention-days: 1
 
 # ==========================================
 # Linux 打包 (增加了并发限制和文件同步)
@@ -64,8 +77,13 @@ jobs:
       matrix:
         format: [debian, tarball, appimage, pacman, rpm]
         arch: [x64, armv7l, arm64]
+    env:
+      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          persist-credentials: false
 
       - name: Download build artifacts
         uses: actions/download-artifact@v4
@@ -126,6 +144,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
+          persist-credentials: false
       - uses: actions/download-artifact@v4
         with:
           name: build-artifacts
