@@ -2,6 +2,12 @@ This document is the authoritative source for TurboWarp's changelogs. Everything
 
 Prefix notes with "Windows:", "macOS:", or "Linux:" as needed. Do not use **formatting** or [links](https://desktop.turbowarp.org/).
 
+# 1.2.5 (2026-06-28)
+
+- 修复窗口控制按钮的诸多问题
+- 修复TabList中插件的显示顺序问题
+- 修复舞台区的宽度问题
+
 # 1.2.4 (2026-06-25)
 
 - 修复当切换工作区时可能会卡顿非常久的问题
