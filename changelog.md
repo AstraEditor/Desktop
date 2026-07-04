@@ -2,6 +2,13 @@ This document is the authoritative source for TurboWarp's changelogs. Everything
 
 Prefix notes with "Windows:", "macOS:", or "Linux:" as needed. Do not use **formatting** or [links](https://desktop.turbowarp.org/).
 
+# 1.2.6 (2026-07-04)
+
+- 修复打包器无法使用的问题
+- 修复窗口控制按钮的颜色问题(AstraEditor/scratch-gui#22)
+- 修复布局的一堆问题(AstraEditor/scratch-gui#18)
+- 修复“hide menubar”插件的一些问题(AstraEditor/scratch-gui#18)
+
 # 1.2.5 (2026-06-28)
 
 - 修复窗口控制按钮的诸多问题
