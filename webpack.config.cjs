@@ -1,5 +1,5 @@
 const path = require('path');
-const { DefinePlugin, ProvidePlugin } = require('webpack');
+const { DefinePlugin, ProvidePlugin, NormalModuleReplacementPlugin } = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const { url } = require('inspector');
@@ -137,6 +137,10 @@ module.exports = [
                 Buffer: ['buffer', 'Buffer'],
                 process: 'process/browser',
             }),
+            new NormalModuleReplacementPlugin(
+                /microbit-hex-url\.cjs$/,
+                path.resolve(__dirname, 'empty-module.js')
+            ),
             new CopyWebpackPlugin({
                 patterns: [
                     {
