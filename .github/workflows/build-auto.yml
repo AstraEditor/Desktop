@@ -26,6 +26,8 @@ jobs:
         python-version: '3.x'
     - name: Verify Python
       run: python --version
+    - name: Clone AstraEditor monorepo
+      run: git clone --depth 1 https://github.com/AstraEditor/AstraEditor.git ../AstraEditor
     - name: Install dependencies
       run: |
         echo "=== Removing pnpm-lock.yaml to use latest git commits ==="

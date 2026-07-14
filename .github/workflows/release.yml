@@ -30,6 +30,9 @@ jobs:
       - name: Install pnpm
         run: corepack enable && corepack prepare pnpm@10.33.2 --activate
 
+      - name: Clone AstraEditor monorepo
+        run: git clone --depth 1 https://github.com/AstraEditor/AstraEditor.git ../AstraEditor
+
       - name: Install dependencies
         run: |
           rm -f pnpm-lock.yaml
@@ -104,6 +107,9 @@ jobs:
           sudo apt-get install -y strip-nondeterminism fakeroot ruby ruby-dev rubygems libarchive-tools rpm
           sudo gem install --no-document fpm
 
+      - name: Clone AstraEditor monorepo
+        run: git clone --depth 1 https://github.com/AstraEditor/AstraEditor.git ../AstraEditor
+
       - name: Install dependencies
         run: |
           rm -f pnpm-lock.yaml
@@ -154,6 +160,8 @@ jobs:
           node-version: 24
       - name: Install pnpm
         run: corepack enable && corepack prepare pnpm@10.33.2 --activate
+      - name: Clone AstraEditor monorepo
+        run: git clone --depth 1 https://github.com/AstraEditor/AstraEditor.git ../AstraEditor
       - name: Install dependencies
         run: |
           rm -f pnpm-lock.yaml
@@ -237,6 +245,10 @@ jobs:
         shell: pwsh
         run: |
           pnpm config set store-dir D:\pnpm-store
+
+      - name: Clone AstraEditor monorepo
+        shell: pwsh
+        run: git clone --depth 1 https://github.com/AstraEditor/AstraEditor.git D:\AstraEditor
 
       - name: Install dependencies (skip postinstall)
         working-directory: D:\repo

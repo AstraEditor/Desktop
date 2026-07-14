@@ -1,6 +1,7 @@
 packages:
   - "."
   - "mobile"
+  - "../AstraEditor/packages/*"
 
 blockExoticSubdeps: false
 shamefullyHoist: true

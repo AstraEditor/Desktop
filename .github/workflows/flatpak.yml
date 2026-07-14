@@ -21,6 +21,9 @@ jobs:
       - name: Install pnpm
         run: corepack enable && corepack prepare pnpm@10.33.2 --activate
 
+      - name: Clone AstraEditor monorepo
+        run: git clone --depth 1 https://github.com/AstraEditor/AstraEditor.git ../AstraEditor
+
       - name: Install dependencies
         run: |
           rm -f pnpm-lock.yaml

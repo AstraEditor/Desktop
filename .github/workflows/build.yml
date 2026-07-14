@@ -25,11 +25,14 @@ jobs:
     - name: Install pnpm
       run: corepack enable && corepack prepare pnpm@10.33.2 --activate
 
+    - name: Clone AstraEditor monorepo
+      run: git clone --depth 1 https://github.com/AstraEditor/AstraEditor.git ../AstraEditor
+
     - name: Install dependencies
       run: |
         rm -f pnpm-lock.yaml
         pnpm install --no-frozen-lockfile --ignore-scripts
-
+    
    # - name: Build scratch-gui (run prepublish)
    #   run: |
    #     GUI_PKG=$(node -e "console.log(require('path').dirname(require.resolve('scratch-gui/package.json')))")
@@ -106,6 +109,9 @@ jobs:
       if: matrix.format == 'pacman' || matrix.format == 'rpm'
       run: sudo gem install --no-document fpm
 
+    - name: Clone AstraEditor monorepo
+      run: git clone --depth 1 https://github.com/AstraEditor/AstraEditor.git ../AstraEditor
+
     - name: Install dependencies
       run: |
         rm -f pnpm-lock.yaml
@@ -144,6 +150,9 @@ jobs:
 
     - name: Install pnpm
       run: corepack enable && corepack prepare pnpm@10.33.2 --activate
+
+    - name: Clone AstraEditor monorepo
+      run: git clone --depth 1 https://github.com/AstraEditor/AstraEditor.git ../AstraEditor
 
     - name: Install dependencies
       run: |
@@ -269,6 +278,9 @@ jobs:
     - name: Install pnpm
       run: corepack enable && corepack prepare pnpm@10.33.2 --activate
 
+    - name: Clone AstraEditor monorepo
+      run: git clone --depth 1 https://github.com/AstraEditor/AstraEditor.git ../AstraEditor
+
     - name: Install dependencies
       run: |
         rm -f pnpm-lock.yaml
@@ -357,6 +369,10 @@ jobs:
       shell: pwsh
       run: |
         pnpm config set store-dir D:\pnpm-store
+
+    - name: Clone AstraEditor monorepo
+      shell: pwsh
+      run: git clone --depth 1 https://github.com/AstraEditor/AstraEditor.git D:\AstraEditor
 
     - name: Install dependencies (skip postinstall)
       working-directory: D:\repo
