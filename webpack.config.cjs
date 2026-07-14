@@ -104,7 +104,8 @@ const base = {
     resolve: {
         fallback: {
             "path": require.resolve("path-browserify"),
-            "url": require.resolve("url")
+            "url": require.resolve("url"),
+            "events": require.resolve("events/")
         },
         // NOTE: exportsField is kept enabled because refractor@5.0.0 relies on it
         // to map sub-path imports like "refractor/all" → "./lib/all.js".
@@ -183,6 +184,10 @@ module.exports = [
                 // Aliases for dynamic requires in AppStateHOC
                 '../reducers/gui': path.resolve(__dirname, 'node_modules/scratch-gui/src/reducers/gui.js'),
                 './tw-scratch-paint': path.resolve(__dirname, 'node_modules/scratch-gui/src/lib/tw-scratch-paint.js'),
+                // Resolve process/browser from Desktop's node_modules for symlinked workspace packages
+                'process/browser$': path.resolve(__dirname, 'node_modules/process/browser'),
+                'regenerator-runtime/runtime$': path.resolve(__dirname, 'node_modules/regenerator-runtime/runtime'),
+                'js-md5$': path.resolve(__dirname, 'node_modules/js-md5'),
             }
         },
         optimization: {
