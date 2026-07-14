@@ -30,16 +30,16 @@ jobs:
         rm -f pnpm-lock.yaml
         pnpm install --no-frozen-lockfile --ignore-scripts
 
-    - name: Build scratch-gui (run prepublish)
-      run: |
-        GUI_PKG=$(node -e "console.log(require('path').dirname(require.resolve('scratch-gui/package.json')))")
-        if [ -z "$GUI_PKG" ]; then
-            exit 1
-        fi
-        cd "$GUI_PKG"
-        pnpm run prepublish || {
-            pnpm run build
-        }
+   # - name: Build scratch-gui (run prepublish)
+   #   run: |
+   #     GUI_PKG=$(node -e "console.log(require('path').dirname(require.resolve('scratch-gui/package.json')))")
+   #     if [ -z "$GUI_PKG" ]; then
+   #         exit 1
+   #     fi
+   #     cd "$GUI_PKG"
+   #     pnpm run prepublish || {
+   #         pnpm run build
+   #     }
     - name: Fetch
       run: pnpm run fetch
 
