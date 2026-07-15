@@ -254,7 +254,7 @@ jobs:
         working-directory: D:\repo
         run: |
           Remove-Item -Path pnpm-lock.yaml -Force -ErrorAction SilentlyContinue
-          pnpm install --loglevel=info --ignore-scripts --config.node-linker=hoisted
+          pnpm install --loglevel=info --ignore-scripts
 
       - name: Package
         working-directory: D:\repo
