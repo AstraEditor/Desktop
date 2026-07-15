@@ -1,9 +1,11 @@
 import * as fs from 'node:fs';
 import * as pathUtil from 'node:path';
 import * as childProcess from 'node:child_process';
-import * as builder from 'electron-builder';
-import * as electronFuses from '@electron/fuses';
-import './patch-electron-builder.cjs';
+import { createRequire } from 'node:module';
+const require = createRequire(import.meta.url);
+const builder = require('electron-builder');
+const electronFuses = require('@electron/fuses');
+require('./patch-electron-builder.cjs');
 
 const { Platform, Arch } = builder;
 
