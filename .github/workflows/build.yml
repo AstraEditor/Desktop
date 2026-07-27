@@ -31,17 +31,7 @@ jobs:
     - name: Install dependencies
       run: |
         pnpm install --no-frozen-lockfile --ignore-scripts
-    
-   # - name: Build scratch-gui (run prepublish)
-   #   run: |
-   #     GUI_PKG=$(node -e "console.log(require('path').dirname(require.resolve('scratch-gui/package.json')))")
-   #     if [ -z "$GUI_PKG" ]; then
-   #         exit 1
-   #     fi
-   #     cd "$GUI_PKG"
-   #     pnpm run prepublish || {
-   #         pnpm run build
-   #     }
+
     - name: Fetch
       run: pnpm run fetch
 
@@ -125,117 +115,117 @@ jobs:
         name: linux-${{ matrix.format }}-${{ matrix.arch }}
         path: dist/*.*
         retention-days: 1
-
-  # ==========================================
-  # FreeBSD 打包
-  # ==========================================
-  package-freebsd:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-
-    - name: Download build artifacts
-      uses: actions/download-artifact@v4
-      with:
-        name: build-artifacts
-
-    - name: Install Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: 24
-
-    - name: Install pnpm
-      run: corepack enable && corepack prepare pnpm@10.33.2 --activate
-
-    - name: Clone AstraEditor monorepo
-      run: git clone --depth 1 https://github.com/AstraEditor/AstraEditor.git ../AstraEditor
-
-    - name: Install dependencies
-      run: |
-        pnpm install --loglevel=info --ignore-scripts
-
-    - name: Get version
-      id: ver
-      run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
-
-    - name: Build tarball & extract app.asar
-      run: |
-        node release-automation/build.mjs --tarball --x64 --production
-        mkdir -p _extract
-        tar -xzf dist/*.tar.gz -C _extract
-        find _extract -name "app.asar" -exec cp {} app.asar \;
-        ls -la app.asar
-
-    - name: Assemble pkg contents
-      run: |
-        mkdir -p staging/usr/local/share/astraeditor
-        mkdir -p staging/usr/local/bin
-        mkdir -p staging/usr/local/share/applications
-        mkdir -p staging/usr/local/share/icons/hicolor/256x256/apps
-
-        cp app.asar staging/usr/local/share/astraeditor/
-
-        cat > staging/usr/local/bin/astraeditor-desktop << 'EOF'
-        #!/bin/sh
-        exec /usr/local/bin/electron /usr/local/share/astraeditor/app.asar "$@"
-        EOF
-        chmod +x staging/usr/local/bin/astraeditor-desktop
-
-        cat > staging/usr/local/share/applications/astraeditor-desktop.desktop << 'EOF'
-        [Desktop Entry]
-        Name=AstraEditor
-        Comment=TurboWarp mod with compiler and more features
-        Exec=astraeditor-desktop %U
-        Terminal=false
-        Type=Application
-        Icon=astraeditor
-        Categories=Development;Education;
-        EOF
-        for res in 48 64 128 256 512; do
-          if [ -f "build/icons/${res}x${res}.png" ]; then
-            mkdir -p "staging/usr/local/share/icons/hicolor/${res}x${res}/apps"
-            cp "build/icons/${res}x${res}.png" "staging/usr/local/share/icons/hicolor/${res}x${res}/apps/astraeditor.png"
-          fi
-        done
-
-    - name: Generate +MANIFEST
-      run: |
-        cd staging
-        cat > +MANIFEST << 'MANIFEST'
-        {
-          "name": "astraeditor",
-          "version": "VERSION_PLACEHOLDER",
-          "origin": "devel/astraeditor",
-          "comment": "AstraEditor - TurboWarp mod",
-          "desc": "AstraEditor is a TurboWarp mod used to add more practical features to make your writing lightning fast.",
-          "maintainer": "LuoTianyi_arm64 <2153585992@qq.com>",
-          "www": "https://github.com/AstraEditor/Desktop",
-          "prefix": "/usr/local",
-          "deps": {
-            "electron": {
-              "origin": "devel/electron",
-              "version": ">=28.0.0"
-            }
-          },
-          "files": {
-        MANIFEST
-        find usr -type f | sed 's|^|    "/|g; s|$|": "1"|g' | sed '$!s/$/,/' >> +MANIFEST
-        echo "  }" >> +MANIFEST
-        echo "}" >> +MANIFEST
-        sed -i "s|VERSION_PLACEHOLDER|${{ steps.ver.outputs.version }}|g" +MANIFEST
-    - name: Create .pkg
-      run: |
-        cd staging
-        tar --format=posix -cf - +MANIFEST $(find usr -type f | sort) | xz -9 > ../astraeditor-freebsd-x64.pkg
-
-    - name: Upload artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: freebsd-x64
-        path: astraeditor-freebsd-x64.pkg
-        retention-days: 1
+  #
+  # # ==========================================
+  # # FreeBSD 打包
+  # # ==========================================
+  # package-freebsd:
+  #   needs: build
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - name: Checkout
+  #     uses: actions/checkout@v4
+  #
+  #   - name: Download build artifacts
+  #     uses: actions/download-artifact@v4
+  #     with:
+  #       name: build-artifacts
+  #
+  #   - name: Install Node.js
+  #     uses: actions/setup-node@v4
+  #     with:
+  #       node-version: 24
+  #
+  #   - name: Install pnpm
+  #     run: corepack enable && corepack prepare pnpm@10.33.2 --activate
+  #
+  #   - name: Clone AstraEditor monorepo
+  #     run: git clone --depth 1 https://github.com/AstraEditor/AstraEditor.git ../AstraEditor
+  #
+  #   - name: Install dependencies
+  #     run: |
+  #       pnpm install --loglevel=info --ignore-scripts
+  #
+  #   - name: Get version
+  #     id: ver
+  #     run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+  #
+  #   - name: Build tarball & extract app.asar
+  #     run: |
+  #       node release-automation/build.mjs --tarball --x64 --production
+  #       mkdir -p _extract
+  #       tar -xzf dist/*.tar.gz -C _extract
+  #       find _extract -name "app.asar" -exec cp {} app.asar \;
+  #       ls -la app.asar
+  #
+  #   - name: Assemble pkg contents
+  #     run: |
+  #       mkdir -p staging/usr/local/share/astraeditor
+  #       mkdir -p staging/usr/local/bin
+  #       mkdir -p staging/usr/local/share/applications
+  #       mkdir -p staging/usr/local/share/icons/hicolor/256x256/apps
+  #
+  #       cp app.asar staging/usr/local/share/astraeditor/
+  #
+  #       cat > staging/usr/local/bin/astraeditor-desktop << 'EOF'
+  #       #!/bin/sh
+  #       exec /usr/local/bin/electron /usr/local/share/astraeditor/app.asar "$@"
+  #       EOF
+  #       chmod +x staging/usr/local/bin/astraeditor-desktop
+  #
+  #       cat > staging/usr/local/share/applications/astraeditor-desktop.desktop << 'EOF'
+  #       [Desktop Entry]
+  #       Name=AstraEditor
+  #       Comment=TurboWarp mod with compiler and more features
+  #       Exec=astraeditor-desktop %U
+  #       Terminal=false
+  #       Type=Application
+  #       Icon=astraeditor
+  #       Categories=Development;Education;
+  #       EOF
+  #       for res in 48 64 128 256 512; do
+  #         if [ -f "build/icons/${res}x${res}.png" ]; then
+  #           mkdir -p "staging/usr/local/share/icons/hicolor/${res}x${res}/apps"
+  #           cp "build/icons/${res}x${res}.png" "staging/usr/local/share/icons/hicolor/${res}x${res}/apps/astraeditor.png"
+  #         fi
+  #       done
+  #
+  #   - name: Generate +MANIFEST
+  #     run: |
+  #       cd staging
+  #       cat > +MANIFEST << 'MANIFEST'
+  #       {
+  #         "name": "astraeditor",
+  #         "version": "VERSION_PLACEHOLDER",
+  #         "origin": "devel/astraeditor",
+  #         "comment": "AstraEditor - TurboWarp mod",
+  #         "desc": "AstraEditor is a TurboWarp mod used to add more practical features to make your writing lightning fast.",
+  #         "maintainer": "LuoTianyi_arm64 <2153585992@qq.com>",
+  #         "www": "https://github.com/AstraEditor/Desktop",
+  #         "prefix": "/usr/local",
+  #         "deps": {
+  #           "electron": {
+  #             "origin": "devel/electron",
+  #             "version": ">=28.0.0"
+  #           }
+  #         },
+  #         "files": {
+  #       MANIFEST
+  #       find usr -type f | sed 's|^|    "/|g; s|$|": "1"|g' | sed '$!s/$/,/' >> +MANIFEST
+  #       echo "  }" >> +MANIFEST
+  #       echo "}" >> +MANIFEST
+  #       sed -i "s|VERSION_PLACEHOLDER|${{ steps.ver.outputs.version }}|g" +MANIFEST
+  #   - name: Create .pkg
+  #     run: |
+  #       cd staging
+  #       tar --format=posix -cf - +MANIFEST $(find usr -type f | sort) | xz -9 > ../astraeditor-freebsd-x64.pkg
+  #
+  #   - name: Upload artifact
+  #     uses: actions/upload-artifact@v4
+  #     with:
+  #       name: freebsd-x64
+  #       path: astraeditor-freebsd-x64.pkg
+  #       retention-days: 1
 
   # ==========================================
   # Mac 打包
