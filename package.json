@@ -279,10 +279,5 @@
             }
         ]
     },
-    "private": true,
-    "pnpm": {
-        "overrides": {
-            "scratch-l10n": "link:../AstraEditor/packages/scratch-l10n"
-        }
-    }
+    "private": true
 }

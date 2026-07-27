@@ -28,6 +28,16 @@ jobs:
       run: python --version
     - name: Clone AstraEditor monorepo
       run: git clone --depth 1 https://github.com/AstraEditor/AstraEditor.git ../AstraEditor
+    - name: Patch scratch-l10n dependency
+      run: |
+        for pkg in scratch-paint scratch-vm scratch-blocks; do
+          node -e "
+            const p = require('../AstraEditor/packages/$pkg/package.json');
+            if (p.dependencies && p.dependencies['scratch-l10n']) p.dependencies['scratch-l10n'] = 'workspace:@turbowarp/scratch-l10n@*';
+            if (p.devDependencies && p.devDependencies['scratch-l10n']) p.devDependencies['scratch-l10n'] = 'workspace:@turbowarp/scratch-l10n@*';
+            require('fs').writeFileSync('../AstraEditor/packages/$pkg/package.json', JSON.stringify(p, null, 2) + '\n');
+          "
+        done
     - name: Install dependencies
       run: |
         echo "=== Installing dependencies ==="

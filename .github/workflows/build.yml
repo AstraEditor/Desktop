@@ -28,6 +28,17 @@ jobs:
     - name: Clone AstraEditor monorepo
       run: git clone --depth 1 https://github.com/AstraEditor/AstraEditor.git ../AstraEditor
 
+    - name: Patch scratch-l10n dependency
+      run: |
+        for pkg in scratch-paint scratch-vm scratch-blocks; do
+          node -e "
+            const p = require('../AstraEditor/packages/$pkg/package.json');
+            if (p.dependencies && p.dependencies['scratch-l10n']) p.dependencies['scratch-l10n'] = 'workspace:@turbowarp/scratch-l10n@*';
+            if (p.devDependencies && p.devDependencies['scratch-l10n']) p.devDependencies['scratch-l10n'] = 'workspace:@turbowarp/scratch-l10n@*';
+            require('fs').writeFileSync('../AstraEditor/packages/$pkg/package.json', JSON.stringify(p, null, 2) + '\n');
+          "
+        done
+
     - name: Install dependencies
       run: |
         pnpm install --no-frozen-lockfile --ignore-scripts
@@ -100,6 +111,17 @@ jobs:
 
     - name: Clone AstraEditor monorepo
       run: git clone --depth 1 https://github.com/AstraEditor/AstraEditor.git ../AstraEditor
+
+    - name: Patch scratch-l10n dependency
+      run: |
+        for pkg in scratch-paint scratch-vm scratch-blocks; do
+          node -e "
+            const p = require('../AstraEditor/packages/$pkg/package.json');
+            if (p.dependencies && p.dependencies['scratch-l10n']) p.dependencies['scratch-l10n'] = 'workspace:@turbowarp/scratch-l10n@*';
+            if (p.devDependencies && p.devDependencies['scratch-l10n']) p.devDependencies['scratch-l10n'] = 'workspace:@turbowarp/scratch-l10n@*';
+            require('fs').writeFileSync('../AstraEditor/packages/$pkg/package.json', JSON.stringify(p, null, 2) + '\n');
+          "
+        done
 
     - name: Install dependencies
       run: |
@@ -268,6 +290,17 @@ jobs:
     - name: Clone AstraEditor monorepo
       run: git clone --depth 1 https://github.com/AstraEditor/AstraEditor.git ../AstraEditor
 
+    - name: Patch scratch-l10n dependency
+      run: |
+        for pkg in scratch-paint scratch-vm scratch-blocks; do
+          node -e "
+            const p = require('../AstraEditor/packages/$pkg/package.json');
+            if (p.dependencies && p.dependencies['scratch-l10n']) p.dependencies['scratch-l10n'] = 'workspace:@turbowarp/scratch-l10n@*';
+            if (p.devDependencies && p.devDependencies['scratch-l10n']) p.devDependencies['scratch-l10n'] = 'workspace:@turbowarp/scratch-l10n@*';
+            require('fs').writeFileSync('../AstraEditor/packages/$pkg/package.json', JSON.stringify(p, null, 2) + '\n');
+          "
+        done
+
     - name: Install dependencies
       run: |
         pnpm install --no-frozen-lockfile --loglevel=info --ignore-scripts
@@ -359,6 +392,11 @@ jobs:
     - name: Clone AstraEditor monorepo
       shell: pwsh
       run: git clone --depth 1 https://github.com/AstraEditor/AstraEditor.git D:\AstraEditor
+
+    - name: Patch scratch-l10n dependency
+      shell: pwsh
+      run: |
+        node -e "const fs=require('fs'); ['scratch-paint','scratch-vm','scratch-blocks'].forEach(p=>{const f='D:/AstraEditor/packages/'+p+'/package.json';const j=JSON.parse(fs.readFileSync(f,'utf8'));if(j.dependencies&&j.dependencies['scratch-l10n'])j.dependencies['scratch-l10n']='workspace:@turbowarp/scratch-l10n@*';if(j.devDependencies&&j.devDependencies['scratch-l10n'])j.devDependencies['scratch-l10n']='workspace:@turbowarp/scratch-l10n@*';fs.writeFileSync(f,JSON.stringify(j,null,2)+'\n');})"
 
     - name: Install dependencies (skip postinstall)
       working-directory: D:\repo
