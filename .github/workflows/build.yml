@@ -103,7 +103,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        pnpm install --loglevel=info --ignore-scripts
+        pnpm install --no-frozen-lockfile --loglevel=info --ignore-scripts
 
     - name: Package
       run: |
@@ -270,7 +270,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        pnpm install --loglevel=info --ignore-scripts
+        pnpm install --no-frozen-lockfile --loglevel=info --ignore-scripts
 
     - name: Package
       run: |
@@ -363,7 +363,7 @@ jobs:
     - name: Install dependencies (skip postinstall)
       working-directory: D:\repo
       run: |
-        pnpm install --loglevel=info --ignore-scripts
+        pnpm install --no-frozen-lockfile --loglevel=info --ignore-scripts
 
     - name: Verify electron-builder
       working-directory: D:\repo

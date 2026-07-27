@@ -111,7 +111,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pnpm install --ignore-scripts
+          pnpm install --no-frozen-lockfile --ignore-scripts
           sync
 
       - name: Package
@@ -162,7 +162,7 @@ jobs:
         run: git clone --depth 1 https://github.com/AstraEditor/AstraEditor.git ../AstraEditor
       - name: Install dependencies
         run: |
-          pnpm install --ignore-scripts
+          pnpm install --no-frozen-lockfile --ignore-scripts
           sync
       - name: Package
         run: node release-automation/build.mjs ${{ matrix.args }} --production
@@ -250,7 +250,7 @@ jobs:
       - name: Install dependencies (skip postinstall)
         working-directory: D:\repo
         run: |
-          pnpm install --loglevel=info --ignore-scripts
+          pnpm install --no-frozen-lockfile --loglevel=info --ignore-scripts
 
       - name: Verify electron-builder
         working-directory: D:\repo

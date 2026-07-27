@@ -26,7 +26,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pnpm install --loglevel=info
+          pnpm install --no-frozen-lockfile --loglevel=info
 
       - name: Fetch assets
         run: pnpm run fetch
