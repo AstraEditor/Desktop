@@ -28,6 +28,14 @@ jobs:
     - name: Clone AstraEditor monorepo
       run: git clone --depth 1 https://github.com/AstraEditor/AstraEditor.git ../AstraEditor
 
+    - name: Patch scratch-l10n package name
+      run: |
+        node -e "
+          const p = JSON.parse(require('fs').readFileSync('../AstraEditor/packages/scratch-l10n/package.json', 'utf8'));
+          p.name = 'scratch-l10n';
+          require('fs').writeFileSync('../AstraEditor/packages/scratch-l10n/package.json', JSON.stringify(p, null, 2) + '\n');
+        "
+
     - name: Install dependencies
       run: |
         pnpm install --no-frozen-lockfile --ignore-scripts
@@ -111,6 +119,14 @@ jobs:
     - name: Clone AstraEditor monorepo
       run: git clone --depth 1 https://github.com/AstraEditor/AstraEditor.git ../AstraEditor
 
+    - name: Patch scratch-l10n package name
+      run: |
+        node -e "
+          const p = JSON.parse(require('fs').readFileSync('../AstraEditor/packages/scratch-l10n/package.json', 'utf8'));
+          p.name = 'scratch-l10n';
+          require('fs').writeFileSync('../AstraEditor/packages/scratch-l10n/package.json', JSON.stringify(p, null, 2) + '\n');
+        "
+
     - name: Install dependencies
       run: |
         pnpm install --loglevel=info --ignore-scripts
@@ -151,6 +167,14 @@ jobs:
 
     - name: Clone AstraEditor monorepo
       run: git clone --depth 1 https://github.com/AstraEditor/AstraEditor.git ../AstraEditor
+
+    - name: Patch scratch-l10n package name
+      run: |
+        node -e "
+          const p = JSON.parse(require('fs').readFileSync('../AstraEditor/packages/scratch-l10n/package.json', 'utf8'));
+          p.name = 'scratch-l10n';
+          require('fs').writeFileSync('../AstraEditor/packages/scratch-l10n/package.json', JSON.stringify(p, null, 2) + '\n');
+        "
 
     - name: Install dependencies
       run: |
@@ -278,6 +302,14 @@ jobs:
     - name: Clone AstraEditor monorepo
       run: git clone --depth 1 https://github.com/AstraEditor/AstraEditor.git ../AstraEditor
 
+    - name: Patch scratch-l10n package name
+      run: |
+        node -e "
+          const p = JSON.parse(require('fs').readFileSync('../AstraEditor/packages/scratch-l10n/package.json', 'utf8'));
+          p.name = 'scratch-l10n';
+          require('fs').writeFileSync('../AstraEditor/packages/scratch-l10n/package.json', JSON.stringify(p, null, 2) + '\n');
+        "
+
     - name: Install dependencies
       run: |
         pnpm install --loglevel=info --ignore-scripts
@@ -369,6 +401,11 @@ jobs:
     - name: Clone AstraEditor monorepo
       shell: pwsh
       run: git clone --depth 1 https://github.com/AstraEditor/AstraEditor.git D:\AstraEditor
+
+    - name: Patch scratch-l10n package name
+      shell: pwsh
+      run: |
+        node -e "const fs=require('fs'); const p=JSON.parse(fs.readFileSync('D:/AstraEditor/packages/scratch-l10n/package.json','utf8')); p.name='scratch-l10n'; fs.writeFileSync('D:/AstraEditor/packages/scratch-l10n/package.json', JSON.stringify(p, null, 2) + '\n');"
 
     - name: Install dependencies (skip postinstall)
       working-directory: D:\repo
