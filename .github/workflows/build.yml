@@ -403,6 +403,10 @@ jobs:
       run: |
         pnpm install --no-frozen-lockfile --loglevel=info --ignore-scripts
 
+    - name: Ensure electron-builder
+      working-directory: D:\repo
+      run: pnpm add -D electron-builder @electron/fuses --no-frozen-lockfile
+
     - name: Package
       working-directory: D:\repo
       run: |
