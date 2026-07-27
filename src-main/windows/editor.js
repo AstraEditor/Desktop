@@ -742,7 +742,6 @@ class EditorWindow extends ProjectRunningWindow {
   getWindowOptions() {
     const options = super.getWindowOptions();
     options.titleBarStyle = 'hidden';
-    if (process.platform === 'win32') options.titleBarOverlay = true;
     options.minWidth = 1024;
     options.minHeight = 640;
 
