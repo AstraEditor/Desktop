@@ -365,10 +365,6 @@ jobs:
       run: |
         pnpm install --no-frozen-lockfile --loglevel=info --ignore-scripts
 
-    - name: Verify electron-builder
-      working-directory: D:\repo
-      run: pnpm exec node -e "require('electron-builder'); console.log('electron-builder OK')"
-
     - name: Package
       working-directory: D:\repo
       run: |
