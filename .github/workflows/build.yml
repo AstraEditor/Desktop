@@ -367,7 +367,7 @@ jobs:
 
     - name: Verify electron-builder
       working-directory: D:\repo
-      run: node -e "require('electron-builder'); console.log('electron-builder OK')"
+      run: pnpm exec node -e "require('electron-builder'); console.log('electron-builder OK')"
 
     - name: Package
       working-directory: D:\repo
