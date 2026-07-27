@@ -26,7 +26,6 @@ jobs:
 
       - name: Install dependencies
         run: |
-          rm -f pnpm-lock.yaml
           pnpm install --loglevel=info
 
       - name: Fetch assets

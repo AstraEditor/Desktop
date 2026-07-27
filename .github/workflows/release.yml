@@ -35,7 +35,6 @@ jobs:
 
       - name: Install dependencies
         run: |
-          rm -f pnpm-lock.yaml
           pnpm install --no-frozen-lockfile --ignore-scripts
 
       - name: Build scratch-gui (run prepublish)
@@ -112,7 +111,6 @@ jobs:
 
       - name: Install dependencies
         run: |
-          rm -f pnpm-lock.yaml
           pnpm install --ignore-scripts
           sync
 
@@ -164,7 +162,6 @@ jobs:
         run: git clone --depth 1 https://github.com/AstraEditor/AstraEditor.git ../AstraEditor
       - name: Install dependencies
         run: |
-          rm -f pnpm-lock.yaml
           pnpm install --ignore-scripts
           sync
       - name: Package
@@ -253,8 +250,11 @@ jobs:
       - name: Install dependencies (skip postinstall)
         working-directory: D:\repo
         run: |
-          Remove-Item -Path pnpm-lock.yaml -Force -ErrorAction SilentlyContinue
           pnpm install --loglevel=info --ignore-scripts
+
+      - name: Verify electron-builder
+        working-directory: D:\repo
+        run: node -e "require('electron-builder'); require('@electron/fuses'); console.log('electron-builder OK')"
 
       - name: Package
         working-directory: D:\repo
