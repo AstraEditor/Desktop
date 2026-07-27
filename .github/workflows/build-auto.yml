@@ -28,13 +28,6 @@ jobs:
       run: python --version
     - name: Clone AstraEditor monorepo
       run: git clone --depth 1 https://github.com/AstraEditor/AstraEditor.git ../AstraEditor
-    - name: Patch scratch-l10n package name
-      run: |
-        node -e "
-          const p = JSON.parse(require('fs').readFileSync('../AstraEditor/packages/scratch-l10n/package.json', 'utf8'));
-          p.name = 'scratch-l10n';
-          require('fs').writeFileSync('../AstraEditor/packages/scratch-l10n/package.json', JSON.stringify(p, null, 2) + '\n');
-        "
     - name: Install dependencies
       run: |
         echo "=== Installing dependencies ==="
