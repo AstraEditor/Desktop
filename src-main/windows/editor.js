@@ -704,20 +704,20 @@ class EditorWindow extends ProjectRunningWindow {
 
     this.ipc.handle('set-window-theme', (event, theme) => {
       if (process.platform === 'win32') {
-        if (theme === 'light' || theme === 'dark') {
-          nativeTheme.themeSource = theme;
-        } else {
-          nativeTheme.themeSource = 'dark'; // default
-        }
+        /** @type {string} */
+        const themeString = JSON.parse(theme).gui ?? 'dark';
+        if (themeString.indexOf('light') !== -1 || themeString.indexOf('white') !== -1) nativeTheme.themeSource = 'light';
+        else if (themeString.indexOf('dark') !== -1) nativeTheme.themeSource = 'dark';
+        else nativeTheme.themeSource = 'system'
       }
     });
 
     this.loadURL('tw-editor://./gui/gui.html');
     this.show();
 
-    // Windows acrylic blur effect (theme controlled by nativeTheme.themeSource in index.js)
+    // Windows mica blur effect (theme controlled by nativeTheme.themeSource in index.js)
     if (process.platform === 'win32' && settings.useBlurBackground) {
-      this.window.setBackgroundMaterial('acrylic');
+      this.window.setBackgroundMaterial('mica');
     }
   }
 
@@ -767,7 +767,7 @@ class EditorWindow extends ProjectRunningWindow {
 
   async updateBlurBackground(useBlurBackground) {
     if (useBlurBackground) {
-      this.window.setBackgroundMaterial('acrylic');
+      this.window.setBackgroundMaterial('mica');
       await this.updateBlurAlphaGain()
     } else {
       this.window.setBackgroundMaterial('none');

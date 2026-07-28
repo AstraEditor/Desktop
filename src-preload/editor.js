@@ -84,6 +84,17 @@ window.addEventListener('storage', () => {
   }
 })
 
+// 同一窗口内修改 localStorage 不会触发 storage 事件，需要监听自定义事件
+window.addEventListener('tw:theme-changed', () => {
+  if (process.platform === 'win32') {
+    ipcRenderer.invoke('set-window-theme', localStorage.getItem('tw:theme'));
+  }
+});
+
+if (process.platform === 'win32') {
+  ipcRenderer.invoke('set-window-theme', localStorage.getItem('tw:theme') ?? {});
+}
+
 ipcRenderer.on('enumerate-media-devices', (e) => {
   navigator.mediaDevices.enumerateDevices()
     .then((devices) => {
