@@ -14,29 +14,30 @@ The website source code is in the `docs` folder.
 
 ## Development
 
-We use submodules, so clone using:
-
 ```bash
-git clone --recursive https://github.com/AstraEditor/desktop astraeditor-desktop
-```
+git clone https://github.com/AstraEditor/desktop
+git clone https://github.com/AstraEditor/AstraEditor 
+# AstraEditor uses a monorepo. You need to clone the repo and run `pnpm install`.
+# The desktop app cannot use packages directly from the monorepo, and we don't publish them to npm.
+# The expected structure:
+#
+# Desktop/
+# AstraEditor/
+#     |- packages/
+#     ...
 
-or run this after cloning:
-
-```bash
-git submodule init
-git submodule update
 ```
 
 Install dependencies using:
 
 ```bash
-npm ci
+pnpm install
 ```
 
 Then fetch extra library, packager, and extension files using:
 
 ```bash
-npm run fetch
+pnpm run fetch
 ```
 
 Repeat the three previous sets of commands every time you pull changes from GitHub.
@@ -52,19 +53,19 @@ Due to the security requirements mandated by custom extensions existing, our des
 To build the webpack portions in src-renderer-webpack for development builds, run this:
 
 ```bash
-npm run webpack:compile
+pnpm run webpack:compile
 ```
 
 You can also run this instead for source file changes to immediately trigger rebuilds:
 
 ```bash
-npm run webpack:watch
+pnpm run webpack:watch
 ```
 
 Once you have everything compiled and fetched, you are ready to package it up for Electron. For development, start a development Electron instance with:
 
 ```bash
-npm run electron:start
+pnpm run electron:start
 ```
 
 In Linux, The app icon won't work in the development version, but it will work in the packaged version.
@@ -95,7 +96,7 @@ The development version of the app will be larger and slower than the final rele
 Build an optimized version of the webpack portions with:
 
 ```bash
-npm run webpack:prod
+pnpm run webpack:prod
 ```
 
 Then to package up the final Electron binaries, use either our build script `release-automation/build.mjs` (see [release-automation/README.md](release-automation/README.md)) or the [electron-builder CLI](https://www.electron.build/cli). Either way the final builds are saved in the `dist` folder. Here are some examples using the electron-builder CLI directly:
