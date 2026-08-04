@@ -42,20 +42,12 @@ jobs:
       run: |
         echo "=== Installing dependencies ==="
         pnpm install --no-frozen-lockfile --ignore-scripts
-    - name: Build scratch-gui (run prepublish)
+    - name: Install AstraEditor dependencies
       run: |
-        GUI_PKG=$(node -e "console.log(require('path').dirname(require.resolve('scratch-gui/package.json')))")
-        if [ -z "$GUI_PKG" ]; then
-            echo "❌ scratch-gui package not found"
-            exit 1
-        fi
-        echo "📦 Found scratch-gui at $GUI_PKG"
-        cd "$GUI_PKG"
-        echo "▶️ Running pnpm prepublish..."
-        pnpm run prepublish || {
-            echo "⚠️ prepublish failed, trying build..."
-            pnpm run build
-        }
+        cd ../AstraEditor
+        pnpm install --no-frozen-lockfile --ignore-scripts
+    - name: Run scratch-gui prepublish (download micro:bit firmware)
+      run: node ../AstraEditor/packages/scratch-gui/scripts/prepublish.mjs
     - name: Verify scratch-blocks has build files
       run: |
         echo "=== Checking if scratch-blocks has build files ==="
