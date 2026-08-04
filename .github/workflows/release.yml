@@ -288,7 +288,7 @@ jobs:
 
       - name: Ensure electron-builder
         working-directory: D:\repo
-        run: pnpm add -D electron-builder @electron/fuses
+        run: pnpm add -w -D electron-builder @electron/fuses
 
       - name: Package
         working-directory: D:\repo
