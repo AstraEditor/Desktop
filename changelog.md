@@ -2,6 +2,15 @@ This document is the authoritative source for TurboWarp's changelogs. Everything
 
 Prefix notes with "Windows:", "macOS:", or "Linux:" as needed. Do not use **formatting** or [links](https://desktop.turbowarp.org/).
 
+# 1.2.7 (2026-08-04)
+
+- 将大部分仓库合并到“AstraEditor”仓库
+- 将模糊效果替换为云母效果
+- 新增全屏（F11）后自动隐藏菜单栏
+- 修复 README 的部分错误
+- 修复查找积木插件的部分问题
+- 修复编辑器无法在打包器使用的问题
+
 # 1.2.6 (2026-07-04)
 
 - 修复打包器无法使用的问题

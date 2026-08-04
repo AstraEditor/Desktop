@@ -104,6 +104,10 @@ const generateCSS = (alphaGain) => `
         [class*=selector_wrapper] {
             background-color: color-mix(in srgb, $ui-secondary, transparent ${35 * alphaGain}%) !important
         }
+
+        [class*="tabs"][class*="vscodeList"] .ae-addons-list .ae-tab-button.is-selected {
+            background-color: transparent !important
+        }
 `;
 
 // Map to store CSS keys for each webContents id

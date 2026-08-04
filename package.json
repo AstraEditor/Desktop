@@ -1,7 +1,7 @@
 {
     "name": "astraeditor-desktop",
     "description": "TurboWarp mod with more features",
-    "version": "1.2.6",
+    "version": "1.2.7",
     "license": "GPL-3.0",
     "author": {
         "email": "2381068747@qq.com",
@@ -44,6 +44,7 @@
         "electron-builder": "^26.3.5",
         "events": "^3.3.0",
         "file-loader": "^6.2.0",
+        "monaco-editor-webpack-plugin": "7.1.1",
         "path-browserify": "^1.0.1",
         "postcss": "^8.4.13",
         "postcss-import": "^14.0.0",

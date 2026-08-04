@@ -2,6 +2,7 @@ const path = require('path');
 const { DefinePlugin, ProvidePlugin, NormalModuleReplacementPlugin } = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
+const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const { url } = require('inspector');
 
 const globalCssFiles = new Set([
@@ -16,7 +17,9 @@ const useCssModules = resourcePath => {
     // JS references class names as string literals (e.g. ".monaco-editor").
     // Only match the actual monaco-editor npm package, not scratch-gui's
     // components/monaco-editor/ which needs CSS Modules for styles.editorWrapper etc.
-    if (resourcePath.includes('node_modules/monaco-editor/') && !resourcePath.includes('scratch-gui')) {
+    // NOTE: resourcePath uses backslashes on Windows, so match path segments
+    // with slash-agnostic checks instead of a forward-slash literal.
+    if (resourcePath.includes('node_modules') && resourcePath.includes('monaco-editor') && !resourcePath.includes('scratch-gui')) {
         return false;
     }
     return true;
@@ -125,6 +128,27 @@ module.exports = [
             index: './src-renderer-webpack/editor/gui/index.jsx'
         },
         plugins: [
+            new MonacoWebpackPlugin({
+                languages: ['javascript', 'typescript', 'python', 'json'],
+                features: [
+                    'bracketMatching',
+                    'caretOperations',
+                    'clipboard',
+                    'comment',
+                    'contextmenu',
+                    'coreCommands',
+                    'dnd',
+                    'find',
+                    'folding',
+                    'hover',
+                    'indentation',
+                    'linesOperations',
+                    'links',
+                    'multicursor',
+                    'suggest',
+                    'toggleMinimap'
+                ]
+            }),
             new DefinePlugin({
                 'process.env.ROOT': '""'
             }),

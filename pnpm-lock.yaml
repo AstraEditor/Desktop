@@ -81,6 +81,9 @@ importers:
       file-loader:
         specifier: ^6.2.0
         version: 6.2.0(webpack@5.106.2)
+      monaco-editor-webpack-plugin:
+        specifier: 7.1.1
+        version: 7.1.1(monaco-editor@0.34.0)(webpack@5.106.2)
       path-browserify:
         specifier: ^1.0.1
         version: 1.0.1
@@ -16290,12 +16293,12 @@ snapshots:
   '@webpack-cli/configtest@2.1.1(webpack-cli@5.1.4)(webpack@5.106.2)':
     dependencies:
       webpack: 5.106.2(clean-css@4.2.4)(html-minifier-terser@5.1.1)(postcss@8.5.23)(uglify-js@3.19.3)(webpack-cli@5.1.4)
-      webpack-cli: 5.1.4(webpack-dev-server@4.15.2)(webpack@5.106.2)
+      webpack-cli: 5.1.4(webpack-dev-server@5.2.6)(webpack@5.106.2)
 
   '@webpack-cli/info@2.0.2(webpack-cli@5.1.4)(webpack@5.106.2)':
     dependencies:
       webpack: 5.106.2(clean-css@4.2.4)(html-minifier-terser@5.1.1)(postcss@8.5.23)(uglify-js@3.19.3)(webpack-cli@5.1.4)
-      webpack-cli: 5.1.4(webpack-dev-server@4.15.2)(webpack@5.106.2)
+      webpack-cli: 5.1.4(webpack-dev-server@5.2.6)(webpack@5.106.2)
 
   '@webpack-cli/serve@2.0.5(webpack-cli@5.1.4)(webpack-dev-server@4.15.2)(webpack@5.106.2)':
     dependencies:
@@ -24378,11 +24381,11 @@ snapshots:
 
   node-abi@4.33.0:
     dependencies:
-      semver: 7.7.4
+      semver: 7.8.5
 
   node-api-version@0.2.1:
     dependencies:
-      semver: 7.7.4
+      semver: 7.8.5
 
   node-environment-flags@1.0.6:
     dependencies:
@@ -24424,7 +24427,7 @@ snapshots:
       graceful-fs: 4.2.11
       nopt: 9.0.0
       proc-log: 6.1.0
-      semver: 7.7.4
+      semver: 7.8.5
       tar: 7.5.22
       tinyglobby: 0.2.17
       undici: 6.28.0
@@ -28449,7 +28452,7 @@ snapshots:
       watchpack: 2.5.2
       webpack-sources: 3.5.1
     optionalDependencies:
-      webpack-cli: 5.1.4(webpack-dev-server@4.15.2)(webpack@5.106.2)
+      webpack-cli: 5.1.4(webpack-dev-server@5.2.6)(webpack@5.106.2)
     transitivePeerDependencies:
       - '@minify-html/node'
       - '@swc/core'

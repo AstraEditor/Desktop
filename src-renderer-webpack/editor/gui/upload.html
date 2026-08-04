@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-    <title>Upload Your Extension!</title>
+    <title>上传你的扩展！</title>
     <meta charset="utf8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
@@ -16,8 +16,19 @@
             padding: 0;
         }
 
+        .no-margin {
+            margin: 0;
+        }
+
         header {
             background-color: #09f;
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .tip {
+            background-color: #06f;
             color: white;
             text-align: center;
             padding: 20px 0;
@@ -43,98 +54,185 @@
             }
         }
 
-        .code{
+        .code {
             background-color: #0000001f;
             border-radius: 5px;
             padding: 5px;
             padding-left: 10px;
         }
+
+        blockquote {
+            font-style: italic;
+            background-color: #0000001f;
+            border-left: 5px solid #09f;
+            margin: 20px 0;
+            padding: 5px 20px;
+        }
+
+        COPY button {
+            width: 30px;
+            height: 30px;
+            background-color: #00000000;
+            border: none;
+            transition: background-color 0.2s ease;
+            border-radius: 5px;
+        }
+
+        COPY button:hover {
+            width: 30px;
+            height: 30px;
+            background-color: #ffffff20;
+            border: none;
+            cursor: pointer;
+        }
+
+        COPY {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+            width: 100%;
+            background-color: #ffffff05;
+            border-radius: 5px;
+        }
+
+        LanguageTab{
+            position: absolute;
+            display: flex;
+            justify-content: left;
+            padding: 20px;
+            align-items: center;
+            border-radius: 5px;
+        }
+
+        LanguageTab select{
+            border: none;
+            color: white;
+            background: #0099FF;
+        }
     </style>
 </head>
 
 <body>
+    <LanguageTab>
+        <select name="language" id="language">
+            <option value="en">English</option>
+            <option value="zh" selected>中文</option>
+        </select>
+    </LanguageTab>
     <header>
-        <h1>为AstraEditor提交扩展</h1>
+        <h1 data-i18n="h1">为AstraEditor提交扩展</h1>
     </header>
+    <div class="tip">
+        <p>
+        <h2 class="no-margin" data-i18n="tipTitle">记住了！</h2>
+        <span data-i18n="tip">AstraEditor 扩展库不需要您提交关于<strong>"杂项工具"</strong>
+            及其它和<strong>"扩展库"</strong>功能重合的扩展！
+            <br /><br />
+            您可以直接用自定义扩展导入自己的扩展，无需提交到扩展库。</span>
+        </p>
+    </div>
     <main>
-        <h2>须知</h2>
-        <p>我们采取 <strong>“Issues”</strong> 的方式让您更方便的提交扩展。
+        <h2 data-i18n="h2_1">须知</h2>
+        <p data-i18n="p1">我们采取 <strong>"Issues"</strong> 的方式让您更方便的提交扩展。
             这需要你在提交扩展前有一个 <strong>Github账号</strong> ，对于如何注册，请自行百度，这里不再赘述。</p>
-        <h2>准备</h2>
-        <h3>审核</h3>
-        <p>在您提交一个扩展前，务必确保您的扩展 <strong>可以正确运行</strong> 。我们会对您提交的扩展展开<em>审核</em>，包括但不限于：</p>
+        <h2 data-i18n="h2_2">准备</h2>
+        <h3 data-i18n="h3_review">审核</h3>
+        <p data-i18n="p_review">在您提交一个扩展前，务必确保您的扩展 <strong>可以正确运行</strong> 。我们会对您提交的扩展展开<em>审核</em>，包括但不限于：</p>
         <ul>
-            <li>扩展可以正确加载</li>
-            <li>所有添加的积木均可正确使用</li>
-            <li>不包含关于<strong>歧视、污秽语言、网络烂梗</strong>等语言、功能</li>
-            <li>没有过分的<strong>AI程度</strong>（100%由AI制作）</li>
+            <li data-i18n="li_review1">扩展可以正确加载</li>
+            <li data-i18n="li_review2">所有添加的积木均可正确使用</li>
+            <li data-i18n="li_review3">不包含关于<strong>歧视、污秽语言、网络烂梗</strong>等语言、功能</li>
+            <li data-i18n="li_review4">没有过分的<strong>AI程度</strong>（100%由AI制作）</li>
+            <li data-i18n="li_review5">您能完全理解您编写的扩展（每一行代码）</li>
         </ul>
-        <p>审核的日期不定，但大多都能在<strong>一周内</strong>审核完成，请及时关注结果。</p>
-        <h3>打包</h3>
-        <p>您需要保证您提交的文件可以<strong>让别人看懂</strong>。我们规定了一个简单的目录，方便你我更快的检查和加入您的扩展：</p>
-        <div class="code"><pre class="language-python"><code class="language-python code-highlight"><span class="code-line line-number" line="1">扩展名<span class="token punctuation">.</span><span class="token builtin">zip</span>
-</span><span class="code-line line-number" line="2">    <span class="token operator">|</span><span class="token operator">-</span> main<span class="token punctuation">.</span>js      <span class="token comment">#您的扩展文件</span>
-</span><span class="code-line line-number" line="3">    <span class="token operator">|</span><span class="token operator">-</span> featured<span class="token punctuation">.</span>png <span class="token comment">#扩展的头图，在扩展库显示</span>
-</span><span class="code-line line-number" line="4">    <span class="token operator">|</span><span class="token operator">-</span> text<span class="token punctuation">.</span>json    <span class="token comment">#存放您的扩展信息</span>
-</span></code></pre></div>
-        <p>如果您提交的<em>不满足</em>我们的要求，我们可能会<strong>拒绝加入</strong>您的扩展。</p>
-        <p>下面我们会展开每个文件具体的规范。</p>
-        <h4>main.js</h4>
-        <p>这里存放您的扩展主文件，具体扩展该如何编写请参考<em>其它扩展教程</em>。</p>
-        <p>说回来，您的扩展开头应有以下内容：</p>
-        <div class="code"><pre class="language-js"><code class="language-js code-highlight"><span class="code-line line-number" line="1"><span class="token comment">// Name: 扩展名称</span>
-</span><span class="code-line line-number" line="2"><span class="token comment">// ID: 扩展ID</span>
-</span><span class="code-line line-number" line="3"><span class="token comment">// Description: 扩展描述</span>
-</span><span class="code-line line-number" line="4"><span class="token comment">// By: 作者 &lt;链接&gt;</span>
-</span><span class="code-line line-number" line="5"><span class="token comment">// By: 更多作者 &lt;链接&gt;</span>
-</span><span class="code-line line-number" line="6"><span class="token comment">// License: 许可证（MIT、GPLv3等）</span>
-</span></code></pre></div>
-        <p>这<em>在此扩展库</em> <strong>是强制的</strong>，因为它涉及到实际的显示。</p>
-        <p><strong>我们需要您将Name和Description写为英文，这需要作为默认文本于扩展库显示。</strong></p>
+        <p data-i18n="p_review_note">审核的日期不定，但大多都能在<strong>一周内</strong>审核完成，请及时关注结果。</p>
+        <h3 data-i18n="h3_pack">打包</h3>
+        <p data-i18n="p_pack">您需要保证您提交的文件可以<strong>让别人看懂</strong>。我们规定了一个简单的目录，方便你我更快的检查和加入您的扩展：</p>
+        <pre class="code" data-i18n="pre_dir">扩展名.zip
+    |- main.js      #您的扩展文件
+    |- featured.png #扩展的头图，在扩展库显示(你也可以上传svg格式的图片)
+    |- text.json    #存放您的扩展信息</pre>
+        <h5 data-i18n="h5_names">确保文件名正确</h5>
+        <p data-i18n="p_names">如果您提交的<em>不满足</em>我们的要求，我们可能会<strong>拒绝加入</strong>您的扩展。</p>
+        <p data-i18n="p_specs">下面我们会展开每个文件具体的规范。</p>
+        <h4 data-i18n="h4_main">main.js</h4>
+        <p data-i18n="p_main1">这里存放您的扩展主文件，具体扩展该如何编写请参考<em>其它扩展教程</em>。</p>
+        <p data-i18n="p_main2">说回来，您的扩展开头应有以下内容：</p>
+        <COPY class="copy">
+            <button class="main_copy">
+                <img src="./submit/copy.svg" alt="复制" style="width:100%;height:100%" />
+            </button>
+            <span class="main_copy_text" data-i18n="copy_it">
+                复制它！
+            </span>
+        </COPY>
+        <pre class="code" id="main" data-i18n="pre_main">
+// Name: 扩展名称
+// ID: 扩展ID
+// Description: 扩展描述
+// By: 作者 <链接>
+// By: 更多作者 <链接> (可选, 可添加更多个)
+// License: 许可证（MIT、GPLv3等）</pre>
+        <p data-i18n="p_mandatory">这<em>在此扩展库</em> <strong>是强制的</strong>，因为它涉及到实际的显示。</p>
+        <p data-i18n="p_english">我们需要您将 <code>Name</code> 和 <code>Description</code> 写为<strong>英文</strong>，这需要作为默认文本于扩展库显示。</p>
         <blockquote>
-            <strong><p>注意，对于多作者要用多个 <code>// By:</code> 而不是逗号</p></strong>
+            <p data-i18n="bq_authors">注意，对于多作者要用多个 <code>// By:</code> 而不是逗号</p>
         </blockquote>
-        <p>此外，我们<em>不要求您的内容包含国际化</em> 。</p>
-        <h4>featured.png</h4>
-        <p>这里是扩展的头图，也就是在扩展库展示的图片。
+        <p data-i18n="p_i18n1">此外，我们<em>不要求您的内容包含国际化</em> 。</p>
+        <h4 data-i18n="h4_featured">featured.png(.svg)</h4>
+        <p data-i18n="p_featured1">这里是扩展的头图，也就是在扩展库展示的图片。
             我们<em>硬性</em> 要求扩展图满足以下条件：</p>
         <ul>
-            <li>纵横比为 2:1</li>
-            <li>分辨率各不小于 600x300</li>
-            <li>有一个明确的代表，无论文字或图形（你甚至可以只写个扩展名上去）</li>
+            <li data-i18n="li_f1">纵横比为 2:1</li>
+            <li data-i18n="li_f2">分辨率各不小于 600x300(如果是png)</li>
+            <li data-i18n="li_f3">有一个明确的代表，无论文字或图形（你甚至可以只写个扩展名上去）</li>
         </ul>
-        <p>我们也<em>建议</em> 您的扩展图可以：</p>
+        <p data-i18n="p_featured2">我们也<em>建议</em> 您的扩展图可以：</p>
         <ul>
-            <li>不单调</li>
-            <li>美观（参考TurboWarp及其他扩展库扩展）</li>
-            <li>有一个<strong>明确清晰</strong>的主题色而不是<em>炸裂非主流的渐变和AI生成</em></li>
+            <li data-i18n="li_f4">不单调</li>
+            <li data-i18n="li_f5">美观（参考TurboWarp及其他扩展库扩展）</li>
+            <li data-i18n="li_f6">有一个<strong>明确清晰</strong>的主题色而不是<em>炸裂非主流的渐变和AI生成</em></li>
         </ul>
-        <h4>text.json</h4>
-        <p>您可以复制这个示例并对其修改</p>
-       <div class="code"> <pre class="language-json"><code class="language-json code-highlight"><span class="code-line line-number" line="1"><span class="token punctuation">{</span>
-</span><span class="code-line line-number" line="2">    <span class="token property">"Name"</span><span class="token operator">:</span><span class="token punctuation">{</span>
-</span><span class="code-line line-number" line="4">        <span class="token property">"zh-cn"</span><span class="token operator">:</span><span class="token string">"扩展名"</span>
+        <h4 data-i18n="h4_text">text.json</h4>
+        <p data-i18n="p_text1">您可以复制这个示例并对其修改</p>
+        <COPY class="copy">
+            <button class="text_copy">
+                <img src="./submit/copy.svg" alt="复制" style="width:100%;height:100%" />
+            </button>
+            <span class="text_copy_text" data-i18n="copy_it">
+                复制它！
+            </span>
+        </COPY>
+        <pre class="code" id="text" data-i18n="pre_text">
+{
+    "Name":{
+        "zh-cn":"扩展名"
         ...更多语言
-</span><span class="code-line line-number" line="5">    <span class="token punctuation">}</span><span class="token punctuation">,</span>
-</span><span class="code-line line-number" line="6">    <span class="token property">"Description"</span><span class="token operator">:</span><span class="token punctuation">{</span>
-</span><span class="code-line line-number" line="8">        <span class="token property">"zh-cn"</span><span class="token operator">:</span><span class="token string">"扩展描述"</span>
+    },
+    "Description":{
+        "zh-cn":"扩展描述"
         ...更多语言
-</span><span class="code-line line-number" line="9">    <span class="token punctuation">}</span><span class="token punctuation">,</span>
-}
-</code></pre></div>
-        <p>我们<strong>硬性要求</strong>您的扩展格式包含以上二项，且<code>Name</code>和<code>Description</code>包含<code>zh-cn</code>。这对国际化很有帮助。
+    }
+}</pre>
+        <blockquote>
+            <p data-i18n="bq_text">
+                这里不需要添加英文，英文添加于 <code>main.js</code> 中的 <code>Name</code>和 <code>Description</code>
+            </p>
+        </blockquote>
+        <p data-i18n="p_text2">我们<strong>硬性要求</strong>您的扩展格式包含以上二项，且 <code>Name</code> 和 <code>Description</code>
+            包含<code>zh-cn</code>。这对国际化很有帮助。
         </p>
-        <p>我们<em>不要求您的扩展内容包含国际化</em>。</p>
-        <h2>准备</h2>
-        <h3>Issues</h3>
-        <p>如上，我们使用<strong>Issues</strong>来作为提交介质。我们将展开提交步骤。</p>
-        <h4>1.进入 Extensions库——Issues</h4>
-        <p>进入此链接
+        <p data-i18n="p_i18n2">我们<em>不要求您的扩展内容包含国际化</em>。</p>
+        <h2 data-i18n="h2_3">准备</h2>
+        <h3 data-i18n="h3_issues">Issues</h3>
+        <p data-i18n="p_issues">如上，我们使用<strong>Issues</strong>来作为提交介质。我们将展开提交步骤。</p>
+        <h4 data-i18n="h4_issues1">1.进入 Extensions库——Issues</h4>
+        <p data-i18n="p_link">进入此链接
             <a
                 href="https://github.com/AstraEditor/extensions/issues">https://github.com/AstraEditor/extensions/issues</a>
         </p>
-        <h4>2.发送 Issue</h4>
-        <p>点击<strong>New issue</strong>。
+        <h4 data-i18n="h4_issues2">2.发送 Issue</h4>
+        <p data-i18n="p_steps">点击<strong>New issue</strong>。
             <img src="./submit/NewIssue.png" alt="New issue">
             在<strong>Add a title</strong>下面的<em>输入框</em>输入类似
             <code>Add new extension named "扩展名"</code>的文字让我们识别。
@@ -146,8 +244,182 @@
             等待导入完成，点击<strong>Create</strong>！
             <img src="./submit/Submit.png" alt="Submit">
         </p>
-        <p>完成！现在只需等待我们进行审核并回复您！</p>
+        <p data-i18n="p_done">完成！现在只需等待我们进行审核并回复您！</p>
     </main>
+    <script>
+        const I18N = {
+            zh: {
+                title: '上传你的扩展！',
+                h1: '为AstraEditor提交扩展',
+                tipTitle: '记住了！',
+                tip: 'AstraEditor 扩展库不需要您提交关于<strong>"杂项工具"</strong>及其它和<strong>"扩展库"</strong>功能重合的扩展！<br /><br />您可以直接用自定义扩展导入自己的扩展，无需提交到扩展库。',
+                h2_1: '须知',
+                p1: '我们采取 <strong>"Issues"</strong> 的方式让您更方便的提交扩展。这需要你在提交扩展前有一个 <strong>Github账号</strong> ，对于如何注册，请自行百度，这里不再赘述。',
+                h2_2: '准备',
+                h3_review: '审核',
+                p_review: '在您提交一个扩展前，务必确保您的扩展 <strong>可以正确运行</strong> 。我们会对您提交的扩展展开<em>审核</em>，包括但不限于：',
+                li_review1: '扩展可以正确加载',
+                li_review2: '所有添加的积木均可正确使用',
+                li_review3: '不包含关于<strong>歧视、污秽语言、网络烂梗</strong>等语言、功能',
+                li_review4: '没有过分的<strong>AI程度</strong>（100%由AI制作）',
+                li_review5: '您能完全理解您编写的扩展（每一行代码）',
+                p_review_note: '审核的日期不定，但大多都能在<strong>一周内</strong>审核完成，请及时关注结果。',
+                h3_pack: '打包',
+                p_pack: '您需要保证您提交的文件可以<strong>让别人看懂</strong>。我们规定了一个简单的目录，方便你我更快的检查和加入您的扩展：',
+                pre_dir: '扩展名.zip\n    |- main.js      #您的扩展文件\n    |- featured.png #扩展的头图，在扩展库显示(你也可以上传svg格式的图片)\n    |- text.json    #存放您的扩展信息',
+                h5_names: '确保文件名正确',
+                p_names: '如果您提交的<em>不满足</em>我们的要求，我们可能会<strong>拒绝加入</strong>您的扩展。',
+                p_specs: '下面我们会展开每个文件具体的规范。',
+                h4_main: 'main.js',
+                p_main1: '这里存放您的扩展主文件，具体扩展该如何编写请参考<em>其它扩展教程</em>。',
+                p_main2: '说回来，您的扩展开头应有以下内容：',
+                copy_it: '复制它！',
+                copy_ok: '复制成功！',
+                copy_fail: '复制失败',
+                pre_main: '// Name: 扩展名称\n// ID: 扩展ID\n// Description: 扩展描述\n// By: 作者 <链接>\n// By: 更多作者 <链接> (可选, 可添加更多个)\n// License: 许可证（MIT、GPLv3等）',
+                p_mandatory: '这<em>在此扩展库</em> <strong>是强制的</strong>，因为它涉及到实际的显示。',
+                p_english: '我们需要您将 <code>Name</code> 和 <code>Description</code> 写为<strong>英文</strong>，这需要作为默认文本于扩展库显示。',
+                bq_authors: '注意，对于多作者要用多个 <code>// By:</code> 而不是逗号',
+                p_i18n1: '此外，我们<em>不要求您的内容包含国际化</em> 。',
+                h4_featured: 'featured.png(.svg)',
+                p_featured1: '这里是扩展的头图，也就是在扩展库展示的图片。我们<em>硬性</em> 要求扩展图满足以下条件：',
+                li_f1: '纵横比为 2:1',
+                li_f2: '分辨率各不小于 600x300(如果是png)',
+                li_f3: '有一个明确的代表，无论文字或图形（你甚至可以只写个扩展名上去）',
+                p_featured2: '我们也<em>建议</em> 您的扩展图可以：',
+                li_f4: '不单调',
+                li_f5: '美观（参考TurboWarp及其他扩展库扩展）',
+                li_f6: '有一个<strong>明确清晰</strong>的主题色而不是<em>炸裂非主流的渐变和AI生成</em>',
+                h4_text: 'text.json',
+                p_text1: '您可以复制这个示例并对其修改',
+                pre_text: '{\n    "Name":{\n        "zh-cn":"扩展名"\n        ...更多语言\n    },\n    "Description":{\n        "zh-cn":"扩展描述"\n        ...更多语言\n    }\n}',
+                bq_text: '这里不需要添加英文，英文添加于 <code>main.js</code> 中的 <code>Name</code>和 <code>Description</code>',
+                p_text2: '我们<strong>硬性要求</strong>您的扩展格式包含以上二项，且 <code>Name</code> 和 <code>Description</code>包含<code>zh-cn</code>。这对国际化很有帮助。',
+                p_i18n2: '我们<em>不要求您的扩展内容包含国际化</em>。',
+                h2_3: '准备',
+                h3_issues: 'Issues',
+                p_issues: '如上，我们使用<strong>Issues</strong>来作为提交介质。我们将展开提交步骤。',
+                h4_issues1: '1.进入 Extensions库——Issues',
+                p_link: '进入此链接\n            <a href="https://github.com/AstraEditor/extensions/issues">https://github.com/AstraEditor/extensions/issues</a>',
+                h4_issues2: '2.发送 Issue',
+                p_steps: '点击<strong>New issue</strong>。<img src="./submit/NewIssue.png" alt="New issue">在<strong>Add a title</strong>下面的<em>输入框</em>输入类似<code>Add new extension named "扩展名"</code>的文字让我们识别。<img src="./submit/AddATitle.png" alt="Add a Title">在<strong>Add a description</strong>处输入您想要告诉我们的信息，这不是必要的。<img src="./submit/Input.png" alt="Input">点击下方写着<strong>Paste, drop, or click to add files</strong>的按钮，导入您制作好的扩展文件（.zip）<img src="./submit/Load.png" alt="Load">等待导入完成，点击<strong>Create</strong>！<img src="./submit/Submit.png" alt="Submit">',
+                p_done: '完成！现在只需等待我们进行审核并回复您！'
+            },
+            en: {
+                title: 'Upload Your Extension!',
+                h1: 'Submit extension for AstraEditor',
+                tipTitle: 'Please Remember!',
+                tip: 'AstraEditor Extensions Gallery Dosen\'t need <strong>"Miscellaneous Tools"</strong> and other extensions that overlap with the <strong>"Extensions Gallery"</strong> feature!<br /><br />You can import your extension directly without submitting it to the Extensions Gallery.',
+                h2_1: 'Remember',
+                p1: 'We use <strong>"Issues"</strong> to make it easier for you to submit extensions. This requires you to have a <strong>GitHub account</strong> before submitting an extension. For how to register, please search online; we won\'t go into detail here.',
+                h2_2: 'Preparation',
+                h3_review: 'Review',
+                p_review: 'Before submitting an extension, make sure your extension <strong>can run correctly</strong>. We will <em>review</em> the extension you submit, including but not limited to:',
+                li_review1: 'The extension can load correctly',
+                li_review2: 'All added blocks work correctly',
+                li_review3: 'Does not contain <strong>discrimination, filthy language, internet memes</strong> or similar content',
+                li_review4: 'No excessive <strong>AI involvement</strong> (100% AI-generated)',
+                li_review5: 'You fully understand the extension you wrote (every line of code)',
+                p_review_note: 'The review timeline is not fixed, but most reviews are completed <strong>within a week</strong>. Please check the results in time.',
+                h3_pack: 'Packaging',
+                p_pack: 'You need to ensure that the files you submit are <strong>understandable to others</strong>. We have specified a simple directory structure to make it easier for both of us to check and add your extension:',
+                pre_dir: 'ExtensionName.zip\n    |- main.js      # Your extension file\n    |- featured.png # Extension header image, displayed in the Extensions Gallery (you can also upload an .svg image)\n    |- text.json    # Stores your extension information',
+                h5_names: 'Make sure file names are correct',
+                p_names: 'If your submission <em>does not meet</em> our requirements, we may <strong>reject</strong> your extension.',
+                p_specs: 'Below we will explain the specific specifications for each file.',
+                h4_main: 'main.js',
+                p_main1: 'This is where your main extension file is stored. For how to write the extension, please refer to <em>other extension tutorials</em>.',
+                p_main2: 'That said, the beginning of your extension should contain the following:',
+                copy_it: 'Copy it!',
+                copy_ok: 'Copied successfully!',
+                copy_fail: 'Copy failed',
+                pre_main: '// Name: Extension Name\n// ID: Extension ID\n// Description: Extension Description\n// By: Author <Link>\n// By: More Authors <Link> (optional, more can be added)\n// License: License (MIT, GPLv3, etc.)',
+                p_mandatory: 'This is <strong>mandatory</strong> in this Extensions Gallery, as it affects the actual display.',
+                p_english: 'We require you to write <code>Name</code> and <code>Description</code> in <strong>English</strong>, which will be used as the default text displayed in the Extensions Gallery.',
+                bq_authors: 'Note: For multiple authors, use multiple <code>// By:</code> lines instead of commas',
+                p_i18n1: 'Additionally, we <em>do not require your content to include internationalization</em>.',
+                h4_featured: 'featured.png(.svg)',
+                p_featured1: 'This is the extension\'s header image, which is the image displayed in the Extensions Gallery. We <em>strictly</em> require the extension image to meet the following conditions:',
+                li_f1: 'Aspect ratio of 2:1',
+                li_f2: 'Resolution no less than 600x300 (if it\'s a png)',
+                li_f3: 'Has a clear representation, whether text or graphic (you can even just write the extension name on it)',
+                p_featured2: 'We also <em>suggest</em> that your extension image:',
+                li_f4: 'Not be monotonous',
+                li_f5: 'Be aesthetically pleasing (refer to TurboWarp and other Extensions Gallery extensions)',
+                li_f6: 'Have a <strong>clear and distinct</strong> theme color, rather than <em>gaudy, unconventional gradients and AI-generated images</em>',
+                h4_text: 'text.json',
+                p_text1: 'You can copy this example and modify it',
+                pre_text: '{\n    "Name":{\n        "zh-cn":"Extension Name"\n        ...more languages\n    },\n    "Description":{\n        "zh-cn":"Extension Description"\n        ...more languages\n    }\n}',
+                bq_text: 'There is no need to add English here; English is added in the <code>Name</code> and <code>Description</code> fields within <code>main.js</code>',
+                p_text2: 'We <strong>strictly require</strong> your extension format to include the above two items, and <code>Name</code> and <code>Description</code> must include <code>zh-cn</code>. This is very helpful for internationalization.',
+                p_i18n2: 'We <em>do not require your extension content to include internationalization</em>.',
+                h2_3: 'Preparation',
+                h3_issues: 'Issues',
+                p_issues: 'As mentioned above, we use <strong>Issues</strong> as the submission medium. We will explain the submission steps.',
+                h4_issues1: '1. Go to the Extensions Repository — Issues',
+                p_link: 'Go to this link:\n            <a href="https://github.com/AstraEditor/extensions/issues">https://github.com/AstraEditor/extensions/issues</a>',
+                h4_issues2: '2. Create an Issue',
+                p_steps: 'Click <strong>New issue</strong>.<img src="./submit/NewIssue.png" alt="New issue">In the <em>input box</em> below <strong>Add a title</strong>, enter something like <code>Add new extension named "Extension Name"</code> so we can identify it.<img src="./submit/AddATitle.png" alt="Add a Title">In the <strong>Add a description</strong> field, enter any additional information you want to tell us; this is not required.<img src="./submit/Input.png" alt="Input">Click the button that says <strong>Paste, drop, or click to add files</strong> and upload your prepared extension file (.zip).<img src="./submit/Load.png" alt="Load">Wait for the upload to complete, then click <strong>Create</strong>!<img src="./submit/Submit.png" alt="Submit">',
+                p_done: 'Done! Now just wait for us to review and respond to you!'
+            }
+        };
+
+        const languageSelect = document.getElementById('language');
+        let currentLang = 'zh';
+
+        function applyLang(lang) {
+            currentLang = lang;
+            const dict = I18N[lang];
+            document.querySelectorAll('[data-i18n]').forEach((el) => {
+                const key = el.dataset.i18n;
+                if (el.tagName === 'PRE') {
+                    el.textContent = dict[key];
+                } else {
+                    el.innerHTML = dict[key];
+                }
+            });
+            document.title = dict.title;
+        }
+
+        let savedLang = null;
+        try {
+            savedLang = localStorage.getItem('upload-lang');
+        } catch (e) {}
+        const initialLang = (savedLang === 'zh' || savedLang === 'en') ? savedLang : 'zh';
+        languageSelect.value = initialLang;
+        applyLang(initialLang);
+
+        languageSelect.addEventListener('change', (e) => {
+            applyLang(e.target.value);
+            try {
+                localStorage.setItem('upload-lang', e.target.value);
+            } catch (err) {}
+        });
+
+        const text_copy_btn = document.querySelector('.text_copy');
+        const text_copy_text = document.querySelector('.text_copy_text');
+        const text_copy = document.querySelector('#text');
+        text_copy_btn.onclick = () => {
+            navigator.clipboard.writeText(text_copy.textContent)
+                .then(() => text_copy_text.textContent = I18N[currentLang].copy_ok)
+                .catch(() => text_copy_text.textContent = I18N[currentLang].copy_fail);
+            setTimeout(() => {
+                text_copy_text.textContent = I18N[currentLang].copy_it
+            }, 1500)
+        }
+
+        const main_copy_btn = document.querySelector('.main_copy');
+        const main_copy_text = document.querySelector('.main_copy_text');
+        const main_copy = document.querySelector('#main');
+        main_copy_btn.onclick = () => {
+            navigator.clipboard.writeText(main_copy.textContent)
+                .then(() => main_copy_text.textContent = I18N[currentLang].copy_ok)
+                .catch(() => main_copy_text.textContent = I18N[currentLang].copy_fail);
+            setTimeout(() => {
+                main_copy_text.textContent = I18N[currentLang].copy_it
+            }, 1500)
+        }
+    </script>
 </body>
 
 </html>
