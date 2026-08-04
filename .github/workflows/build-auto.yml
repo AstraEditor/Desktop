@@ -19,7 +19,7 @@ jobs:
         node-version: 24
 
     - name: Install pnpm
-      run: corepack enable && corepack prepare pnpm@10.33.2 --activate
+      run: corepack enable && corepack prepare pnpm@11.17.0 --activate
     - name: Install Python
       uses: actions/setup-python@v5
       with:
@@ -42,13 +42,20 @@ jobs:
       run: |
         echo "=== Installing dependencies ==="
         pnpm install --no-frozen-lockfile --ignore-scripts
-    - name: Generate scratch-gui files (prepublish)
-      # 不要在 AstraEditor 包目录内运行 pnpm：
-      # scratch-gui 的 packageManager 字段会让 corepack 切换到 pnpm 11，
-      # 其脚本运行前的依赖自检会自动 install，且只会把当前目录当作 workspace，
-      # 导致 workspace: 依赖（如 @turbowarp/scratch-l10n）无法解析而失败。
-      # prepublish.mjs 基于脚本自身路径写文件，用 node 直接执行即可。
-      run: node ../AstraEditor/packages/scratch-gui/scripts/prepublish.mjs
+    - name: Build scratch-gui (run prepublish)
+      run: |
+        GUI_PKG=$(node -e "console.log(require('path').dirname(require.resolve('scratch-gui/package.json')))")
+        if [ -z "$GUI_PKG" ]; then
+            echo "❌ scratch-gui package not found"
+            exit 1
+        fi
+        echo "📦 Found scratch-gui at $GUI_PKG"
+        cd "$GUI_PKG"
+        echo "▶️ Running pnpm prepublish..."
+        pnpm run prepublish || {
+            echo "⚠️ prepublish failed, trying build..."
+            pnpm run build
+        }
     - name: Verify scratch-blocks has build files
       run: |
         echo "=== Checking if scratch-blocks has build files ==="

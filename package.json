@@ -8,6 +8,7 @@
         "name": "KOSHINO"
     },
     "type": "commonjs",
+    "packageManager": "pnpm@11.17.0",
     "scripts": {
         "fetch": "node scripts/download-library-files.mjs && node scripts/download-packager.mjs && node scripts/download-extension-editor.mjs && node scripts/prepare-extensions.mjs",
         "webpack:compile": "webpack",
