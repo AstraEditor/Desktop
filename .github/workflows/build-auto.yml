@@ -42,12 +42,6 @@ jobs:
       run: |
         echo "=== Installing dependencies ==="
         pnpm install --no-frozen-lockfile --ignore-scripts
-    - name: Install AstraEditor dependencies
-      run: |
-        cd ../AstraEditor
-        pnpm install --no-frozen-lockfile --ignore-scripts
-    - name: Run scratch-gui prepublish (download micro:bit firmware)
-      run: node ../AstraEditor/packages/scratch-gui/scripts/prepublish.mjs
     - name: Verify scratch-blocks has build files
       run: |
         echo "=== Checking if scratch-blocks has build files ==="
@@ -124,6 +118,12 @@ jobs:
       run: node scripts/prepare-extensions.mjs
     - name: Compile
       run: pnpm run webpack:compile
+    - name: Install AstraEditor dependencies
+      run: |
+        cd ../AstraEditor
+        pnpm install --no-frozen-lockfile --ignore-scripts
+    - name: Run scratch-gui prepublish (download micro:bit firmware)
+      run: node ../AstraEditor/packages/scratch-gui/scripts/prepublish.mjs
     - name: Package
       run: |
         pnpm run electron:package:dir -- --config.disableSanityCheckAsar=true
