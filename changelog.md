@@ -2,6 +2,11 @@ This document is the authoritative source for TurboWarp's changelogs. Everything
 
 Prefix notes with "Windows:", "macOS:", or "Linux:" as needed. Do not use **formatting** or [links](https://desktop.turbowarp.org/).
 
+# 1.2.8 (2026-08-25)
+
+- 修复全屏的时候会隐藏工具栏，它应该在编辑器中一直显示
+- 让全屏软件并全屏舞台的时候隐藏工具栏
+
 # 1.2.7 (2026-08-04)
 
 - 将大部分仓库合并到“AstraEditor”仓库
