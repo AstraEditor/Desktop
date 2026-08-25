@@ -657,10 +657,30 @@ class EditorWindow extends ProjectRunningWindow {
     const notifyMaximizeState = () => {
       this.window.webContents.send('maximize-state-changed', this.window.isMaximized());
     };
+    const setFullScreenAttribute = (value) => {
+      // Use literal values instead of isFullScreen() here: on Windows the
+      // internal flag may not be updated yet when these events fire, which
+      // would write the inverted state.
+      this.window.webContents
+        .executeJavaScript(`document.documentElement.setAttribute('isfullscreen', ${value});`)
+        .catch(() => {});
+    };
     this.window.on('maximize', notifyMaximizeState);
     this.window.on('unmaximize', notifyMaximizeState);
-    this.window.on('enter-full-screen', notifyMaximizeState);
-    this.window.on('leave-full-screen', notifyMaximizeState);
+    this.window.on('enter-full-screen', () => {
+      notifyMaximizeState();
+      setFullScreenAttribute(true);
+    });
+    this.window.on('leave-full-screen', () => {
+      notifyMaximizeState();
+      setFullScreenAttribute(false);
+    });
+    // Re-sync after page (re)loads, e.g. app started directly into fullscreen
+    this.window.webContents.on('did-finish-load', () => {
+      setTimeout(() => {
+        setFullScreenAttribute(this.window.isFullScreen());
+      }, 1000);
+    });
 
     this.ipc.handle('close-window', () => {
       this.window.close();
